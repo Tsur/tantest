@@ -1,0 +1,77 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/gray"
+    android:windowActionBarOverlay="true"
+    tools:context=".MainActivity" >
+
+    <TextView
+        android:id="@+id/testgrade_textquestionsok"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="false"
+        android:layout_centerHorizontal="true"
+        android:layout_centerInParent="true"
+        android:layout_marginLeft="35dp"
+        android:layout_marginRight="35dp"
+        android:layout_marginTop="147dp"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/testgrade_textgrade"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/testgrade_textquestionsok"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="44dp"
+        android:gravity="center|center_horizontal"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/testgrade_texttotalquestions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/testgrade_textquestionsok"
+        android:layout_centerHorizontal="true"
+        android:layout_centerInParent="true"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/testgrade_textbase"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/testgrade_textgrade"
+        android:layout_centerHorizontal="true"
+        android:textSize="14sp" />
+
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/testgrade_textbase"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="20dp"
+        android:src="@drawable/logo" />
+
+    <ImageView
+        android:id="@+id/testgrade_imageOK"
+        android:layout_width="272dp"
+        android:layout_height="132dp"
+        android:layout_alignBottom="@+id/testgrade_textquestionsok"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="68dp"
+        android:src="@drawable/felicidades"
+        android:visibility="gone" />
+    
+    <ImageView
+        android:id="@+id/testgrade_imageKO"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/testgrade_textquestionsok"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="68dp"
+        android:src="@drawable/quepena"
+        android:visibility="gone"/>
+
+</RelativeLayout>

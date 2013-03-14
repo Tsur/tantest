@@ -1,0 +1,91 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:windowActionBarOverlay="true"
+    tools:context=".MainActivity" >
+
+    <Button
+        android:id="@+id/testButtonNext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="88dp"
+        android:onClick="nextQuestion"
+        android:text="@string/test_next_button" />
+
+    <TextView
+        android:id="@+id/testTextQuestion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:textColor="@color/red"
+        android:textSize="40sp" />
+
+    <RadioGroup
+        android:id="@+id/testRadioGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/testTextQuestion"
+        android:layout_marginTop="44dp"
+        android:visibility="gone" >
+
+        <RadioButton
+            android:id="@+id/testRadio1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <RadioButton
+            android:id="@+id/testRadio2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <RadioButton
+            android:id="@+id/testRadio3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <RadioButton
+            android:id="@+id/testRadio4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        
+    </RadioGroup>
+
+    <LinearLayout
+        android:id="@+id/testCheckGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/testButtonNext"
+        android:layout_alignRight="@+id/testButtonNext"
+        android:layout_marginBottom="16dp"
+        android:orientation="vertical"
+        android:visibility="gone" >
+
+        <CheckBox
+            android:id="@+id/testCheck1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <CheckBox
+            android:id="@+id/testCheck2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <CheckBox
+            android:id="@+id/testCheck3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <CheckBox
+            android:id="@+id/testCheck4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+    </LinearLayout>
+
+</RelativeLayout>
