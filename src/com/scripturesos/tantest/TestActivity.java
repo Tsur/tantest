@@ -88,11 +88,10 @@ public class TestActivity extends SherlockActivity {
 			test = TestFactory.createTest(TestBible.class);
 			Log.i("tantes","Iniciando");
 			
-			if(this.isNetworkAvailable())
+			if(isNetworkAvailable())
 			{
 				JSONArray test_data = TestUtil.getRemoteSource("https://dl.dropbox.com/s/uiwybzpsxcy04je/bible.json?token_hash=AAEHX2RaffWtjJbXQMdSAefawUyquGBYgwI3tW2BFe5tAg&dl=1");
 				test.initTest(5, test_data);
-				test_data = null;
 			}
 			else
 			{
