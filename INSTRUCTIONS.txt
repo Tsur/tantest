@@ -1,0 +1,7 @@
+INSTRUCTIONS
+
+1) Descomprime JakeWharton-ActionBarSherlock-4.2.0-0-g90939dc en donde sea
+2) En tu espacio de trabajo de eclipse pulsa boton derecho->importar->android code y seleccionas la carpeta anterior descomprimida, en directorio src
+3) Haz que el nuevo proyecto importado sea una libreria: boton derehco proyecto -> propiedades -> marcar isLibrary
+4) En tu espacio de trabajo de eclipse pulsa boton derecho->importar->todo el repositorio bajado de git
+5) Boton derecho en el proyecto del paso 4 y añadir libreria del paso 3
