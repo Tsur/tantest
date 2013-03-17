@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 
 import android.content.Context;
@@ -11,6 +12,8 @@ import android.content.Intent;
 import android.content.res.Resources.NotFoundException;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
@@ -39,6 +42,7 @@ import com.scripturesos.tantest.test.TestGrade;
 import com.scripturesos.tantest.test.TestQuestion;
 import com.scripturesos.tantest.test.TestQuestionCheckBox;
 import com.scripturesos.tantest.test.TestQuestionRadio;
+import com.scripturesos.tantest.test.TestRemoteSourceException;
 import com.scripturesos.tantest.test.TestSolution;
 import com.scripturesos.tantest.test.TestSolutionCheck;
 import com.scripturesos.tantest.test.TestSolutionRadio;
@@ -84,8 +88,17 @@ public class TestActivity extends SherlockActivity {
 			test = TestFactory.createTest(TestBible.class);
 			Log.i("tantes","Iniciando");
 			
-			//test.initTest(5, TestUtil.getSource(getResources().openRawResource(R.raw.bible)));
-			test.initTest(5, TestUtil.getRemoteSource("https://dl.dropbox.com/s/uiwybzpsxcy04je/bible.json?token_hash=AAEHX2RaffWtjJbXQMdSAefawUyquGBYgwI3tW2BFe5tAg&dl=1"));
+			if(this.isNetworkAvailable())
+			{
+				JSONArray test_data = TestUtil.getRemoteSource("https://dl.dropbox.com/s/uiwybzpsxcy04je/bible.json?token_hash=AAEHX2RaffWtjJbXQMdSAefawUyquGBYgwI3tW2BFe5tAg&dl=1");
+				test.initTest(5, test_data);
+				test_data = null;
+			}
+			else
+			{
+				test.initTest(5, TestUtil.getSource(getResources().openRawResource(R.raw.bible)));
+			}
+			
 			Log.i("tantes","Creando Test");
 			
 			//Si no activamos activity_test, no podemos usar nada de lo que tiene
@@ -109,7 +122,43 @@ public class TestActivity extends SherlockActivity {
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} 
+		}
+		catch (TestRemoteSourceException e)
+		{
+			try
+			{
+				test.initTest(5, TestUtil.getSource(getResources().openRawResource(R.raw.bible)));
+				Log.i("tantes","Creando Test");
+				
+				//Si no activamos activity_test, no podemos usar nada de lo que tiene
+				setContentView(R.layout.activity_scroll_test);
+				
+				createTestLayout();
+				Log.i("tantes","LayoutCreando");
+				
+				gotoQuestion(test.getFirstQuestion());
+				Log.i("tantes","Test creado");
+				
+				Log.i("tantes","Todo fue correcto!");
+			}
+			catch (NotFoundException e1)
+			{
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			catch (TestException e1)
+			{
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			catch (JSONException e1)
+			{
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			
+		}
 		catch (TestException e)
 		{
 			// TODO Auto-generated catch block
@@ -117,6 +166,14 @@ public class TestActivity extends SherlockActivity {
 		}
 		
 		
+	}
+	
+	private boolean isNetworkAvailable()
+	{
+	    ConnectivityManager connectivityManager 
+	          = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+	    NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+	    return activeNetworkInfo != null && activeNetworkInfo.isConnected();
 	}
 
 	protected void onPause()

@@ -153,7 +153,7 @@ public final class TestUtil {
 
 		return null;
     }
-    public static JSONArray getRemoteSource(String url)
+    public static JSONArray getRemoteSource(String url) throws TestRemoteSourceException
 	{
 		try
 		{
@@ -167,9 +167,16 @@ public final class TestUtil {
 		    
 		    HttpEntity entity = httpResponse.getEntity();
 
-		    InputStream file = entity.getContent();
+		    if(httpResponse.getStatusLine().getStatusCode() >= 200 || 
+		    		httpResponse.getStatusLine().getStatusCode() <= 202)
+		    {
+		    	InputStream file = entity.getContent();
 		    
-		    return getSource(file);
+		    	return getSource(file);
+		    }
+		    
+		    throw new TestRemoteSourceException();
+		    
 			
 		}
 		catch (UnsupportedEncodingException e)
