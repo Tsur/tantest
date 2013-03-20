@@ -153,9 +153,10 @@ public final class TestUtil {
 
 		return null;
     }
+    
     public static JSONArray getRemoteSource(String url) throws TestRemoteSourceException
 	{
-		try
+		/*try
 		{
 			// Create a new HTTP Client
 		    DefaultHttpClient httpClient = new DefaultHttpClient();
@@ -189,8 +190,29 @@ public final class TestUtil {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+		
 		return null;
+		
+		*/
+			
+		try 
+		{
+			
+			return getSource(new URL(url).openStream());
+		} 
+		catch(MalformedURLException e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		catch (IOException e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return null;
+		
 	}
     
     public static Set<Integer> random(int amount, int max)

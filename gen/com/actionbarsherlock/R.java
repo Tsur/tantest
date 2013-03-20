@@ -135,14 +135,13 @@ public final class R {
 		public static final int Widget_Sherlock_ProgressBar = 0x7f0c002e;
 		public static final int Widget_Sherlock_Light_ActionBar_TabView_Inverse = 0x7f0c0009;
 		public static final int TextAppearance_Sherlock_Widget_ActionBar_Title = 0x7f0c0039;
-		public static final int Widget_Sherlock_ActionBar_TabText = 0x7f0c000d;
 		public static final int TextAppearance_Sherlock_Light_Widget_PopupMenu_Small = 0x7f0c0045;
+		public static final int Widget_Sherlock_ActionBar_TabText = 0x7f0c000d;
 		public static final int Widget_Sherlock_Light_ProgressBar = 0x7f0c002f;
 		public static final int Widget_Sherlock_ActionBar_TabView = 0x7f0c0007;
 		public static final int Widget_Sherlock_ActionBar_Solid = 0x7f0c0003;
 		public static final int Widget_Sherlock_ListView_DropDown = 0x7f0c0027;
 		public static final int Widget_Sherlock_ActionButton_Overflow = 0x7f0c0014;
-		public static final int AppTheme = 0x7f0c005a;
 		public static final int Widget_Sherlock_Light_ActionBar_TabText = 0x7f0c000e;
 		public static final int TextAppearance_Sherlock_Widget_ActionMode_Subtitle = 0x7f0c003f;
 		public static final int TextAppearance_Sherlock_Widget_ActionBar_Subtitle = 0x7f0c003b;
@@ -150,7 +149,6 @@ public final class R {
 		public static final int Sherlock___Widget_SearchAutoCompleteTextView = 0x7f0c0033;
 		public static final int Widget_Sherlock_Light_ActionButton = 0x7f0c0011;
 		public static final int TextAppearance_Sherlock_Widget_PopupMenu_Large = 0x7f0c0042;
-		public static final int AppBaseTheme = 0x7f0c0059;
 		public static final int Widget_Sherlock_SearchAutoCompleteTextView = 0x7f0c0034;
 	}
 	public static final class integer {
@@ -181,7 +179,6 @@ public final class R {
 		public static final int abs__shareactionprovider_share_with = 0x7f0b0008;
 		public static final int abs__action_bar_home_description = 0x7f0b0000;
 		public static final int abs__searchview_description_search = 0x7f0b000a;
-		public static final int app_name = 0x7f0b000f;
 		public static final int abs__activity_chooser_view_see_all = 0x7f0b0004;
 		public static final int abs__activitychooserview_choose_application = 0x7f0b0007;
 		public static final int abs__share_action_provider_share_with = 0x7f0b0006;
@@ -197,7 +194,7 @@ public final class R {
 		public static final int abs__screen_simple_overlay_action_mode = 0x7f030013;
 		public static final int abs__screen_action_bar = 0x7f030010;
 		public static final int abs__action_menu_layout = 0x7f030005;
-		public static final int sherlock_spinner_dropdown_item = 0x7f03001d;
+		public static final int sherlock_spinner_dropdown_item = 0x7f03001c;
 		public static final int abs__search_dropdown_item_icons_2line = 0x7f030014;
 		public static final int abs__screen_action_bar_overlay = 0x7f030011;
 		public static final int abs__action_bar_title_item = 0x7f030003;
@@ -206,7 +203,7 @@ public final class R {
 		public static final int abs__list_menu_item_icon = 0x7f03000c;
 		public static final int abs__action_mode_bar = 0x7f030006;
 		public static final int abs__list_menu_item_layout = 0x7f03000d;
-		public static final int sherlock_spinner_item = 0x7f03001e;
+		public static final int sherlock_spinner_item = 0x7f03001d;
 		public static final int abs__screen_simple = 0x7f030012;
 		public static final int abs__search_view = 0x7f030015;
 		public static final int abs__activity_chooser_view = 0x7f030008;
@@ -406,7 +403,6 @@ public final class R {
 		public static final int abs__ab_stacked_transparent_dark_holo = 0x7f02000c;
 		public static final int abs__dialog_full_holo_dark = 0x7f02001e;
 		public static final int abs__progress_bg_holo_light = 0x7f020048;
-		public static final int ic_launcher = 0x7f020074;
 		public static final int abs__ic_clear_search_api_holo_light = 0x7f020029;
 		public static final int abs__menu_dropdown_panel_holo_dark = 0x7f020045;
 		public static final int abs__activated_background_holo_light = 0x7f020011;

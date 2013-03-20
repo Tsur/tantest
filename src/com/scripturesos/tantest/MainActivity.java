@@ -23,51 +23,19 @@ public class MainActivity extends SherlockActivity {
 
 	private View loader;
 
-	
-	//private ProgressBar mProgress;
-    //private int mProgressStatus = 0;
-    //private Handler mHandler = new Handler();
-
-    
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		
-		/*setContentView(R.layout.main_progress);
 
-        mProgress = (ProgressBar) findViewById(R.id.main_progressbar);
-
-        // Start lengthy operation in a background thread
-        new Thread(new Runnable() {
-            
-        	public void run()
-        	{
-                while (mProgressStatus < 100)
-                {
-                    mProgressStatus = doWork();
-
-                    // Update the progress bar
-                    mHandler.post(new Runnable() {
-                        public void run() {
-                            mProgress.setProgress(mProgressStatus);
-                        }
-                    });
-                }
-            }
-        	
-        }).start();*/
-        
 		/* ACTION BAR CONFIGURATION */
 		getSupportActionBar().setDisplayShowCustomEnabled(true);
 		getSupportActionBar().setDisplayShowTitleEnabled(false);
 		getSupportActionBar().setDisplayShowHomeEnabled(false);
 
 		LayoutInflater inflator = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		View v = inflator.inflate(R.layout.main_actionbar_title, null);
-
-		//if you need to customize anything else about the text, do it here.
-		//I'm using a custom TextView with a custom font in my layout xml so all I need to do is set title
+		View v = (View) inflator.inflate(R.layout.main_actionbar_title, null);
+		
 		Typeface fontTitle = Typeface.createFromAsset(getAssets(), "fuentes/kg.ttf");
 		TextView title = (TextView)v.findViewById(R.id.main_actionbar_textTitle);
 		title.setText(getTitle());
@@ -99,20 +67,6 @@ public class MainActivity extends SherlockActivity {
     	
     	super.onResume();
     }
-    /*
-    @Override
-    public void onStop() {
-        super.onStop();
-        if (VERBOSE) Log.v(TAG, "-- ON STOP --");
-    }
-       
-    @Override
-    public void onPause()
-    {
-        loader.setVisibility(View.GONE);
-    	super.onPause();
-    }
-    */
 	
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
@@ -125,12 +79,6 @@ public class MainActivity extends SherlockActivity {
 				//Mostramos ajax cargando
 				
 				Log.i("tantes","creando actividad");
-				
-				/*
-				ImageView loader = (ImageView) findViewById(R.id.main_loaderimg);
-				loader.setVisibility(View.VISIBLE);
-				*/
-				
 				
 				RelativeLayout rl = (RelativeLayout) findViewById(R.id.main_logoimg);
 				loader = new MYGIFView(this);

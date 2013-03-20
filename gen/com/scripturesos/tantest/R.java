@@ -1009,14 +1009,14 @@ containing a value of this type.
         public static final int disableHome=0x7f060009;
         public static final int edit_query=0x7f060027;
         public static final int homeAsUp=0x7f060006;
-        public static final int imageView1=0x7f06004b;
+        public static final int imageView1=0x7f060040;
         public static final int listMode=0x7f060002;
-        public static final int main_actionbar_textTitle=0x7f06004e;
+        public static final int main_actionbar_textTitle=0x7f060043;
         public static final int main_logoimg=0x7f060033;
-        public static final int main_progressbar=0x7f06004f;
-        public static final int menu_header_social=0x7f060052;
-        public static final int menu_header_test=0x7f060051;
-        public static final int menu_settings=0x7f060050;
+        public static final int main_progressbar=0x7f060044;
+        public static final int menu_header_social=0x7f060047;
+        public static final int menu_header_test=0x7f060046;
+        public static final int menu_settings=0x7f060045;
         public static final int normal=0x7f060001;
         public static final int showCustom=0x7f060008;
         public static final int showHome=0x7f060005;
@@ -1027,27 +1027,16 @@ containing a value of this type.
         public static final int testButtonLast=0x7f06003b;
         public static final int testButtonNav=0x7f060036;
         public static final int testButtonNext=0x7f06003a;
-        public static final int testCheck1=0x7f060043;
-        public static final int testCheck2=0x7f060044;
-        public static final int testCheck3=0x7f060045;
-        public static final int testCheck4=0x7f060046;
-        public static final int testCheckGroup=0x7f060042;
         public static final int testQuestionsContainer=0x7f060034;
-        public static final int testRadio1=0x7f06003e;
-        public static final int testRadio2=0x7f06003f;
-        public static final int testRadio3=0x7f060040;
-        public static final int testRadio4=0x7f060041;
-        public static final int testRadioGroup=0x7f06003d;
         public static final int testSeekBar=0x7f060039;
         public static final int testSeekBarText=0x7f060035;
-        public static final int testTextQuestion=0x7f06003c;
-        public static final int test_menu_header_grade=0x7f060053;
-        public static final int testgrade_imageKO=0x7f06004d;
-        public static final int testgrade_imageOK=0x7f06004c;
-        public static final int testgrade_textbase=0x7f06004a;
-        public static final int testgrade_textgrade=0x7f060048;
-        public static final int testgrade_textquestionsok=0x7f060047;
-        public static final int testgrade_texttotalquestions=0x7f060049;
+        public static final int test_menu_header_grade=0x7f060048;
+        public static final int testgrade_imageKO=0x7f060042;
+        public static final int testgrade_imageOK=0x7f060041;
+        public static final int testgrade_textbase=0x7f06003f;
+        public static final int testgrade_textgrade=0x7f06003d;
+        public static final int testgrade_textquestionsok=0x7f06003c;
+        public static final int testgrade_texttotalquestions=0x7f06003e;
         public static final int useLogo=0x7f060004;
         public static final int wrap_content=0x7f060000;
     }
@@ -1080,18 +1069,16 @@ containing a value of this type.
         public static final int abs__simple_dropdown_hint=0x7f030016;
         public static final int activity_main=0x7f030017;
         public static final int activity_scroll_test=0x7f030018;
-        public static final int activity_test=0x7f030019;
-        public static final int activity_test_grade=0x7f03001a;
-        public static final int main_actionbar_title=0x7f03001b;
-        public static final int main_progress=0x7f03001c;
-        public static final int sherlock_spinner_dropdown_item=0x7f03001d;
-        public static final int sherlock_spinner_item=0x7f03001e;
+        public static final int activity_test_grade=0x7f030019;
+        public static final int main_actionbar_title=0x7f03001a;
+        public static final int main_progress=0x7f03001b;
+        public static final int sherlock_spinner_dropdown_item=0x7f03001c;
+        public static final int sherlock_spinner_item=0x7f03001d;
     }
     public static final class menu {
         public static final int activity_main=0x7f0d0000;
         public static final int activity_scroll_test=0x7f0d0001;
-        public static final int activity_test=0x7f0d0002;
-        public static final int activity_test_grade=0x7f0d0003;
+        public static final int activity_test_grade=0x7f0d0002;
     }
     public static final class raw {
         public static final int bible=0x7f050000;
@@ -1173,32 +1160,8 @@ containing a value of this type.
         res/values-v11/styles.xml on API 14+ devices.
     
  API 14 theme customizations can go here. 
-
-        Base application theme, dependent on API level. This theme is replaced
-        by AppBaseTheme from res/values-vXX/styles.xml on newer devices.
-    
-
-            Theme customizations available in newer API levels can go in
-            res/values-vXX/styles.xml, while customizations related to
-            backward-compatibility can go here.
-        
-
-        Base application theme for API 11+. This theme completely replaces
-        AppBaseTheme from res/values/styles.xml on API 11+ devices.
-    
- API 11 theme customizations can go here. 
-
-        Base application theme for API 14+. This theme completely replaces
-        AppBaseTheme from BOTH res/values/styles.xml and
-        res/values-v11/styles.xml on API 14+ devices.
-    
- API 14 theme customizations can go here. 
          */
         public static final int AppBaseTheme=0x7f0c0059;
-        /**  Application theme. 
- All customizations that are NOT specific to a particular API-level can go here. 
-         */
-        public static final int AppTheme=0x7f0c005a;
         public static final int DialogWindowTitle_Sherlock=0x7f0c0036;
         public static final int DialogWindowTitle_Sherlock_Light=0x7f0c0037;
         public static final int Sherlock___TextAppearance_Small=0x7f0c004a;
@@ -1213,7 +1176,7 @@ containing a value of this type.
         public static final int Sherlock___Widget_Holo_ListView=0x7f0c0026;
         public static final int Sherlock___Widget_Holo_Spinner=0x7f0c0023;
         public static final int Sherlock___Widget_SearchAutoCompleteTextView=0x7f0c0033;
-        public static final int SherlockBaseTheme=0x7f0c005b;
+        public static final int SherlockBaseTheme=0x7f0c005a;
         public static final int TextAppearance_Sherlock_DialogWindowTitle=0x7f0c0048;
         public static final int TextAppearance_Sherlock_Light_DialogWindowTitle=0x7f0c0049;
         public static final int TextAppearance_Sherlock_Light_Small=0x7f0c004c;
