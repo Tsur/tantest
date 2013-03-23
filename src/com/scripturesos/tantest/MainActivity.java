@@ -1,51 +1,26 @@
 package com.scripturesos.tantest;
 
-import java.io.InputStream;
-
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Movie;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
+import android.widget.ProgressBar;
 
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 
-public class MainActivity extends SherlockActivity {
+public class MainActivity extends ActionBarActivity {
 
-	private View loader;
+	private ProgressBar loader;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-
-		/* ACTION BAR CONFIGURATION */
-		getSupportActionBar().setDisplayShowCustomEnabled(true);
-		getSupportActionBar().setDisplayShowTitleEnabled(false);
-		getSupportActionBar().setDisplayShowHomeEnabled(false);
-
-		LayoutInflater inflator = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		View v = (View) inflator.inflate(R.layout.main_actionbar_title, null);
-		
-		Typeface fontTitle = Typeface.createFromAsset(getAssets(), "fuentes/kg.ttf");
-		TextView title = (TextView)v.findViewById(R.id.main_actionbar_textTitle);
-		title.setText(getTitle());
-		title.setTypeface(fontTitle);
-
-		//assign the view to the actionbar
-		getSupportActionBar().setCustomView(v);
-		
 		/* INIT CONTENT VIEW */
 		setContentView(R.layout.activity_main);
+		
+		loader = (ProgressBar) findViewById(R.id.main_progressbar);
 
 	}
 
@@ -71,6 +46,8 @@ public class MainActivity extends SherlockActivity {
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
 		
+		loader.setVisibility(View.VISIBLE);
+		loader.setIndeterminate(true);
 		
 		switch(item.getItemId())
 		{
@@ -79,10 +56,11 @@ public class MainActivity extends SherlockActivity {
 				//Mostramos ajax cargando
 				
 				Log.i("tantes","creando actividad");
+
 				
-				RelativeLayout rl = (RelativeLayout) findViewById(R.id.main_logoimg);
-				loader = new MYGIFView(this);
-				rl.addView(loader);
+				//RelativeLayout rl = (RelativeLayout) findViewById(R.id.main_logoimg);
+				//loader = new MYGIFView(this);
+				//rl.addView(loader);
 				
 				Intent intent = new Intent(this, TestActivity.class);
 				Log.i("tantes","iniciando actividad");
@@ -91,7 +69,9 @@ public class MainActivity extends SherlockActivity {
 
 				break;
 			case R.id.menu_header_social:
-				
+				Intent cintent = new Intent(this, ContactsActivity.class);
+				Log.i("tantes","iniciando actividad");
+				startActivity(cintent);
 				break;
 			case R.id.menu_settings:
 
@@ -102,7 +82,7 @@ public class MainActivity extends SherlockActivity {
 		return true;
 	}
 	
-	private class MYGIFView extends View{
+	/*private class MYGIFView extends View{
 
 		Movie movie;
 		InputStream is=null;
@@ -136,6 +116,6 @@ public class MainActivity extends SherlockActivity {
 			movie.draw(canvas,this.getWidth()/2-11,this.getHeight()/2+27);
 			this.invalidate();
 		}
-	}
+	}*/
 
 }

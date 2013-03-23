@@ -48,7 +48,7 @@ import com.scripturesos.tantest.test.TestSolutionCheck;
 import com.scripturesos.tantest.test.TestSolutionRadio;
 import com.scripturesos.tantest.test.TestUtil;
 
-public class TestActivity extends SherlockActivity {
+public class TestActivity extends ActionBarActivity {
 	
 	private Test test;
 	
@@ -61,24 +61,6 @@ public class TestActivity extends SherlockActivity {
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		
-		/* ACTION BAR CONFIGURATION */
-		getSupportActionBar().setDisplayShowCustomEnabled(true);
-		getSupportActionBar().setDisplayShowTitleEnabled(false);
-		getSupportActionBar().setDisplayShowHomeEnabled(false);
-		
-		LayoutInflater inflator = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		View v = inflator.inflate(R.layout.main_actionbar_title, null);
-
-		//if you need to customize anything else about the text, do it here.
-		//I'm using a custom TextView with a custom font in my layout xml so all I need to do is set title
-		Typeface fontTitle = Typeface.createFromAsset(getAssets(), "fuentes/kg.ttf");
-		TextView title = (TextView)v.findViewById(R.id.main_actionbar_textTitle);
-		title.setText(getTitle());
-		title.setTypeface(fontTitle);
-
-		//assign the view to the actionbar
-		getSupportActionBar().setCustomView(v);
 		
 		//overridePendingTransition(R.anim.fadein, R.anim.fadeout);
 		
