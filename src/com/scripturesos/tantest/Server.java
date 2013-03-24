@@ -62,7 +62,7 @@ public final class Server extends Socket
 
     	args += "]}";
     	
-    	System.out.println(command);
+    	//Log.i("tantes",command);
     	
     }
     
