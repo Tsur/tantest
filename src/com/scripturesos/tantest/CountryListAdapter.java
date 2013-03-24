@@ -1,12 +1,9 @@
 package com.scripturesos.tantest;
 
 
-import java.util.Locale;
-
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -71,7 +68,7 @@ public class CountryListAdapter extends BaseAdapter
 		//Save image to cache
         if(Cache.images.get(position) == null)
         {
-            Log.i("tantest","img: "+MainActivity.abbreviations[position]);
+            //Log.i("tantest","img: "+MainActivity.abbreviations[position]);
             
         	int imageResource = activity.getResources().getIdentifier(MainActivity.abbreviations[position].toLowerCase(), "drawable", activity.getPackageName());
 			Drawable img = activity.getResources().getDrawable(imageResource);
