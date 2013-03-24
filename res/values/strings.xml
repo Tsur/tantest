@@ -11,4 +11,5 @@
 	<string name="test_menu_header_grade">¡Nota final!</string>
 	<string name="menu_header_search">Buscar</string>
 	<string name="act_contacts_title">Selecciona Contacto</string>
+	<string name="act_main_phone">Teléfono</string>
 </resources>

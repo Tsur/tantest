@@ -6,31 +6,77 @@
     android:background="@drawable/wall3"
     tools:context=".MainActivity" >
 
-
     <RelativeLayout
         android:id="@+id/main_logoimg"
         android:layout_width="300dp"
         android:layout_height="200dp"
-        android:layout_alignParentBottom="false"
-        android:layout_alignParentLeft="false"
-        android:layout_alignParentRight="false"
-        android:layout_alignParentTop="false"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/main_logo" >
+
+        <ProgressBar
+            android:id="@+id/main_progressbar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="28dp"
+            android:paddingBottom="5dp"
+            android:paddingLeft="8dp"
+            android:visibility="gone" />
+
+    </RelativeLayout>
+    
+    <EditText
+        android:id="@+id/main_phone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/main_logoimg"
         android:layout_centerHorizontal="true"
         android:layout_centerInParent="true"
-        android:layout_centerVertical="true"
-        android:background="@drawable/main_logo">
+        android:layout_marginTop="36dp"
+        android:background="@drawable/rounded_corners"
+        android:ems="10"
+        android:hint="@string/act_main_phone"
+        android:inputType="phone"
+        android:paddingBottom="5dp"
+        android:paddingLeft="40dp"
+        android:paddingRight="5dp"
+        android:paddingTop="5dp"
+        android:textColor="@color/gray_main"
+        android:textColorHint="@color/gray_main" />
 
-	    <ProgressBar
-	        android:id="@+id/main_progressbar"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_alignParentBottom="true"
-	        android:layout_centerHorizontal="true"
-	        android:layout_marginBottom="28dp"
-	        android:paddingBottom="5dp"
-	        android:paddingLeft="8dp" 
-	        android:visibility="gone"/>
-    
+    <Button
+        android:id="@+id/main_country"
+        android:layout_width="26dp"
+        android:layout_height="24dp"
+        android:layout_alignBottom="@+id/main_phone"
+        android:layout_alignLeft="@+id/main_phone"
+        android:layout_alignTop="@+id/main_phone"
+        android:layout_marginLeft="8dp"
+        android:background="@drawable/es" 
+        android:onClick="displayCountries"/>
+
+    <RelativeLayout
+		android:layout_width="match_parent"
+	    android:layout_height="match_parent"
+	    android:layout_centerHorizontal="true"
+	    android:layout_centerInParent="true" >
+        
+        <ListView
+            android:id="@+id/main_lv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerHorizontal="true"
+            android:layout_centerInParent="true"
+            android:background="@color/black"
+            android:visibility="gone" >
+
+    	</ListView>
+    	
     </RelativeLayout>
+        
+
 
 </RelativeLayout>

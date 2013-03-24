@@ -35,6 +35,12 @@
         </activity>
         
         <activity 
+            android:name="com.scripturesos.tantest.HomeActivity"
+            android:theme="@style/SherlockBaseTheme"
+            android:label="@string/app_name" >
+        </activity>
+        
+        <activity 
             android:name="com.scripturesos.tantest.ContactsActivity"
             android:theme="@style/SherlockBaseTheme"
             android:label="@string/app_name" >
