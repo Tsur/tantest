@@ -13,8 +13,16 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;
+import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
+import com.scripturesos.tantest.connection.ClientSocket;
+import com.scripturesos.tantest.connection.MainClientSocketController;
 
 public class MainActivity extends Activity 
 {
@@ -23,6 +31,7 @@ public class MainActivity extends Activity
 	private ListView countriesContainer;
 	private Button country;
 	private String abbr;
+	private EditText phone_input;
 	
 	@SuppressWarnings("deprecation")
 	@TargetApi(16)
@@ -36,6 +45,8 @@ public class MainActivity extends Activity
 		loader = (ProgressBar) findViewById(R.id.main_progressbar);
 		
 		country = (Button) findViewById(R.id.main_country);
+		
+		phone_input = (EditText) findViewById(R.id.main_phone);
 		
 		countriesContainer = (ListView) findViewById(R.id.main_lv);
 		
@@ -103,6 +114,37 @@ public class MainActivity extends Activity
 	
 	public void connect(View view)
 	{
+		Log.i("tantest", "Pulsado connect");
+		String phone = phone_input.getText().toString();
+		Log.i("tantest", "telefono es: "+ phone);
+		PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+		
+		try 
+		{
+			Log.i("tantest", "pais es: "+ abbr);
+			
+			if(phone.equals("") || abbr == null)
+			{
+				//Display error
+				return;
+			}
+			
+			PhoneNumber phoneData = phoneUtil.parse(phone, abbr);
+			
+			phone = phoneUtil.format(phoneData, PhoneNumberFormat.E164);
+			
+			Log.i("tantest", "Telefono final es: "+phone);
+			
+			//Mandamos al servidor
+			ClientSocket
+			.getInstance()
+			.init(phone)
+			.send("createUser", phone, new MainClientSocketController(this));
+		} 
+		catch(NumberParseException e) 
+		{
+			Log.i("tantest", "Error telefono "+phone);
+		}
 		
 	}
 	

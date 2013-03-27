@@ -80,24 +80,24 @@
 
     </RelativeLayout>
 
-    
     <Button
-           android:id="@+id/button1"
-           android:layout_width="wrap_content"
-           android:layout_height="wrap_content"
-           android:layout_alignParentBottom="true"
-           android:layout_centerHorizontal="true"
-           android:text="Entrar" 
-           android:onClick="connect" />
-        
+        android:id="@+id/main_connect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/relativeLayout1"
+        android:layout_marginTop="15dp"
+        android:layout_toRightOf="@+id/main_country"
+        android:onClick="connect"
+        android:text="Entrar" />
+
     <Button
         android:id="@+id/button2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/relativeLayout1"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="16dp"
-        android:text="Offine" 
-        android:onClick="test" />
+        android:layout_alignBaseline="@+id/button1"
+        android:layout_alignBottom="@+id/button1"
+        android:layout_toRightOf="@+id/button1"
+        android:onClick="test"
+        android:text="Offine" />
 
 </RelativeLayout>

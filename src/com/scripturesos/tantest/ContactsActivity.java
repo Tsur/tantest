@@ -141,11 +141,11 @@ public class ContactsActivity extends ActionBarActivity {
 	private JSONArray getContactsFromServer(Collection<String> contacts) throws JSONException
 	{
 		
-		Server.setCommand("getContacts", contacts);
+		//Server.setCommand("getContacts", contacts);
 		
 		try 
 		{
-			return new JSONArray(Server.send());
+			return new JSONArray("[]");//new JSONArray(Server.send());
 		} 
 		catch (JSONException e) 
 		{
