@@ -1,16 +1,23 @@
 package com.scripturesos.tantest.connection;
 
-import android.app.Activity;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.util.Log;
+
+import com.scripturesos.tantest.MainActivity;
 
 public class MainClientSocketController implements SocketResponse
 {
 
-	private Activity context;
+	private MainActivity activity;
 	private String response;
+	private String method;
 	
-	public MainClientSocketController(Activity context)
+	public MainClientSocketController(MainActivity context, String method)
 	{
-		this.context = context;
+		this.activity = context;
+		this.method = method;
 	}
 
 
@@ -31,7 +38,27 @@ public class MainClientSocketController implements SocketResponse
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-		
+		if(method.equals("createUser"))
+		{
+			
+			try 
+			{
+				Log.i("tantest", response);
+				JSONObject jresponse = new JSONObject(response);
+				
+				String code = jresponse.getString("validationCode");
+				Log.i("tantest", "El codigo de validacion es: "+code);
+				
+				activity.validateCode(code);
+				
+			} 
+			catch (JSONException e) 
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+		}
 	}
 
 }

@@ -5,18 +5,23 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 public class ClientSocket extends Thread
 {
 	
 	private Socket clientSocket;
 	private String clientID;
-	private String command;
+	private List<String> commands;
+	//private String command;
 	private PrintWriter out;
     private BufferedReader in;
     private SocketResponse responseController;
+    private boolean ready = false;
 	
 	//Bill Pugh Singleton thread safe solution
 	private ClientSocket(){}
@@ -49,13 +54,8 @@ public class ClientSocket extends Thread
         
     	try 
         {
-            clientSocket = new Socket(IP, PORT);
-
             clientID = client;
-            
-            in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            out = new PrintWriter(clientSocket.getOutputStream(), true);
-            
+            commands = new ArrayList<String>();
             start();
 		} 
         catch (Exception e) 
@@ -75,13 +75,11 @@ public class ClientSocket extends Thread
     {
     	assert clientSocket != null;
     	
-    	command = "{\"client\":\""+getClient()+"\",\"method\":\""+method+"\",\"arguments\":[\""+argument+"\"]}";
-    	
-    	out.write(command);
-		out.flush();
-		
-		responseController = controller;
+    	String command = "{\"client\":\""+getClient()+"\",\"method\":\""+method+"\",\"arguments\":[\""+argument+"\"]}";
 
+    	commands.add(command);
+    	
+		responseController = controller;
     }
     
     public void send(String method, Collection<String> arguments, SocketResponse controller)
@@ -89,7 +87,7 @@ public class ClientSocket extends Thread
 
     	assert clientSocket != null;
     	
-    	command = "{\"client\":\""+getClient()+"\",\"method\":\""+method+"\",\"arguments\":";
+    	String command = "{\"client\":\""+getClient()+"\",\"method\":\""+method+"\",\"arguments\":";
     	
     	String args = "[";
     	
@@ -109,8 +107,7 @@ public class ClientSocket extends Thread
     	
     	command += args;
     	
-    	out.write(command);
-		out.flush();
+    	commands.add(command);
 		
 		responseController = controller;
     }
@@ -122,20 +119,39 @@ public class ClientSocket extends Thread
     	{
     		out.write("{\"client\":\""+getClient()+"\"}");
             out.flush();
+            
+            ready = true;
     	}
     	else
     	{
     		responseController.setResponse(response);
     		
-    		Thread responseControllerThread = new Thread(responseController);
-    		
-    		responseControllerThread.start();
+    		new Thread(responseController).start();
     	}
     }
     
     @Override
     public void run()
     {
+    	
+    	try 
+    	{
+			clientSocket = new Socket(IP, PORT); 
+			
+			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+			out = new PrintWriter(clientSocket.getOutputStream(), true);
+		} 
+    	catch (UnknownHostException e1) 
+    	{
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} 
+    	catch (IOException e1) 
+    	{
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+
     	String response;
     	
  	    while(clientSocket.isConnected())
@@ -149,6 +165,17 @@ public class ClientSocket extends Thread
  				   //System.out.println("obtengo respuesta");
  				   response = in.readLine();
  				   processResponse(response);
+ 			   }
+ 			   
+ 			   if(ready == true && commands.size() > 0)
+ 			   {
+ 				  for(String command: commands)
+ 				  {
+ 					  out.write(command);
+ 					  out.flush();
+ 				  }
+ 				   
+ 				  commands.clear();
  			   }
  			   
  			   sleep(INTERVAL);
@@ -169,7 +196,7 @@ public class ClientSocket extends Thread
  	   
     }
 	
-	private final String IP = "localhost";
+	private final String IP = "192.168.1.130";
     private final int PORT = 3000;
     private final int INTERVAL = 1000;
 }

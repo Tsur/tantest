@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
@@ -31,6 +32,7 @@ public class MainActivity extends Activity
 	private ListView countriesContainer;
 	private Button country;
 	private String abbr;
+	private String code;
 	private EditText phone_input;
 	
 	@SuppressWarnings("deprecation")
@@ -136,10 +138,19 @@ public class MainActivity extends Activity
 			Log.i("tantest", "Telefono final es: "+phone);
 			
 			//Mandamos al servidor
-			ClientSocket
+			
+			/*ClientSocket
 			.getInstance()
 			.init(phone)
-			.send("createUser", phone, new MainClientSocketController(this));
+			.send("createUser", phone, new MainClientSocketController(this,"createUser"));
+			*/
+			
+			MainClientSocketController responseController = new MainClientSocketController(this,"createUser");
+			responseController.setResponse("{\"validationCode\":\"3434\"}");
+    		
+    		new Thread(responseController).start();
+    		
+    		
 		} 
 		catch(NumberParseException e) 
 		{
@@ -157,6 +168,45 @@ public class MainActivity extends Activity
 		Log.i("tantes","iniciando actividad");
 		startActivity(intent);
 	}
+	
+	public void validateCode(String code)
+	{
+		Log.i("tantest","Main validateCode");
+		country.setVisibility(View.GONE);
+		
+		Button connect = (Button) findViewById(R.id.main_connect);
+		connect.setVisibility(View.GONE);
+		Button verify = (Button) findViewById(R.id.main_code);
+		verify.setVisibility(View.VISIBLE);
+		
+		TextView textCode = (TextView) findViewById(R.id.main_text_code);
+		textCode.setVisibility(View.VISIBLE);
+		
+		phone_input.setText("");
+		phone_input.setHint("Codigo verificacion");
+		
+		this.code = code;
+	}
+	
+	public void verifyCode(View view)
+	{
+		Log.i("tantest", "Verificando codigo");
+		String code_given = phone_input.getText().toString();
+		
+		Log.i("tantest", "Codigo dado: "+code_given);
+		Log.i("tantest", "Codigo correcto: "+code);
+		
+		if(code.equals(code_given))
+		{
+			Log.i("tantest", "Codigo correcto!");
+		}
+		else
+		{
+			Log.i("tantest", "Codigo INcorrecto!");
+		}
+	}
+	
+	
 	
     @Override
     public void onResume()

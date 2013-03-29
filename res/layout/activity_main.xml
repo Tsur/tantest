@@ -78,6 +78,16 @@
             android:visibility="gone" >
         </ListView>
 
+        <TextView
+            android:id="@+id/main_text_code"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="92dp"
+            android:text="Hemos enviado un código a su telefono, introduzcalo y pulse verificar" 
+            android:visibility="gone"/>
+
     </RelativeLayout>
 
     <Button
@@ -89,6 +99,17 @@
         android:layout_toRightOf="@+id/main_country"
         android:onClick="connect"
         android:text="Entrar" />
+    
+    <Button
+        android:id="@+id/main_code"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/relativeLayout1"
+        android:layout_marginTop="15dp"
+        android:layout_toRightOf="@+id/main_country"
+        android:onClick="verifyCode"
+        android:text="Verificar"
+        android:visibility="gone" />
 
     <Button
         android:id="@+id/button2"
