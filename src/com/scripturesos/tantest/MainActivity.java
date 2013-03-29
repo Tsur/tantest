@@ -274,7 +274,21 @@ public class MainActivity extends Activity
     	super.onResume();
     }
 	
-	public static String[] countries =
+    public static String[] countries =
+    	{ 
+    		"Alemania","España", 
+            "Finlandia","Francia","Reino Unido",
+            "Honduras","Israel"
+        };
+    	
+    	//Usar mejor Locale.getISOCountries()
+    	public static String[] abbreviations = 
+    	{ 
+    		
+    		"DE", "ES", "FI", "FR", "GB",
+            "HN", "IL"
+         };
+	/*public static String[] countries =
 	{ 
 		"Andorra","(al-Imārāt) الامارات","(Afganistan) افغانستان", "ANTIGUA AND BARBUDA", 
 		"ANGUILLA","ALBANIA","ARMENIA", "Netherlands Antilles", "ANGOLA", 
@@ -336,5 +350,5 @@ public class MainActivity extends Activity
         "TN", "TO", "TR", "TT", "TV", "TW", "TZ", "UA", "UG", "US", "UY",
         "UZ", "VA", "VC", "VE", "VG", "VI", "VN", "VU", "WF", "WS", "YE",
         "YT", "ZA","ZM","ZW"
-     };
+     };*/
 }
