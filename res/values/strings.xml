@@ -12,4 +12,8 @@
 	<string name="menu_header_search">Buscar</string>
 	<string name="act_contacts_title">Selecciona Contacto</string>
 	<string name="act_main_phone">Teléfono</string>
+	<string name="act_main_code">Código Validación</string>
+	<string name="act_main_connect">Acceder</string>
+	<string name="act_main_offine">Desconectado</string>
+	<string name="act_main_verify">Verificar</string>
 </resources>

@@ -16,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -62,6 +63,7 @@ public class MainActivity extends Activity
 	private String phone;
 	private String code;
 	private EditText phone_input;
+	private EditText phone_code;
 	
 	@SuppressWarnings("deprecation")
 	@TargetApi(16)
@@ -81,6 +83,7 @@ public class MainActivity extends Activity
 		country = (Button) findViewById(R.id.main_country);
 		
 		phone_input = (EditText) findViewById(R.id.main_phone);
+		phone_code = (EditText) findViewById(R.id.main_code);
 		
 		countriesContainer = (ListView) findViewById(R.id.main_lv);
 		
@@ -164,6 +167,10 @@ public class MainActivity extends Activity
 			return;
 		}
 		
+		ImageButton connect = (ImageButton) findViewById(R.id.main_connect);
+		
+		connect.setEnabled(false);
+		
 		Thread handlePhone = new Thread() {
 		    
 			public void run() 
@@ -215,10 +222,12 @@ public class MainActivity extends Activity
 	{
 		Log.i("tantest","Main validateCode: "+code);
 		country.setVisibility(View.GONE);
+		phone_input.setVisibility(View.GONE);
+		phone_code.setVisibility(View.VISIBLE);
 		
-		Button connect = (Button) findViewById(R.id.main_connect);
+		ImageButton connect = (ImageButton) findViewById(R.id.main_connect);
 		connect.setVisibility(View.GONE);
-		Button verify = (Button) findViewById(R.id.main_code);
+		ImageButton verify = (ImageButton) findViewById(R.id.main_verify);
 		verify.setVisibility(View.VISIBLE);
 		
 		TextView textCode = (TextView) findViewById(R.id.main_text_code);
@@ -235,7 +244,7 @@ public class MainActivity extends Activity
 	public void verifyCode(View view)
 	{
 		Log.i("tantest", "Verificando codigo");
-		String code_given = phone_input.getText().toString();
+		String code_given = phone_code.getText().toString();
 		
 		Log.i("tantest", "Codigo dado: "+code_given);
 		Log.i("tantest", "Codigo correcto: "+code);

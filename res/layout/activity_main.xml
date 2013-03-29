@@ -26,6 +26,7 @@
             android:paddingBottom="5dp"
             android:paddingLeft="8dp"
             android:visibility="gone" />
+
     </RelativeLayout>
 
     <EditText
@@ -41,22 +42,52 @@
         android:hint="@string/act_main_phone"
         android:inputType="phone"
         android:paddingBottom="5dp"
-        android:paddingLeft="40dp"
+        android:paddingLeft="44dp"
         android:paddingRight="5dp"
         android:paddingTop="5dp"
         android:textColor="@color/gray_main"
-        android:textColorHint="@color/gray_main" />
+        android:textColorHint="@color/gray_main"/>
+    
+	<EditText
+	    android:id="@+id/main_code"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_below="@+id/main_logoimg"
+	    android:layout_centerHorizontal="true"
+	    android:layout_centerInParent="true"
+	    android:layout_marginTop="36dp"
+	    android:background="@drawable/rounded_corners"
+	    android:hint="@string/act_main_code"
+	    android:inputType="textPassword"
+	    android:paddingBottom="5dp"
+	    android:paddingLeft="15dp"
+	    android:paddingRight="15dp"
+	    android:paddingTop="5dp"
+	    android:textColor="@color/gray_main"
+	    android:textColorHint="@color/gray_main"
+	    android:visibility="gone" />
 
     <Button
         android:id="@+id/main_country"
-        android:layout_width="24dp"
-        android:layout_height="20dp"
+        android:layout_width="22dp"
+        android:layout_height="15dp"
         android:layout_alignBottom="@+id/main_phone"
         android:layout_alignLeft="@+id/main_phone"
         android:layout_alignTop="@+id/main_phone"
-        android:layout_marginLeft="8dp"
+        android:layout_marginLeft="12dp"
         android:background="@drawable/iso_unknown"
+        android:minHeight="15dp"
         android:onClick="displayCountries" />
+    
+    <ImageView
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_alignBottom="@+id/main_phone"
+        android:layout_alignLeft="@+id/main_phone"
+        android:layout_alignTop="@+id/main_phone"
+        android:layout_marginLeft="21dp"
+        
+        android:contentDescription="@string/act_main_connect" />
 
     <RelativeLayout
         android:id="@+id/relativeLayout1"
@@ -89,36 +120,41 @@
             android:visibility="gone"/>
 
     </RelativeLayout>
-
-    <Button
-        android:id="@+id/main_connect"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/relativeLayout1"
-        android:layout_marginTop="15dp"
-        android:layout_toRightOf="@+id/main_country"
-        android:onClick="connect"
-        android:text="Entrar" />
     
-    <Button
-        android:id="@+id/main_code"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/relativeLayout1"
-        android:layout_marginTop="15dp"
-        android:layout_toRightOf="@+id/main_country"
-        android:onClick="verifyCode"
-        android:text="Verificar"
-        android:visibility="gone" />
+    <ImageButton
+        android:id="@+id/main_verify"
+        android:layout_width="95dp"
+        android:layout_height="50dp"
+        android:layout_below="@+id/main_code"
+        android:layout_centerHorizontal="true"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="41dp"
+        android:background="@drawable/main_verify_buttom"
+        android:contentDescription="@string/act_main_verify"
+        android:onClick="verifyCode" 
+        android:visibility="gone"/>
 
-    <Button
-        android:id="@+id/button2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/button1"
-        android:layout_alignBottom="@+id/button1"
-        android:layout_toRightOf="@+id/button1"
-        android:onClick="test"
-        android:text="Offine" />
+    <ImageButton
+        android:id="@+id/main_connect"
+        android:layout_width="95dp"
+        android:layout_height="50dp"
+        android:layout_below="@+id/main_phone"
+        android:layout_centerHorizontal="true"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="41dp"
+        android:background="@drawable/main_connect_buttom"
+        android:contentDescription="@string/act_main_connect"
+        android:onClick="connect" />
+
+    <ImageButton
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/main_offine_buttom"
+        android:contentDescription="@string/act_main_offine"
+        android:onClick="test" />
 
 </RelativeLayout>
