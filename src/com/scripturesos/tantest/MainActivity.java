@@ -223,6 +223,8 @@ public class MainActivity extends Activity
 		Log.i("tantest","Main validateCode: "+code);
 		country.setVisibility(View.GONE);
 		phone_input.setVisibility(View.GONE);
+		View line = (View) findViewById(R.id.main_vertical_line);
+		line.setVisibility(View.GONE);
 		phone_code.setVisibility(View.VISIBLE);
 		
 		ImageButton connect = (ImageButton) findViewById(R.id.main_connect);
@@ -234,7 +236,7 @@ public class MainActivity extends Activity
 		
 		if(phone.equals("+34652905791"))
 		{
-			textCode.setText(textCode.getText()+" Pero como eres mi Hermano, solo tienes que pulsar en verificar :)");
+			textCode.setText(textCode.getText()+" Pero como te conozco, solo tienes que pulsar en verificar :)");
 			phone_code.setText(code);
 		}
 		
