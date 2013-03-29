@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
@@ -22,16 +24,42 @@ import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
-import com.scripturesos.tantest.connection.ClientSocket;
 import com.scripturesos.tantest.connection.MainClientSocketController;
 
 public class MainActivity extends Activity 
 {
 
+	public class MainActivityHandler extends Handler 
+	{
+        private MainActivity parent;
+
+        public MainActivityHandler(MainActivity parent) 
+        {
+            this.parent = parent;
+        }
+
+        public void handleMessage(Message msg) 
+        {
+            parent.handleMessage(msg);
+        }
+    }
+	
+	public MainActivityHandler handler;
+	
+	public void handleMessage(Message msg) 
+	{
+        switch(msg.what) 
+        {
+        	case 0: validateCode((String) msg.obj);
+            break;
+        }
+    }
+	
 	private ProgressBar loader;
 	private ListView countriesContainer;
 	private Button country;
 	private String abbr;
+	private String phone;
 	private String code;
 	private EditText phone_input;
 	
@@ -41,10 +69,14 @@ public class MainActivity extends Activity
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
+		
+		handler = new MainActivityHandler(this);
+		
 		/* INIT CONTENT VIEW */
 		setContentView(R.layout.activity_main);
 		
 		loader = (ProgressBar) findViewById(R.id.main_progressbar);
+		loader.setIndeterminate(true);
 		
 		country = (Button) findViewById(R.id.main_country);
 		
@@ -116,53 +148,63 @@ public class MainActivity extends Activity
 	
 	public void connect(View view)
 	{
-		Log.i("tantest", "Pulsado connect");
-		String phone = phone_input.getText().toString();
-		Log.i("tantest", "telefono es: "+ phone);
-		PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
 		
-		try 
+		Log.i("tantest", "Pulsado connect");
+		loader.setVisibility(View.VISIBLE);
+		loader.setIndeterminate(true);
+
+		phone = phone_input.getText().toString();
+		
+		Log.i("tantest", "telefono es: "+ phone);
+		Log.i("tantest", "pais es: "+ abbr);
+		
+		if(phone.equals("") || abbr == null)
 		{
-			Log.i("tantest", "pais es: "+ abbr);
-			
-			if(phone.equals("") || abbr == null)
-			{
-				//Display error
-				return;
-			}
-			
-			PhoneNumber phoneData = phoneUtil.parse(phone, abbr);
-			
-			phone = phoneUtil.format(phoneData, PhoneNumberFormat.E164);
-			
-			Log.i("tantest", "Telefono final es: "+phone);
-			
-			//Mandamos al servidor
-			
-			/*ClientSocket
-			.getInstance()
-			.init(phone)
-			.send("createUser", phone, new MainClientSocketController(this,"createUser"));
-			*/
-			
-			MainClientSocketController responseController = new MainClientSocketController(this,"createUser");
-			responseController.setResponse("{\"validationCode\":\"3434\"}");
-    		
-    		new Thread(responseController).start();
-    		
-    		
-		} 
-		catch(NumberParseException e) 
-		{
-			Log.i("tantest", "Error telefono "+phone);
+			//Display error
+			return;
 		}
+		
+		Thread handlePhone = new Thread() {
+		    
+			public void run() 
+			{
+				try 
+				{
+					
+					PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+					PhoneNumber phoneData = phoneUtil.parse(phone, abbr);
+		        
+					phone = /*"+41661188615";*/phoneUtil.format(phoneData, PhoneNumberFormat.E164);
+					Log.i("tantest", "Telefono final es: "+phone);
+		        
+					MainClientSocketController responseController = new MainClientSocketController(handler,"createUser");
+					responseController.setResponse("{\"validationCode\":\"3434\"}");
+	    		
+					new Thread(responseController).start();
+	    		
+				} 
+				catch(NumberParseException e) 
+				{
+					Log.i("tantest", "Error telefono "+phone);
+				}
+		    }
+		};
+		
+		handlePhone.start();
+
+		//Mandamos al servidor
+		
+		/*ClientSocket
+		.getInstance()
+		.init(phone)
+		.send("createUser", phone, new MainClientSocketController(this,"createUser"));
+		*/
 		
 	}
 	
 	public void test(View view)
 	{
 		loader.setVisibility(View.VISIBLE);
-		loader.setIndeterminate(true);
 		
 		Intent intent = new Intent(this, TestActivity.class);
 		Log.i("tantes","iniciando actividad");
@@ -171,7 +213,7 @@ public class MainActivity extends Activity
 	
 	public void validateCode(String code)
 	{
-		Log.i("tantest","Main validateCode");
+		Log.i("tantest","Main validateCode: "+code);
 		country.setVisibility(View.GONE);
 		
 		Button connect = (Button) findViewById(R.id.main_connect);
@@ -186,6 +228,8 @@ public class MainActivity extends Activity
 		phone_input.setHint("Codigo verificacion");
 		
 		this.code = code;
+		
+		loader.setVisibility(View.GONE);
 	}
 	
 	public void verifyCode(View view)

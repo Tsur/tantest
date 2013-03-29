@@ -3,20 +3,22 @@ package com.scripturesos.tantest.connection;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.os.Message;
 import android.util.Log;
 
 import com.scripturesos.tantest.MainActivity;
+import com.scripturesos.tantest.MainActivity.MainActivityHandler;
 
 public class MainClientSocketController implements SocketResponse
 {
 
-	private MainActivity activity;
+	private MainActivityHandler handler;
 	private String response;
 	private String method;
 	
-	public MainClientSocketController(MainActivity context, String method)
+	public MainClientSocketController(MainActivityHandler handler, String method)
 	{
-		this.activity = context;
+		this.handler = handler;
 		this.method = method;
 	}
 
@@ -49,7 +51,11 @@ public class MainClientSocketController implements SocketResponse
 				String code = jresponse.getString("validationCode");
 				Log.i("tantest", "El codigo de validacion es: "+code);
 				
-				activity.validateCode(code);
+				Message msg = new Message();
+				msg.obj = code;
+				msg.what = 0;
+				
+				handler.sendMessage(msg);
 				
 			} 
 			catch (JSONException e) 
