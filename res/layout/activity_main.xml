@@ -109,16 +109,6 @@
             android:visibility="gone" >
         </ListView>
 
-        <TextView
-            android:id="@+id/main_text_code"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="92dp"
-            android:text="Hemos enviado un código a su telefono, introduzcalo y pulse verificar" 
-            android:visibility="gone"/>
-
     </RelativeLayout>
     
     <ImageButton
@@ -156,5 +146,19 @@
         android:background="@drawable/main_offine_buttom"
         android:contentDescription="@string/act_main_offine"
         android:onClick="test" />
+
+    <TextView
+        android:id="@+id/main_verify_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_centerInParent="true"
+        android:layout_centerVertical="true"
+        android:background="@color/gray"
+        android:padding="15dp"
+        android:text="@string/act_main_verify_text"
+        android:textColor="@color/white"
+        android:visibility="gone" />
 
 </RelativeLayout>

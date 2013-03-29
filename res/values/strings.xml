@@ -16,4 +16,5 @@
 	<string name="act_main_connect">Acceder</string>
 	<string name="act_main_offine">Desconectado</string>
 	<string name="act_main_verify">Verificar</string>
+	<string name="act_main_verify_text">Hemos enviado un código de verificación a su telefono, introduzcalo y pulse verificar para validar su cuenta.</string>
 </resources>

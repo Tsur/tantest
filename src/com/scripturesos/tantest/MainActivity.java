@@ -230,11 +230,15 @@ public class MainActivity extends Activity
 		ImageButton verify = (ImageButton) findViewById(R.id.main_verify);
 		verify.setVisibility(View.VISIBLE);
 		
-		TextView textCode = (TextView) findViewById(R.id.main_text_code);
-		textCode.setVisibility(View.VISIBLE);
+		TextView textCode = (TextView) findViewById(R.id.main_verify_text);
 		
-		phone_input.setText("");
-		phone_input.setHint("Codigo verificacion");
+		if(phone.equals("+34652905791"))
+		{
+			textCode.setText(textCode.getText()+" Pero como eres mi Hermano, solo tienes que pulsar en verificar :)");
+			phone_code.setText(code);
+		}
+		
+		textCode.setVisibility(View.VISIBLE);
 		
 		this.code = code;
 		
@@ -258,8 +262,6 @@ public class MainActivity extends Activity
 			Log.i("tantest", "Codigo INcorrecto!");
 		}
 	}
-	
-	
 	
     @Override
     public void onResume()

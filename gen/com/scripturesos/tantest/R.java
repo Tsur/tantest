@@ -1279,14 +1279,14 @@ containing a value of this type.
         public static final int listMode=0x7f060002;
         public static final int main_actionbar_textTitle=0x7f060056;
         public static final int main_code=0x7f06003a;
-        public static final int main_connect=0x7f060040;
+        public static final int main_connect=0x7f06003f;
         public static final int main_country=0x7f06003b;
         public static final int main_logoimg=0x7f060037;
         public static final int main_lv=0x7f06003d;
         public static final int main_phone=0x7f060039;
         public static final int main_progressbar=0x7f060038;
-        public static final int main_text_code=0x7f06003e;
-        public static final int main_verify=0x7f06003f;
+        public static final int main_verify=0x7f06003e;
+        public static final int main_verify_text=0x7f060040;
         public static final int menu_header_search=0x7f060058;
         public static final int menu_header_social=0x7f06005a;
         public static final int menu_header_test=0x7f060059;
@@ -1414,6 +1414,7 @@ containing a value of this type.
         public static final int act_main_offine=0x7f0b001d;
         public static final int act_main_phone=0x7f0b001a;
         public static final int act_main_verify=0x7f0b001e;
+        public static final int act_main_verify_text=0x7f0b001f;
         public static final int app_name=0x7f0b000f;
         public static final int hello_world=0x7f0b0010;
         public static final int menu_header_search=0x7f0b0018;

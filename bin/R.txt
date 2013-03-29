@@ -589,14 +589,14 @@ int id imageView1 0x7f06004d
 int id listMode 0x7f060002
 int id main_actionbar_textTitle 0x7f060056
 int id main_code 0x7f06003a
-int id main_connect 0x7f060040
+int id main_connect 0x7f06003f
 int id main_country 0x7f06003b
 int id main_logoimg 0x7f060037
 int id main_lv 0x7f06003d
 int id main_phone 0x7f060039
 int id main_progressbar 0x7f060038
-int id main_text_code 0x7f06003e
-int id main_verify 0x7f06003f
+int id main_verify 0x7f06003e
+int id main_verify_text 0x7f060040
 int id menu_header_search 0x7f060058
 int id menu_header_social 0x7f06005a
 int id menu_header_test 0x7f060059
@@ -684,6 +684,7 @@ int string act_main_connect 0x7f0b001c
 int string act_main_offine 0x7f0b001d
 int string act_main_phone 0x7f0b001a
 int string act_main_verify 0x7f0b001e
+int string act_main_verify_text 0x7f0b001f
 int string app_name 0x7f0b000f
 int string hello_world 0x7f0b0010
 int string menu_header_search 0x7f0b0018
