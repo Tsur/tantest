@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
@@ -18,6 +19,8 @@ public class HomeActivity extends ActionBarActivity {
 	{
 		super.onCreate(savedInstanceState);
 		/* INIT CONTENT VIEW */
+		Log.i("tantest","CREATE HOME ACTIVITY");
+		
 		setContentView(R.layout.activity_home);
 		
 		loader = (ProgressBar) findViewById(R.id.home_progressbar);
@@ -34,12 +37,29 @@ public class HomeActivity extends ActionBarActivity {
     @Override
     public void onResume()
     {
+    	Log.i("tantest","RESUME HOM ACTIVITY");
+    	
     	if(loader != null)
 		{
     		loader.setVisibility(View.GONE);
 		}
     	
     	super.onResume();
+    }
+	
+	public void changeText(View view)
+	{
+		TextView text = (TextView) findViewById(R.id.home_text);
+		
+		text.setText("BOTON HA SIDO PULSADO");
+		
+	}
+	
+    // Alternative variant for API 5 and higher
+    @Override
+    public void onBackPressed() 
+    {
+      moveTaskToBack(true);
     }
 	
 	public boolean onOptionsItemSelected(MenuItem item)

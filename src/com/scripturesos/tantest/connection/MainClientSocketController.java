@@ -6,7 +6,6 @@ import org.json.JSONObject;
 import android.os.Message;
 import android.util.Log;
 
-import com.scripturesos.tantest.MainActivity;
 import com.scripturesos.tantest.MainActivity.MainActivityHandler;
 
 public class MainClientSocketController implements SocketResponse

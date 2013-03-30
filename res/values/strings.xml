@@ -17,4 +17,6 @@
 	<string name="act_main_offine">Desconectado</string>
 	<string name="act_main_verify">Verificar</string>
 	<string name="act_main_verify_text">Hemos enviado un código de verificación a su telefono, introduzcalo y pulse verificar para validar su cuenta.</string>
+	<string name="act_main_wrong_code">El código introducido no es correcto brother, ¡ revisalo bien !</string>
+	<string name="act_main_right_code">El código introducido es correctísimo brother, ¡ pasa adelante !</string>
 </resources>

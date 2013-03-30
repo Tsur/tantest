@@ -1,0 +1,12 @@
+	A quiere enviar imagen a B
+	
+	
+	A selecciona imagen galeria, 
+	
+	1)Imagen se envia al servidor, el servidor envia un mensaje confirmacion
+	a quien envia la imagen(A) y envia mensaje con la uri de la imagen al 
+	destinatario(B)
+	
+	2)Cuando llega mensaje al destinatario, baja la imagen de la uri, la guarda
+	en galeria y la muestra por pantalla en el chat. Entonces envia mensaje al 
+	servidor para que la borre

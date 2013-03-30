@@ -12,6 +12,10 @@ import android.os.Message;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
@@ -59,19 +63,31 @@ public class MainActivity extends Activity
 	private ProgressBar loader;
 	private ListView countriesContainer;
 	private Button country;
+	private ImageButton connect;
 	private String abbr;
 	private String phone;
 	private String code;
 	private EditText phone_input;
 	private EditText phone_code;
+	private TextView textCode;
+	private boolean correct = false;
 	
 	@SuppressWarnings("deprecation")
 	@TargetApi(16)
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
+		Log.i("tantest", "CREANDO");
 		super.onCreate(savedInstanceState);
 		
+		/*
+		 * AQUI miramos si en base de datos existe entrada de cuenta ya confirmada
+		 * en tal caso, directemente creamos actividad home:
+		 * 
+		 * Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+		   intent.putExtra("extra", "load");//Indica a la actividad Home que carga los chats abiertos
+		   startActivity(intent);
+		 */
 		handler = new MainActivityHandler(this);
 		
 		/* INIT CONTENT VIEW */
@@ -81,9 +97,12 @@ public class MainActivity extends Activity
 		loader.setIndeterminate(true);
 		
 		country = (Button) findViewById(R.id.main_country);
+		connect = (ImageButton) findViewById(R.id.main_connect);
 		
 		phone_input = (EditText) findViewById(R.id.main_phone);
 		phone_code = (EditText) findViewById(R.id.main_code);
+		
+		textCode = (TextView) findViewById(R.id.main_verify_text);
 		
 		countriesContainer = (ListView) findViewById(R.id.main_lv);
 		
@@ -98,6 +117,7 @@ public class MainActivity extends Activity
 		    	
 		    	//abbr = Locale.getISOCountries()[position];
 		    	countriesContainer.setVisibility(View.GONE);
+		    	connect.setVisibility(View.VISIBLE);
 		    	
 		    	Log.i("tantes","nuevo pais es: "+abbr);
 		    	
@@ -142,10 +162,12 @@ public class MainActivity extends Activity
 		if(countriesContainer.isShown())
 	    {
 		   countriesContainer.setVisibility(View.GONE);
+		   connect.setVisibility(View.VISIBLE);
 	    }
 	    else
 	    {
 		   countriesContainer.setVisibility(View.VISIBLE);
+		   connect.setVisibility(View.GONE);
 	    }
 	}
 	
@@ -184,6 +206,11 @@ public class MainActivity extends Activity
 					phone = /*"+41661188615";*/phoneUtil.format(phoneData, PhoneNumberFormat.E164);
 					Log.i("tantest", "Telefono final es: "+phone);
 		        
+					/*ClientSocket
+					.getInstance()
+					.init(phone)
+					.send("createUser", phone, new MainClientSocketController(handler,"createUser"));
+					*/
 					MainClientSocketController responseController = new MainClientSocketController(handler,"createUser");
 					responseController.setResponse("{\"validationCode\":\"3434\"}");
 	    		
@@ -198,24 +225,25 @@ public class MainActivity extends Activity
 		};
 		
 		handlePhone.start();
-
-		//Mandamos al servidor
-		
-		/*ClientSocket
-		.getInstance()
-		.init(phone)
-		.send("createUser", phone, new MainClientSocketController(this,"createUser"));
-		*/
-		
 	}
 	
 	public void test(View view)
 	{
 		loader.setVisibility(View.VISIBLE);
 		
-		Intent intent = new Intent(this, TestActivity.class);
-		Log.i("tantes","iniciando actividad");
-		startActivity(intent);
+		Thread startTest = new Thread() {
+		    
+			public void run() 
+			{
+				Intent intent = new Intent(MainActivity.this, TestActivity.class);
+				Log.i("tantest","iniciando actividad");
+				//overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
+				startActivity(intent);
+		    }
+		};
+		
+		startTest.start();
+		
 	}
 	
 	public void validateCode(String code)
@@ -226,21 +254,54 @@ public class MainActivity extends Activity
 		View line = (View) findViewById(R.id.main_vertical_line);
 		line.setVisibility(View.GONE);
 		phone_code.setVisibility(View.VISIBLE);
+		ImageButton test = (ImageButton) findViewById(R.id.main_test);
+		test.setVisibility(View.GONE);
 		
-		ImageButton connect = (ImageButton) findViewById(R.id.main_connect);
 		connect.setVisibility(View.GONE);
 		ImageButton verify = (ImageButton) findViewById(R.id.main_verify);
 		verify.setVisibility(View.VISIBLE);
-		
-		TextView textCode = (TextView) findViewById(R.id.main_verify_text);
-		
+
 		if(phone.equals("+34652905791"))
 		{
 			textCode.setText(textCode.getText()+" Pero como te conozco, solo tienes que pulsar en verificar :)");
 			phone_code.setText(code);
 		}
 		
+		Animation out = new TranslateAnimation(0, 0, -50, 0);
+		out.setFillAfter(true);
+		out.setDuration(2000);
+		
+		textCode.startAnimation(out);
 		textCode.setVisibility(View.VISIBLE);
+		
+		/*Animation out = new AlphaAnimation(1.0f, 0.0f);
+		out.setFillAfter(true);
+		out.setStartOffset(5000);
+		out.setDuration(600);
+		
+		out.setAnimationListener(new AnimationListener() {
+
+		    @Override
+		    public void onAnimationEnd(Animation animation) {
+
+		    	textCode.setVisibility(View.GONE);
+
+		    }
+
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void onAnimationStart(Animation animation) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		
+		textCode.startAnimation(out);*/
 		
 		this.code = code;
 		
@@ -255,25 +316,90 @@ public class MainActivity extends Activity
 		Log.i("tantest", "Codigo dado: "+code_given);
 		Log.i("tantest", "Codigo correcto: "+code);
 		
+		//final Animation in = new AlphaAnimation(0.0f, 1.0f);
+		//in.setDuration(1000);
+		
+		final Animation out = new AlphaAnimation(1.0f, 0.0f);
+		out.setDuration(500);
+		out.setStartOffset(1500);
+		
+		out.setAnimationListener(new AnimationListener() {
+
+		    @Override
+		    public void onAnimationEnd(Animation animation)
+		    {
+		    	
+		    	textCode.setVisibility(View.GONE);
+		    	
+		    	if(correct == true)
+		    	{
+		    		//Hay que crear entrada en BD asegurando que en el onCreate
+		    		//pasamos a HomeActivity
+		    		startActivity(new Intent(MainActivity.this, HomeActivity.class));
+		    	}
+
+		    }
+
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void onAnimationStart(Animation animation) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		
 		if(code.equals(code_given))
 		{
 			Log.i("tantest", "Codigo correcto!");
+			
+			//textCode.setGravity(Gravity.CENTER);
+			textCode.setText(R.string.act_main_right_code);
+			
+			correct = true;
+			
+			textCode.startAnimation(out);
+			
+			//homeAct = new Intent(MainActivity.this, HomeActivity.class);
+			Log.i("tantes","iniciando actividad");
+			//overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
+			//startActivity(homeAct);
+			
 		}
 		else
 		{
 			Log.i("tantest", "Codigo INcorrecto!");
+			
+			textCode.setText(R.string.act_main_wrong_code);
+
+			textCode.startAnimation(out);
 		}
 	}
 	
     @Override
     public void onResume()
     {
+    	super.onResume();
+    	
+    	Log.i("tantest", "RESUME");
+    	
     	if(loader != null)
 		{
     		loader.setVisibility(View.GONE);
 		}
     	
-    	super.onResume();
+    	
+    }
+    
+    // Alternative variant for API 5 and higher
+    @Override
+    public void onBackPressed() 
+    {
+      moveTaskToBack(true);
     }
 	
     public static String[] countries =

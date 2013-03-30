@@ -104,10 +104,12 @@
             android:layout_centerInParent="true"
             android:background="@color/black"
             android:cacheColorHint="@color/black"
-            android:dividerHeight="3dp"
             android:divider="@drawable/horizontal_line"
+            android:dividerHeight="3dp"
             android:drawSelectorOnTop="true"
-             >
+            android:padding="5dp"
+            android:visibility="gone" >
+
         </ListView>
 
     </RelativeLayout>
@@ -138,6 +140,7 @@
         android:onClick="connect" />
 
     <ImageButton
+        android:id="@+id/main_test"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:layout_alignParentRight="true"
@@ -150,13 +153,13 @@
 
     <TextView
         android:id="@+id/main_verify_text"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_centerInParent="true"
-        android:layout_centerVertical="true"
         android:background="@color/gray"
+        android:gravity="center"
         android:padding="15dp"
         android:text="@string/act_main_verify_text"
         android:textColor="@color/white"
