@@ -178,6 +178,9 @@ public class MainActivity extends Activity
 	
 	public void connectButtom(View view)
 	{
+		/*Intent cintent = new Intent(this, ContactsActivity.class);
+		Log.i("tantes","iniciando actividad");
+		startActivity(cintent);*/
 		
 		Log.i("tantest", "Pulsado connect");
 		loader.setVisibility(View.VISIBLE);
@@ -207,7 +210,7 @@ public class MainActivity extends Activity
 					PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
 					PhoneNumber phoneData = phoneUtil.parse(phone, abbr);
 		        
-					phone = /*"+41661188615";*/phoneUtil.format(phoneData, PhoneNumberFormat.E164);
+					phone = phoneUtil.format(phoneData, PhoneNumberFormat.E164);
 					Log.i("tantest", "Telefono final es: "+phone);
 		        
 					//AQUI TENEMOS QUE CHEQUEAR SI PHONE YA HA RECIBIDO EL MSG CON EL CODIGO
@@ -216,11 +219,6 @@ public class MainActivity extends Activity
 					.getInstance()
 					.init(phone)
 					.send("createUser", phone, new ClientResponse(handler,0));
-					
-					/*MainClientSocketController responseController = new MainClientSocketController(handler,"createUser");
-					responseController.setResponse("{\"validationCode\":\"3434\"}");
-	    		
-					new Thread(responseController).start();*/
 	    		
 				} 
 				catch(NumberParseException e) 
@@ -231,6 +229,7 @@ public class MainActivity extends Activity
 		};
 		
 		handlePhone.start();
+
 	}
 	
 	public void test(View view)

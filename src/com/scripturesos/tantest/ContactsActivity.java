@@ -15,6 +15,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
+import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -28,7 +29,7 @@ public class ContactsActivity extends ActionBarActivity {
 
 	//TextView debug;
 	private ListView contactsListView;
-	private ProgressBar loader;
+	private ProgressBar progress;
 	private Map<String,String> phonesList;
 	
 	@Override
@@ -40,19 +41,24 @@ public class ContactsActivity extends ActionBarActivity {
 		
 		/* INIT CONTENT VIEW */
 		setContentView(R.layout.activity_contacts);
+	
+		handler = new ContactsActivityHandler(ContactsActivity.this);
 		
-		loader = (ProgressBar) findViewById(R.id.contacts_loader);
-		loader.setIndeterminate(true);
+		progress = (ProgressBar) findViewById(R.id.act_contacts_loader);
 		
-		Thread contacts = new Thread() {
+		(new Thread() {
 		    
 			public void run() 
 			{
+				try {
+					sleep(2000);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				getContacts();
 		    }
-		};
-		
-		contacts.start();
+		}).start();
 		
 	}
 
@@ -89,6 +95,7 @@ public class ContactsActivity extends ActionBarActivity {
 			Cursor phones = cr.query(Phone.CONTENT_URI, null,
 		            Phone.CONTACT_ID + " = " + contactId, null, null);
 
+			
 			while(phones.moveToNext())
 			{
 				
@@ -118,8 +125,6 @@ public class ContactsActivity extends ActionBarActivity {
 		//Tenemos en phoneList un diccionario/ mapa de numeros -> nombre
 		cursor.close();
 		
-		handler = new ContactsActivityHandler(ContactsActivity.this);
-		
 		//Conectamos con el servidor y mandamos telefonos
 		if(phonesList.size() > 0)
 		{
@@ -131,6 +136,7 @@ public class ContactsActivity extends ActionBarActivity {
 		}
 		else
 		{
+			
 			Message msg = new Message();
 			
 			msg.what = 1;
@@ -143,7 +149,8 @@ public class ContactsActivity extends ActionBarActivity {
 	
 	public void displayNoAgenda()
 	{
-		loader.setVisibility(View.GONE);
+		
+		progress.setVisibility(View.GONE);
 		
 		TextView info = (TextView) findViewById(R.id.act_contacts_text);
 		

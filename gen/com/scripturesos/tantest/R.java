@@ -1265,9 +1265,9 @@ containing a value of this type.
         public static final int abs__title=0x7f06001b;
         public static final int abs__titleDivider=0x7f06001c;
         public static final int abs__up=0x7f06000b;
-        public static final int act_contacts_lv=0x7f060034;
-        public static final int act_contacts_text=0x7f060033;
-        public static final int contacts_loader=0x7f060035;
+        public static final int act_contacts_loader=0x7f060034;
+        public static final int act_contacts_lv=0x7f060033;
+        public static final int act_contacts_text=0x7f060035;
         public static final int contacts_lv_img=0x7f060053;
         public static final int contacts_lv_name=0x7f060054;
         public static final int contacts_lv_points=0x7f060056;

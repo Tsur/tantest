@@ -30,6 +30,7 @@
      android:onClick="showContacts"
      android:padding="10dp"
      android:text="@string/home_no_chats"
-     android:textColor="@color/black" />
+     android:textColor="@color/black"
+     android:textStyle="bold" />
  
 </RelativeLayout>
