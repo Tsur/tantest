@@ -62,6 +62,13 @@ public class HomeActivity extends ActionBarActivity {
       moveTaskToBack(true);
     }
 	
+    public void showContacts(View v)
+    {
+    	Intent cintent = new Intent(this, ContactsActivity.class);
+		Log.i("tantes","iniciando actividad");
+		startActivity(cintent);
+    }
+    
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
 		

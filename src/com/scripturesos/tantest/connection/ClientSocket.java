@@ -70,12 +70,12 @@ public class ClientSocket extends Thread
             clientID = client;
             //commands = new ArrayList<String>();
             responseHandlers = new HashMap<String,ClientResponse>();
-            Log.i("tantest", "Conectando");
+            //Log.i("tantest", "Conectando");
             clientSocket = new Socket(IP, PORT); 
-            Log.i("tantest", "Conectado");
+            //Log.i("tantest", "Conectado");
 			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 			out = new PrintWriter(clientSocket.getOutputStream(), true);
-			Log.i("tantest", "Buffers arrancados");
+			//Log.i("tantest", "Buffers arrancados");
             start();
             
             return this;
@@ -166,7 +166,7 @@ public class ClientSocket extends Thread
 		//new Thread(responseController).start();
 
     	final String res = response;
-    	Log.i("tantest", "Respuesta del servidor: "+res);
+    	//Log.i("tantest", "Respuesta del servidor: "+res);
     	
     	(new Thread() {
 		    
@@ -187,7 +187,7 @@ public class ClientSocket extends Thread
 					msg.what = response.what;
 					
 					//Send Message to handler
-					Log.i("tantest", "Enviamos mensaje al manejador");
+					//Log.i("tantest", "Enviamos mensaje al manejador");
 					response.handler.sendMessage(msg);
 					
 					responseHandlers.remove(id);
@@ -210,7 +210,7 @@ public class ClientSocket extends Thread
     	try 
     	{
 
-    		Log.i("tantest", "ESperando respuesta");
+    		//Log.i("tantest", "ESperando respuesta");
     		
 	 	    while(clientSocket.isConnected())
 	 	    {
@@ -218,7 +218,7 @@ public class ClientSocket extends Thread
 	 	    	if(in.ready())
 	 	    	{
  				   //System.out.println("obtengo respuesta");
-	 	    		Log.i("tantest", "Tenemos respuesta!");
+	 	    		//Log.i("tantest", "Tenemos respuesta!");
  				   processResponse(in.readLine());
 	 	    	}
  			   

@@ -1,7 +1,6 @@
 package com.scripturesos.tantest;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,19 +15,14 @@ import android.os.Handler;
 import android.os.Message;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
-import android.util.Log;
+import android.view.View;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.actionbarsherlock.view.Menu;
-import com.google.i18n.phonenumbers.NumberParseException;
-import com.google.i18n.phonenumbers.PhoneNumberUtil;
-import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;
-import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
-import com.scripturesos.tantest.MainActivity.MainActivityHandler;
 import com.scripturesos.tantest.connection.ClientResponse;
 import com.scripturesos.tantest.connection.ClientSocket;
-import com.scripturesos.tantest.connection.MainClientSocketController;
 
 public class ContactsActivity extends ActionBarActivity {
 
@@ -54,8 +48,6 @@ public class ContactsActivity extends ActionBarActivity {
 		    
 			public void run() 
 			{
-				contactsListView = (ListView) findViewById(R.id.act_contacts_lv);
-				handler = new ContactsActivityHandler(ContactsActivity.this);
 				getContacts();
 		    }
 		};
@@ -126,11 +118,36 @@ public class ContactsActivity extends ActionBarActivity {
 		//Tenemos en phoneList un diccionario/ mapa de numeros -> nombre
 		cursor.close();
 		
+		handler = new ContactsActivityHandler(ContactsActivity.this);
+		
 		//Conectamos con el servidor y mandamos telefonos
-		ClientSocket
-		.getInstance()
-		.send("getContacts", phonesList.keySet(), new ClientResponse(handler,0));	
+		if(phonesList.size() > 0)
+		{
+			contactsListView = (ListView) findViewById(R.id.act_contacts_lv);
+
+			ClientSocket
+			.getInstance()
+			.send("getContacts", phonesList.keySet(), new ClientResponse(handler,0));	
+		}
+		else
+		{
+			Message msg = new Message();
+			
+			msg.what = 1;
+			
+			handler.sendMessage(msg);
+		}
+		
 		 
+	}
+	
+	public void displayNoAgenda()
+	{
+		loader.setVisibility(View.GONE);
+		
+		TextView info = (TextView) findViewById(R.id.act_contacts_text);
+		
+		info.setVisibility(View.VISIBLE);
 	}
 	
 	public void displayContacts(JSONObject serverContacts)
@@ -197,8 +214,9 @@ public class ContactsActivity extends ActionBarActivity {
 	{
         switch(msg.what) 
         {
-        	case 0: displayContacts((JSONObject)msg.obj);
-            break;
+        	case 0: displayContacts((JSONObject)msg.obj);break;
+        	case 1: displayNoAgenda();break;
+            default:break;
         }
     }
 	
