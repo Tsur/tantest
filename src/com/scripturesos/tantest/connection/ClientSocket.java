@@ -6,22 +6,30 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.os.Message;
+import android.util.Log;
 
 public class ClientSocket extends Thread
 {
 	
 	private Socket clientSocket;
 	private String clientID;
-	private List<String> commands;
+	//private List<String> commands;
 	//private String command;
 	private PrintWriter out;
     private BufferedReader in;
-    private SocketResponse responseController;
-    private boolean ready = false;
+    //private SocketResponse responseController;
+	private Map<String,ClientResponse> responseHandlers;
+	boolean connected = false;
 	
 	//Bill Pugh Singleton thread safe solution
 	private ClientSocket(){}
@@ -38,7 +46,7 @@ public class ClientSocket extends Thread
 	
 	public final ClientSocket init(String client) 
     {
-        assert clientSocket == null;
+        //assert clientSocket == null;
 		/*if(clientSocket != null)
     	{
         	try 
@@ -51,19 +59,33 @@ public class ClientSocket extends Thread
 				e.printStackTrace();
 			}
     	}*/
+		
+		if(clientSocket != null)
+		{
+			return this;
+		}
         
     	try 
         {
             clientID = client;
-            commands = new ArrayList<String>();
+            //commands = new ArrayList<String>();
+            responseHandlers = new HashMap<String,ClientResponse>();
+            Log.i("tantest", "Conectando");
+            clientSocket = new Socket(IP, PORT); 
+            Log.i("tantest", "Conectado");
+			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+			out = new PrintWriter(clientSocket.getOutputStream(), true);
+			Log.i("tantest", "Buffers arrancados");
             start();
+            
+            return this;
 		} 
         catch (Exception e) 
         {
-            e.printStackTrace();
+        	Log.i("tantest", "Error conexion");
         }
 
-    	return this;
+    	return null;
     }
     
     public String getClient()
@@ -71,7 +93,7 @@ public class ClientSocket extends Thread
     	return clientID;
     }
     
-    public void send(String method, String argument, SocketResponse controller)
+    /*public void send(String method, String argument, SocketResponse controller)
     {
     	assert clientSocket != null;
     	
@@ -80,14 +102,35 @@ public class ClientSocket extends Thread
     	commands.add(command);
     	
 		responseController = controller;
-    }
+    }*/
     
-    public void send(String method, Collection<String> arguments, SocketResponse controller)
+    public void send(String method, String argument, ClientResponse controller)
     {
 
-    	assert clientSocket != null;
+    	String id = UUID.randomUUID().toString();
+
+    	responseHandlers.put(id, controller);
+
+		out.write("{\"client\":\""+getClient()+
+    			"\",\"method\":\""+method+
+    			"\",\"id\":\""+id+
+    			"\",\"arguments\":[\""+argument+"\"]}");
+		
+		out.flush();
+		
+		Log.i("tantest", "Mensaje enviado");
     	
-    	String command = "{\"client\":\""+getClient()+"\",\"method\":\""+method+"\",\"arguments\":";
+    }
+    
+    public void send(String method, Collection<String> arguments, ClientResponse controller)
+    {
+    	
+    	String id = UUID.randomUUID().toString();
+    	
+    	String command = "{\"client\":\""+getClient()+
+    			"\",\"method\":\""+method+
+    			"\",\"id\":\""+id+
+    			"\",\"arguments\":";
     	
     	String args = "[";
     	
@@ -107,27 +150,57 @@ public class ClientSocket extends Thread
     	
     	command += args;
     	
-    	commands.add(command);
-		
-		responseController = controller;
+    	responseHandlers.put(id, controller);
+    	
+    	//commands.add(command);
+    	
+    	out.write(command);
+		out.flush();
     }
     
     private void processResponse(String response)
     {
-    	//System.out.println("He obtenido respuesta:" + response);
-    	if(response.equals("who are you?"))
-    	{
-    		out.write("{\"client\":\""+getClient()+"\"}");
-            out.flush();
-            
-            ready = true;
-    	}
-    	else
-    	{
-    		responseController.setResponse(response);
-    		
-    		new Thread(responseController).start();
-    	}
+
+		//responseController.setResponse(response);
+		
+		//new Thread(responseController).start();
+
+    	final String res = response;
+    	Log.i("tantest", "Respuesta del servidor: "+res);
+    	
+    	(new Thread() {
+		    
+			public void run() 
+			{
+				try 
+				{
+					//Parse response to JSON object
+					JSONObject jres = new JSONObject(res);
+					String id = jres.getString("id");
+					
+					//Get the handler information
+					ClientResponse response = responseHandlers.get(id);
+					
+					//Compose the message including the JSON object
+					Message msg = new Message();
+					msg.obj = jres;
+					msg.what = response.what;
+					
+					//Send Message to handler
+					Log.i("tantest", "Enviamos mensaje al manejador");
+					response.handler.sendMessage(msg);
+					
+					responseHandlers.remove(id);
+				} 
+				catch (JSONException e) 
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		    }
+			
+		}).start();
+		
     }
     
     @Override
@@ -136,11 +209,38 @@ public class ClientSocket extends Thread
     	
     	try 
     	{
-			clientSocket = new Socket(IP, PORT); 
-			
-			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-			out = new PrintWriter(clientSocket.getOutputStream(), true);
+
+    		Log.i("tantest", "ESperando respuesta");
+    		
+	 	    while(clientSocket.isConnected())
+	 	    {
+	 	    	
+	 	    	if(in.ready())
+	 	    	{
+ 				   //System.out.println("obtengo respuesta");
+	 	    		Log.i("tantest", "Tenemos respuesta!");
+ 				   processResponse(in.readLine());
+	 	    	}
+ 			   
+	 	    	/*if(commands.size() > 0)
+	 	    	{
+ 				  for(String command: commands)
+ 				  {
+ 					  out.write(command);
+ 					  out.flush();
+ 				  }
+ 				   
+ 				  commands.clear();
+	 	    	}*/
+ 			   
+	 	    	sleep(INTERVAL);
+	 	    }
 		} 
+    	catch (InterruptedException e) 
+		{		
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
     	catch (UnknownHostException e1) 
     	{
 			// TODO Auto-generated catch block
@@ -151,52 +251,11 @@ public class ClientSocket extends Thread
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-
-    	String response;
-    	
- 	    while(clientSocket.isConnected())
- 	    {
- 		     
- 		   try 
- 		   {
- 			   //System.out.println("dando vueltas");
- 			   if(in.ready())
- 			   {
- 				   //System.out.println("obtengo respuesta");
- 				   response = in.readLine();
- 				   processResponse(response);
- 			   }
- 			   
- 			   if(ready == true && commands.size() > 0)
- 			   {
- 				  for(String command: commands)
- 				  {
- 					  out.write(command);
- 					  out.flush();
- 				  }
- 				   
- 				  commands.clear();
- 			   }
- 			   
- 			   sleep(INTERVAL);
- 			   
- 		   } 
- 		   catch (InterruptedException e) 
- 		   {
- 				// TODO Auto-generated catch block
- 				e.printStackTrace();
- 			}
- 		   catch (IOException e) 
- 		   {
- 			// TODO Auto-generated catch block
- 			e.printStackTrace();
- 		   }
- 		   
- 	    }
  	   
     }
 	
-	private final String IP = "192.168.1.130";
+	private final String IP = "192.168.1.132";
     private final int PORT = 3000;
     private final int INTERVAL = 1000;
+    //private final int CON_INTERVAL = 100;
 }

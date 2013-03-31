@@ -1,5 +1,8 @@
 package com.scripturesos.tantest;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
@@ -29,7 +32,8 @@ import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
-import com.scripturesos.tantest.connection.MainClientSocketController;
+import com.scripturesos.tantest.connection.ClientResponse;
+import com.scripturesos.tantest.connection.ClientSocket;
 
 public class MainActivity extends Activity 
 {
@@ -53,10 +57,13 @@ public class MainActivity extends Activity
 	
 	public void handleMessage(Message msg) 
 	{
-        switch(msg.what) 
+        JSONObject response = (JSONObject) msg.obj;
+        
+		switch(msg.what) 
         {
-        	case 0: validateCode((String) msg.obj);
-            break;
+        	case 0: requestCode(response);break;
+        	case 1: verifyCode(response);break;
+            default:break;
         }
     }
 	
@@ -150,8 +157,6 @@ public class MainActivity extends Activity
 		{
 			Log.i("tantest","abbr: nada");
 		}
-
-
 		
 	}
 	
@@ -171,12 +176,11 @@ public class MainActivity extends Activity
 	    }
 	}
 	
-	public void connect(View view)
+	public void connectButtom(View view)
 	{
 		
 		Log.i("tantest", "Pulsado connect");
 		loader.setVisibility(View.VISIBLE);
-		loader.setIndeterminate(true);
 
 		phone = phone_input.getText().toString();
 		
@@ -189,9 +193,9 @@ public class MainActivity extends Activity
 			return;
 		}
 		
-		ImageButton connect = (ImageButton) findViewById(R.id.main_connect);
+		//ImageButton connect = (ImageButton) findViewById(R.id.main_connect);
 		
-		connect.setEnabled(false);
+		view.setEnabled(false);
 		
 		Thread handlePhone = new Thread() {
 		    
@@ -206,15 +210,17 @@ public class MainActivity extends Activity
 					phone = /*"+41661188615";*/phoneUtil.format(phoneData, PhoneNumberFormat.E164);
 					Log.i("tantest", "Telefono final es: "+phone);
 		        
-					/*ClientSocket
+					//AQUI TENEMOS QUE CHEQUEAR SI PHONE YA HA RECIBIDO EL MSG CON EL CODIGO
+					//EN CUYO CASO LLAMAMOS DIRECTAMENTE A REQUESTCODE
+					ClientSocket
 					.getInstance()
 					.init(phone)
-					.send("createUser", phone, new MainClientSocketController(handler,"createUser"));
-					*/
-					MainClientSocketController responseController = new MainClientSocketController(handler,"createUser");
+					.send("createUser", phone, new ClientResponse(handler,0));
+					
+					/*MainClientSocketController responseController = new MainClientSocketController(handler,"createUser");
 					responseController.setResponse("{\"validationCode\":\"3434\"}");
 	    		
-					new Thread(responseController).start();
+					new Thread(responseController).start();*/
 	    		
 				} 
 				catch(NumberParseException e) 
@@ -246,33 +252,56 @@ public class MainActivity extends Activity
 		
 	}
 	
-	public void validateCode(String code)
+	public void requestCode(JSONObject response)
 	{
-		Log.i("tantest","Main validateCode: "+code);
-		country.setVisibility(View.GONE);
-		phone_input.setVisibility(View.GONE);
-		View line = (View) findViewById(R.id.main_vertical_line);
-		line.setVisibility(View.GONE);
-		phone_code.setVisibility(View.VISIBLE);
-		ImageButton test = (ImageButton) findViewById(R.id.main_test);
-		test.setVisibility(View.GONE);
 		
-		connect.setVisibility(View.GONE);
-		ImageButton verify = (ImageButton) findViewById(R.id.main_verify);
-		verify.setVisibility(View.VISIBLE);
-
-		if(phone.equals("+34652905791"))
+		try
 		{
-			textCode.setText(textCode.getText()+" Pero como te conozco, solo tienes que pulsar en verificar :)");
-			phone_code.setText(code);
+
+			String code = response.getString("response");
+			
+			Log.i("tantest","Server envia codigo: "+code);
+			
+			//Ocultamos interfaz paso 1
+			country.setVisibility(View.GONE);
+			phone_input.setVisibility(View.GONE);
+			connect.setVisibility(View.GONE);
+			
+			View line = (View) findViewById(R.id.main_vertical_line);
+			line.setVisibility(View.GONE);
+			
+			ImageButton test = (ImageButton) findViewById(R.id.main_test);
+			test.setVisibility(View.GONE);
+			
+			//Mostramos interfaz paso 2
+			phone_code.setVisibility(View.VISIBLE);
+			
+			ImageButton verify = (ImageButton) findViewById(R.id.main_verify);
+			verify.setVisibility(View.VISIBLE);
+			
+			if(phone.equals("+34652905791"))
+			{
+				textCode.setText(textCode.getText()+" Pero como te conozco, solo tienes que pulsar en verificar :)");
+				phone_code.setText(code);
+			}
+			
+			Animation out = new TranslateAnimation(0, 0, -50, 0);
+			out.setFillAfter(true);
+			out.setDuration(2000);
+			
+			textCode.startAnimation(out);
+			textCode.setVisibility(View.VISIBLE);
+			
+			//Guardamos Codigo para posterior verificacion
+			this.code = code;
+			
+			loader.setVisibility(View.GONE);
+		} 
+		catch (JSONException e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		
-		Animation out = new TranslateAnimation(0, 0, -50, 0);
-		out.setFillAfter(true);
-		out.setDuration(2000);
-		
-		textCode.startAnimation(out);
-		textCode.setVisibility(View.VISIBLE);
 		
 		/*Animation out = new AlphaAnimation(1.0f, 0.0f);
 		out.setFillAfter(true);
@@ -301,23 +330,41 @@ public class MainActivity extends Activity
 			}
 		});
 		
-		textCode.startAnimation(out);*/
+		textCode.startAnimation(out);*/	
 		
-		this.code = code;
-		
-		loader.setVisibility(View.GONE);
 	}
 	
-	public void verifyCode(View view)
+	public void verifyCodeButtom(View view)
 	{
 		Log.i("tantest", "Verificando codigo");
-		String code_given = phone_code.getText().toString();
-		
-		Log.i("tantest", "Codigo dado: "+code_given);
+		Log.i("tantest", "Codigo dado: "+phone_code.getText().toString());
 		Log.i("tantest", "Codigo correcto: "+code);
 		
-		//final Animation in = new AlphaAnimation(0.0f, 1.0f);
-		//in.setDuration(1000);
+		ClientSocket
+		.getInstance()
+		.send("confirmValidationCode", phone_code.getText().toString(), new ClientResponse(handler,1));
+		
+		view.setEnabled(false);
+		loader.setVisibility(View.VISIBLE);
+	}
+	
+	public void verifyCode(JSONObject response)
+	{
+
+		loader.setVisibility(View.GONE);
+
+		boolean confirmated = false;
+		
+		try 
+		{
+			confirmated = response.getBoolean("response");
+		} 
+		catch (JSONException e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 		
 		final Animation out = new AlphaAnimation(1.0f, 0.0f);
 		out.setDuration(500);
@@ -353,7 +400,7 @@ public class MainActivity extends Activity
 			}
 		});
 		
-		if(code.equals(code_given))
+		if(confirmated)
 		{
 			Log.i("tantest", "Codigo correcto!");
 			
@@ -377,6 +424,10 @@ public class MainActivity extends Activity
 			textCode.setText(R.string.act_main_wrong_code);
 
 			textCode.startAnimation(out);
+			
+			ImageButton verify = (ImageButton) findViewById(R.id.main_verify);
+    		
+			verify.setEnabled(true);
 		}
 	}
 	
@@ -392,14 +443,6 @@ public class MainActivity extends Activity
     		loader.setVisibility(View.GONE);
 		}
     	
-    	
-    }
-    
-    // Alternative variant for API 5 and higher
-    @Override
-    public void onBackPressed() 
-    {
-      moveTaskToBack(true);
     }
 	
     public static String[] countries =

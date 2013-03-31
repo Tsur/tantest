@@ -12,16 +12,30 @@ import org.json.JSONObject;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
+import android.util.Log;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import com.actionbarsherlock.view.Menu;
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;
+import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
+import com.scripturesos.tantest.MainActivity.MainActivityHandler;
+import com.scripturesos.tantest.connection.ClientResponse;
+import com.scripturesos.tantest.connection.ClientSocket;
+import com.scripturesos.tantest.connection.MainClientSocketController;
 
 public class ContactsActivity extends ActionBarActivity {
 
 	//TextView debug;
-	ListView contactsListView;
+	private ListView contactsListView;
+	private ProgressBar loader;
+	private Map<String,String> phonesList;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -33,9 +47,21 @@ public class ContactsActivity extends ActionBarActivity {
 		/* INIT CONTENT VIEW */
 		setContentView(R.layout.activity_contacts);
 		
-		contactsListView = (ListView) findViewById(R.id.act_contacts_lv);
+		loader = (ProgressBar) findViewById(R.id.contacts_loader);
+		loader.setIndeterminate(true);
 		
-		getContacts();
+		Thread contacts = new Thread() {
+		    
+			public void run() 
+			{
+				contactsListView = (ListView) findViewById(R.id.act_contacts_lv);
+				handler = new ContactsActivityHandler(ContactsActivity.this);
+				getContacts();
+		    }
+		};
+		
+		contacts.start();
+		
 	}
 
 	@Override
@@ -46,13 +72,16 @@ public class ContactsActivity extends ActionBarActivity {
 		return true;
 	}
 	
+	/*
+	 * Obtenemos contactos de la Agenda
+	 */
 	private void getContacts()
 	{
 		ContentResolver cr = getContentResolver();
 		 
 		Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
 		
-		Map<String,String> phonesList = new HashMap<String,String>();
+		phonesList = new HashMap<String,String>();
 		
 		if(cursor.moveToFirst())
 		{
@@ -94,33 +123,44 @@ public class ContactsActivity extends ActionBarActivity {
 		       
 		}
 		
+		//Tenemos en phoneList un diccionario/ mapa de numeros -> nombre
 		cursor.close();
-
-		//debug.setText(contacts);
-		
-		//ListView lv = new ListView(this);
 		
 		//Conectamos con el servidor y mandamos telefonos
-		
+		ClientSocket
+		.getInstance()
+		.send("getContacts", phonesList.keySet(), new ClientResponse(handler,0));	
+		 
+	}
+	
+	public void displayContacts(JSONObject serverContacts)
+	{
+
 		ArrayList<ContactItemListView> contactItems = new ArrayList<ContactItemListView>();
-		JSONObject jsonContact = null;
+		JSONArray contacts;
+		JSONObject jsonContact;
 		String id = null;
 		ContactItemListView contact;
 		
 		//Recorremos respuesta del servidor y generamos el listView
 		try 
 		{
-			JSONArray serverContacts = getContactsFromServer(phonesList.keySet());
+			contacts = serverContacts.getJSONArray("response");
 			
-			for(int i = 0; i < serverContacts.length(); i++)
+			for(int i = 0; i < contacts.length(); i++)
 			{
 			
-				jsonContact = serverContacts.getJSONObject(i);
+				jsonContact = contacts.getJSONObject(i);
 				id = jsonContact.getString("id");
 				
 				if(phonesList.containsKey(id) == true)
 				{
-					contact = new ContactItemListView(Long.parseLong(id), phonesList.get(id), jsonContact.getString("status"), jsonContact.getString("points"), jsonContact.getString("photo"));
+					contact = new ContactItemListView(
+							Long.parseLong(id), 
+							jsonContact.getString("name").equals("") ? phonesList.get(id) : jsonContact.getString("name"), 
+							jsonContact.getString("status"), 
+							jsonContact.getString("points"), 
+							jsonContact.getString("photo"));
 					
 					contactItems.add(contact);
 				}
@@ -135,25 +175,33 @@ public class ContactsActivity extends ActionBarActivity {
 
 	    ContactListAdapter adapter = new ContactListAdapter(this, contactItems);
 	         
-	    contactsListView.setAdapter(adapter); 
+	    contactsListView.setAdapter(adapter);
 	}
 	
-	private JSONArray getContactsFromServer(Collection<String> contacts) throws JSONException
+	public class ContactsActivityHandler extends Handler 
 	{
-		
-		//Server.setCommand("getContacts", contacts);
-		
-		try 
-		{
-			return new JSONArray("[]");//new JSONArray(Server.send());
-		} 
-		catch (JSONException e) 
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		return new JSONArray("[]");
-	}
+        private ContactsActivity parent;
+
+        public ContactsActivityHandler(ContactsActivity parent) 
+        {
+            this.parent = parent;
+        }
+
+        public void handleMessage(Message msg) 
+        {
+            parent.handleMessage(msg);
+        }
+    }
+	
+	public void handleMessage(Message msg) 
+	{
+        switch(msg.what) 
+        {
+        	case 0: displayContacts((JSONObject)msg.obj);
+            break;
+        }
+    }
+	
+	public ContactsActivityHandler handler;
 
 }

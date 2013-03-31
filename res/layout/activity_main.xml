@@ -124,7 +124,7 @@
         android:layout_marginTop="41dp"
         android:background="@drawable/main_verify_buttom"
         android:contentDescription="@string/act_main_verify"
-        android:onClick="verifyCode" 
+        android:onClick="verifyCodeButtom" 
         android:visibility="gone"/>
 
     <ImageButton
@@ -137,7 +137,7 @@
         android:layout_marginTop="41dp"
         android:background="@drawable/main_connect_buttom"
         android:contentDescription="@string/act_main_connect"
-        android:onClick="connect" />
+        android:onClick="connectButtom" />
 
     <ImageButton
         android:id="@+id/main_test"

@@ -1,7 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/gray" >
+    android:windowActionBarOverlay="true"
+    android:background="@drawable/wall3" >
 
     <TextView
         android:id="@+id/act_contacts_text"
@@ -10,12 +11,21 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:layout_marginLeft="63dp"
-        android:layout_marginTop="94dp" />
+        android:layout_marginTop="94dp"
+        android:visibility="gone" />
     
      <ListView
         android:id="@+id/act_contacts_lv"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-    </ListView>
+        android:layout_height="wrap_content"
+        android:visibility="gone" />
+
+     <ProgressBar
+         android:id="@+id/contacts_loader"
+         style="?android:attr/progressBarStyleLarge"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_centerHorizontal="true"
+         android:layout_centerVertical="true" />
 	
 </RelativeLayout>
