@@ -85,6 +85,14 @@ public class ClientSocket extends Thread
         catch (Exception e) 
         {
         	Log.i("tantest", "Error conexion");
+        	ClientResponse response = responseHandlers.get("error");
+			
+			//Compose the message including the JSON object
+			Message msg = new Message();
+			msg.what = response.what;
+			
+			response.handler.sendMessage(msg);
+        	
         }
 
     	return null;
@@ -119,6 +127,11 @@ public class ClientSocket extends Thread
     public void send(String method, String argument, ClientResponse controller)
     {
 
+    	if(clientSocket == null)
+    	{
+    		return;
+    	}
+    		
     	String id = UUID.randomUUID().toString();
 
     	responseHandlers.put(id, controller);
@@ -136,6 +149,11 @@ public class ClientSocket extends Thread
     
     public void send(String method, Collection<String> arguments, ClientResponse controller)
     {
+    	
+    	if(clientSocket == null)
+    	{
+    		return;
+    	}
     	
     	String id = UUID.randomUUID().toString();
     	

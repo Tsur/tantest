@@ -120,7 +120,10 @@ public class MainActivity extends Activity
 		/* INIT CONTENT VIEW */
 		setContentView(R.layout.activity_main);
 		
-		getActionBar().hide();
+		if (Build.VERSION.SDK_INT >= 11)
+		{
+			getActionBar().hide();
+		}
 		
 		loader = (ProgressBar) findViewById(R.id.main_progressbar);
 		loader.setIndeterminate(true);
@@ -321,7 +324,7 @@ public class MainActivity extends Activity
 			Log.i("tantest","Server envia codigo a requestCodeSMS: "+code);
 
 			sms_mode = true;
-			sendSMS("5556","Tantest codigo: "+code);
+			sendSMS(phone,"Tantest codigo: "+code);
 
 			//Guardamos Codigo para posterior verificacion
 			this.code = code;

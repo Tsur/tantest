@@ -351,8 +351,6 @@ public class ContactsActivity extends ActionBarActivity {
 	
 	public void displayContacts(JSONObject serverContacts)
 	{
-
-		progress.setVisibility(View.GONE);
 		
 		contactsListView = (ListView) findViewById(R.id.act_contacts_lv);
 		
@@ -367,25 +365,39 @@ public class ContactsActivity extends ActionBarActivity {
 		{
 			contacts = serverContacts.getJSONArray("response");
 			
-			for(int i = 0; i < contacts.length(); i++)
+			if(contacts.length() == 0)
 			{
-			
-				jsonContact = contacts.getJSONObject(i);
-				id = jsonContact.getString("id");
-				
-				if(phonesList.containsKey(id) == true)
+				displayNoAgenda("Ninguno de tus contactos utiliza tantest, qué pena ...");
+			}
+			else
+			{
+				for(int i = 0; i < contacts.length(); i++)
 				{
-					contact = new ContactItemListView(
-							Long.parseLong(id), 
-							jsonContact.getString("name").equals("") ? phonesList.get(id) : jsonContact.getString("name"), 
-							jsonContact.getString("status"), 
-							jsonContact.getString("points"), 
-							jsonContact.getString("photo"));
-					
-					contactItems.add(contact);
-				}
 				
-			} 
+					jsonContact = contacts.getJSONObject(i);
+					id = jsonContact.getString("id");
+					
+					if(phonesList.containsKey(id) == true)
+					{
+						contact = new ContactItemListView(
+								Long.parseLong(id), 
+								jsonContact.getString("name").equals("") ? phonesList.get(id) : jsonContact.getString("name"), 
+								jsonContact.getString("status"), 
+								jsonContact.getString("points"), 
+								jsonContact.getString("photo"));
+						
+						contactItems.add(contact);
+					}
+					
+				} 
+				
+				ContactListAdapter adapter = new ContactListAdapter(this, contactItems);
+		         
+			    contactsListView.setAdapter(adapter);
+			    
+			    progress.setVisibility(View.GONE);
+			}
+			
 		}
 		catch (JSONException e)
 		{
@@ -393,9 +405,6 @@ public class ContactsActivity extends ActionBarActivity {
 			e.printStackTrace();
 		}
 
-	    ContactListAdapter adapter = new ContactListAdapter(this, contactItems);
-	         
-	    contactsListView.setAdapter(adapter);
 	}
 	
 	public class ContactsActivityHandler extends Handler 
