@@ -178,11 +178,11 @@ public class MainActivity extends Activity
 	
 	public void connectButtom(View view)
 	{
-		/*Intent cintent = new Intent(this, ContactsActivity.class);
+		Intent cintent = new Intent(this, ContactsActivity.class);
 		Log.i("tantes","iniciando actividad");
-		startActivity(cintent);*/
+		startActivity(cintent);
 		
-		Log.i("tantest", "Pulsado connect");
+		/*Log.i("tantest", "Pulsado connect");
 		loader.setVisibility(View.VISIBLE);
 
 		phone = phone_input.getText().toString();
@@ -228,7 +228,7 @@ public class MainActivity extends Activity
 		    }
 		};
 		
-		handlePhone.start();
+		handlePhone.start();*/
 
 	}
 	

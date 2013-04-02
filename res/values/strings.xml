@@ -21,5 +21,11 @@
 	<string name="act_main_right_code">El código introducido es correctísimo brother, ¡ pasa adelante !</string>
 	<string name="home_no_chats">No has iniciado ninguna conversación. ¡ Pulsa aquí o en el botón contactos de la esquinita de arriba para iniciar una conversación nueva !</string>
 	<string name="contacts_no_agenda">Su agenda no dispone de ningún contacto. Necesitas añadir los contactos a la agenda de su teléfono antes de poder iniciar una conversación. Si estás usando una tableta, entonces importe sus contactos desde el menú de opciones.</string>
+	<string name="contacts_no_agenda_import">El archivo importado no contiene la información necesaria, ¡ prueba con otro !</string>
+	
+	<string name="empty_directory">Empty Directory</string>
+	<string name="storage_removed">Storage was removed or unmounted.</string>
+	<string name="choose_file">Select a file</string>
+	<string name="error_selecting_file">Error selecting File</string>
 	
 </resources>
