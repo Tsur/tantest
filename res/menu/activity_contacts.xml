@@ -6,6 +6,12 @@
         android:showAsAction="never"
         android:icon="@drawable/ic_settings"
         android:title="@string/menu_settings"/>
+    
+    <item
+        android:id="@+id/menu_contacts_import"
+        android:showAsAction="never"
+        android:icon="@drawable/ic_settings"
+        android:title="@string/menu_contacts_import"/>
      
      <item android:id="@+id/menu_header_search"
           android:icon="@drawable/ic_menu_header_social"

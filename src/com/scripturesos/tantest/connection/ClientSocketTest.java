@@ -7,7 +7,7 @@ public class ClientSocketTest
 	{
 		ClientSocket
 		.getInstance()
-		.init("+34661188615");
+		.init("+34661188615","+34");
 		//.send("createUser", phone, new MainClientSocketController(this,"createUser"));
 	
 	}

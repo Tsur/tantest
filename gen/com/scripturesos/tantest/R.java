@@ -1301,9 +1301,12 @@ containing a value of this type.
         public static final int main_verify=0x7f070040;
         public static final int main_verify_text=0x7f070043;
         public static final int main_vertical_line=0x7f07003d;
-        public static final int menu_header_search=0x7f07005e;
-        public static final int menu_header_social=0x7f070060;
-        public static final int menu_header_test=0x7f07005f;
+        public static final int menu_contacts_import=0x7f07005e;
+        public static final int menu_header_search=0x7f07005f;
+        public static final int menu_header_social=0x7f070061;
+        public static final int menu_header_test=0x7f070060;
+        public static final int menu_main_code=0x7f070063;
+        public static final int menu_main_help=0x7f070062;
         public static final int menu_settings=0x7f07005d;
         public static final int normal=0x7f070001;
         public static final int relativeLayout1=0x7f07003e;
@@ -1319,7 +1322,7 @@ containing a value of this type.
         public static final int testQuestionsContainer=0x7f070044;
         public static final int testSeekBar=0x7f070049;
         public static final int testSeekBarText=0x7f070045;
-        public static final int test_menu_header_grade=0x7f070061;
+        public static final int test_menu_header_grade=0x7f070064;
         public static final int testgrade_imageKO=0x7f070052;
         public static final int testgrade_imageOK=0x7f070051;
         public static final int testgrade_textbase=0x7f07004f;
@@ -1372,8 +1375,9 @@ containing a value of this type.
     public static final class menu {
         public static final int activity_contacts=0x7f0e0000;
         public static final int activity_home=0x7f0e0001;
-        public static final int activity_scroll_test=0x7f0e0002;
-        public static final int activity_test_grade=0x7f0e0003;
+        public static final int activity_main=0x7f0e0002;
+        public static final int activity_scroll_test=0x7f0e0003;
+        public static final int activity_test_grade=0x7f0e0004;
     }
     public static final class raw {
         public static final int bible=0x7f060000;
@@ -1424,32 +1428,39 @@ containing a value of this type.
         /**  Description of a share target (both in the list of such or the default share button) in a ShareActionProvider (share UI). [CHAR LIMIT=NONE] 
          */
         public static final int abs__shareactionprovider_share_with_application=0x7f0c0009;
-        public static final int act_contacts_title=0x7f0c0019;
-        public static final int act_main_code=0x7f0c001b;
-        public static final int act_main_connect=0x7f0c001c;
-        public static final int act_main_offine=0x7f0c001d;
-        public static final int act_main_phone=0x7f0c001a;
-        public static final int act_main_right_code=0x7f0c0021;
-        public static final int act_main_verify=0x7f0c001e;
-        public static final int act_main_verify_text=0x7f0c001f;
-        public static final int act_main_wrong_code=0x7f0c0020;
+        public static final int act_contacts_title=0x7f0c001c;
+        public static final int act_main_code=0x7f0c001e;
+        public static final int act_main_connect=0x7f0c001f;
+        public static final int act_main_offine=0x7f0c0020;
+        public static final int act_main_phone=0x7f0c001d;
+        public static final int act_main_right_code=0x7f0c0028;
+        public static final int act_main_sms_body=0x7f0c0025;
+        public static final int act_main_sms_sign=0x7f0c0026;
+        public static final int act_main_sms_validating=0x7f0c0023;
+        public static final int act_main_verify=0x7f0c0021;
+        public static final int act_main_verify_nosms=0x7f0c0024;
+        public static final int act_main_verify_text=0x7f0c0022;
+        public static final int act_main_wrong_code=0x7f0c0027;
         public static final int app_name=0x7f0c000f;
-        public static final int choose_file=0x7f0c0027;
-        public static final int contacts_no_agenda=0x7f0c0023;
-        public static final int contacts_no_agenda_import=0x7f0c0024;
-        public static final int empty_directory=0x7f0c0025;
-        public static final int error_selecting_file=0x7f0c0028;
+        public static final int choose_file=0x7f0c002e;
+        public static final int contacts_no_agenda=0x7f0c002a;
+        public static final int contacts_no_agenda_import=0x7f0c002b;
+        public static final int empty_directory=0x7f0c002c;
+        public static final int error_selecting_file=0x7f0c002f;
         public static final int hello_world=0x7f0c0010;
-        public static final int home_no_chats=0x7f0c0022;
-        public static final int menu_header_search=0x7f0c0018;
+        public static final int home_no_chats=0x7f0c0029;
+        public static final int menu_contacts_import=0x7f0c0014;
+        public static final int menu_header_search=0x7f0c0019;
         public static final int menu_header_social=0x7f0c0013;
         public static final int menu_header_test=0x7f0c0012;
+        public static final int menu_help=0x7f0c001a;
+        public static final int menu_main_code=0x7f0c001b;
         public static final int menu_settings=0x7f0c0011;
-        public static final int storage_removed=0x7f0c0026;
-        public static final int test_back_button=0x7f0c0015;
-        public static final int test_menu_header_grade=0x7f0c0017;
-        public static final int test_next_button=0x7f0c0014;
-        public static final int test_text_question=0x7f0c0016;
+        public static final int storage_removed=0x7f0c002d;
+        public static final int test_back_button=0x7f0c0016;
+        public static final int test_menu_header_grade=0x7f0c0018;
+        public static final int test_next_button=0x7f0c0015;
+        public static final int test_text_question=0x7f0c0017;
     }
     public static final class style {
         /** 

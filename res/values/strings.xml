@@ -5,11 +5,14 @@
     <string name="menu_settings">Opciones</string>
 	<string name="menu_header_test">Nuevo Examen</string>
 	<string name="menu_header_social">Contactos</string>
+	<string name="menu_contacts_import">Importar Contactos</string>
 	<string name="test_next_button">Siguiente</string>
 	<string name="test_back_button">Anterior</string>
 	<string name="test_text_question">Pregunta</string>
 	<string name="test_menu_header_grade">¡Nota final!</string>
 	<string name="menu_header_search">Buscar</string>
+	<string name="menu_help">Ayuda</string>
+	<string name="menu_main_code">Insertar Código Manualmente</string>
 	<string name="act_contacts_title">Selecciona Contacto</string>
 	<string name="act_main_phone">Teléfono</string>
 	<string name="act_main_code">Código Validación</string>
@@ -17,6 +20,10 @@
 	<string name="act_main_offine">Desconectado</string>
 	<string name="act_main_verify">Verificar</string>
 	<string name="act_main_verify_text">Hemos enviado un código de verificación a su telefono, introduzcalo y pulse verificar para validar su cuenta.</string>
+	<string name="act_main_sms_validating">Estamos validando su número de telefono, espere por favor ...</string>
+	<string name="act_main_verify_nosms">Introduzca eL código de verificación de su telefono y pulse verificar para validar su cuenta.</string>
+	<string name="act_main_sms_body">Su código de verificación es</string>
+	<string name="act_main_sms_sign">El Señor te bendiga. Tantest.</string>
 	<string name="act_main_wrong_code">El código introducido no es correcto brother, ¡ revisalo bien !</string>
 	<string name="act_main_right_code">El código introducido es correctísimo brother, ¡ pasa adelante !</string>
 	<string name="home_no_chats">No has iniciado ninguna conversación. ¡ Pulsa aquí o en el botón contactos de la esquinita de arriba para iniciar una conversación nueva !</string>

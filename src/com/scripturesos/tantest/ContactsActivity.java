@@ -39,6 +39,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 import com.ipaulpro.afilechooser.utils.FileUtils;
 import com.scripturesos.tantest.connection.ClientResponse;
 import com.scripturesos.tantest.connection.ClientSocket;
@@ -79,6 +80,18 @@ public class ContactsActivity extends ActionBarActivity {
 	{
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getSupportMenuInflater().inflate(R.menu.activity_contacts, menu);
+		return true;
+	}
+	
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		
+		switch(item.getItemId())
+		{
+			case R.id.menu_contacts_import: importVCF(null);break;
+			default:break;
+		}
+		
 		return true;
 	}
 	

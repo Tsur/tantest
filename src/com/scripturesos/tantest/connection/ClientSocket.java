@@ -23,12 +23,13 @@ public class ClientSocket extends Thread
 	
 	private Socket clientSocket;
 	private String clientID;
+	private String countryCode;
 	//private List<String> commands;
 	//private String command;
 	private PrintWriter out;
     private BufferedReader in;
     //private SocketResponse responseController;
-	private Map<String,ClientResponse> responseHandlers;
+	private Map<String,ClientResponse> responseHandlers = new HashMap<String,ClientResponse>();
 	boolean connected = false;
 	
 	//Bill Pugh Singleton thread safe solution
@@ -44,7 +45,7 @@ public class ClientSocket extends Thread
 	    return InstanceHolder.instance;
 	}
 	
-	public final ClientSocket init(String client) 
+	public final ClientSocket init(String client, String country) 
     {
         //assert clientSocket == null;
 		/*if(clientSocket != null)
@@ -68,8 +69,9 @@ public class ClientSocket extends Thread
     	try 
         {
             clientID = client;
+            countryCode = country;
             //commands = new ArrayList<String>();
-            responseHandlers = new HashMap<String,ClientResponse>();
+            //responseHandlers = new HashMap<String,ClientResponse>();
             //Log.i("tantest", "Conectando");
             clientSocket = new Socket(IP, PORT); 
             //Log.i("tantest", "Conectado");
@@ -91,6 +93,16 @@ public class ClientSocket extends Thread
     public String getClient()
     {
     	return clientID;
+    }
+    
+    public Map<String,ClientResponse> getHandlers()
+    {
+    	return responseHandlers;
+    }
+    
+    public String getCountry()
+    {
+    	return countryCode;
     }
     
     /*public void send(String method, String argument, SocketResponse controller)
@@ -166,7 +178,7 @@ public class ClientSocket extends Thread
 		//new Thread(responseController).start();
 
     	final String res = response;
-    	//Log.i("tantest", "Respuesta del servidor: "+res);
+    	Log.i("tantest", "Respuesta del servidor: "+res);
     	
     	(new Thread() {
 		    
@@ -175,22 +187,39 @@ public class ClientSocket extends Thread
 				try 
 				{
 					//Parse response to JSON object
-					JSONObject jres = new JSONObject(res);
-					String id = jres.getString("id");
+					if(res.equals("error"))
+					{
+						ClientResponse response = responseHandlers.get("error");
+						
+						//Compose the message including the JSON object
+						Message msg = new Message();
+						msg.what = response.what;
+						
+						response.handler.sendMessage(msg);
 					
-					//Get the handler information
-					ClientResponse response = responseHandlers.get(id);
+					}
+					else
+					{
+						JSONObject jres = new JSONObject(res);
+						String id = jres.getString("id");
 					
-					//Compose the message including the JSON object
-					Message msg = new Message();
-					msg.obj = jres;
-					msg.what = response.what;
+						//Get the handler information
+						ClientResponse response = responseHandlers.get(id);
+					
+						//Compose the message including the JSON object
+						Message msg = new Message();
+						msg.obj = jres;
+						msg.what = response.what;
+						
+						response.handler.sendMessage(msg);
+					
+						responseHandlers.remove(id);
+					}
+					
 					
 					//Send Message to handler
 					//Log.i("tantest", "Enviamos mensaje al manejador");
-					response.handler.sendMessage(msg);
 					
-					responseHandlers.remove(id);
 				} 
 				catch (JSONException e) 
 				{
@@ -254,7 +283,7 @@ public class ClientSocket extends Thread
  	   
     }
 	
-	private final String IP = "192.168.1.132";
+	private final String IP = "54.246.107.200";
     private final int PORT = 3000;
     private final int INTERVAL = 1000;
     //private final int CON_INTERVAL = 100;
