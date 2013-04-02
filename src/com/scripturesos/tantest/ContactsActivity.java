@@ -120,11 +120,17 @@ public class ContactsActivity extends ActionBarActivity {
 			Cursor phones = cr.query(Phone.CONTENT_URI, null,
 		            Phone.CONTACT_ID + " = " + contactId, null, null);
 
+			String country = ClientSocket.getInstance().getCountry();
 			
 			while(phones.moveToNext())
 			{
 				
-				String number = phones.getString(phones.getColumnIndex(Phone.NUMBER));
+				String number = phones.getString(phones.getColumnIndex(Phone.NUMBER)).trim();
+				
+				if(!number.startsWith("+"))
+				{
+					number = country+number;
+				}
 				
 				phonesList.put("\""+number+"\"",name);
 
@@ -375,18 +381,19 @@ public class ContactsActivity extends ActionBarActivity {
 				{
 				
 					jsonContact = contacts.getJSONObject(i);
-					id = jsonContact.getString("id");
+					id = jsonContact.getString("client");
 					
-					if(phonesList.containsKey(id) == true)
+					if(phonesList.containsKey("\""+id+"\"") == true)
 					{
 						contact = new ContactItemListView(
-								Long.parseLong(id), 
-								jsonContact.getString("name").equals("") ? phonesList.get(id) : jsonContact.getString("name"), 
+								Long.parseLong(id.substring(1)), 
+								jsonContact.getString("name").equals("") ? phonesList.get("\""+id+"\"") : jsonContact.getString("name"), 
 								jsonContact.getString("status"), 
 								jsonContact.getString("points"), 
 								jsonContact.getString("photo"));
 						
 						contactItems.add(contact);
+						Log.i("tantest",id);
 					}
 					
 				} 
@@ -394,6 +401,8 @@ public class ContactsActivity extends ActionBarActivity {
 				ContactListAdapter adapter = new ContactListAdapter(this, contactItems);
 		         
 			    contactsListView.setAdapter(adapter);
+			    
+			    contactsListView.setVisibility(View.VISIBLE);
 			    
 			    progress.setVisibility(View.GONE);
 			}
