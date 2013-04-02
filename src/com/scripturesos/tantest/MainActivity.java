@@ -632,6 +632,9 @@ public class MainActivity extends Activity
 		{
 			Log.i("tantest", "Codigo correcto!");
 			
+			unregisterReceiver(bcr_sent);
+			unregisterReceiver(bcr_received);
+			
 			startActivity(new Intent(MainActivity.this, HomeActivity.class));
 			
 			Log.i("tantes","iniciando actividad");

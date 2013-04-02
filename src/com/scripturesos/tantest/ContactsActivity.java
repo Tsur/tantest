@@ -126,7 +126,7 @@ public class ContactsActivity extends ActionBarActivity {
 				
 				String number = phones.getString(phones.getColumnIndex(Phone.NUMBER));
 				
-				phonesList.put(number,name);
+				phonesList.put("\""+number+"\"",name);
 
 				/*int type = phones.getInt(phones.getColumnIndex(Phone.TYPE));
 				
@@ -153,9 +153,14 @@ public class ContactsActivity extends ActionBarActivity {
 		//Conectamos con el servidor y mandamos telefonos
 		if(phonesList.size() > 0)
 		{
+			List<String> args = new ArrayList<String>();
+			
+			args.add(phonesList.keySet().toString());
+			args.add(ClientSocket.getInstance().getCountry());
+			
 			ClientSocket
 			.getInstance()
-			.send("getContacts", phonesList.keySet(), new ClientResponse(handler,0));	
+			.send("getContacts", args, new ClientResponse(handler,0));	
 		}
 		else
 		{

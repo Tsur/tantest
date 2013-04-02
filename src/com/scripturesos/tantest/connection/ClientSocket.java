@@ -147,10 +147,21 @@ public class ClientSocket extends Thread
     	String args = "[";
     	
     	Iterator<String> it = arguments.iterator();
+    	String elem;
     	
     	while(it.hasNext())
     	{
-    		args += "\""+it.next()+"\",";
+    		elem = it.next();
+    		
+    		if(elem.startsWith("["))
+    		{
+    			args += elem+",";
+    		}
+    		else
+    		{
+    			args += "\""+elem+"\",";
+    		}
+    		
     	}
     	
     	if(arguments.size() > 0)
