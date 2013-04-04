@@ -4,30 +4,20 @@
   android:layout_height="wrap_content" >
  
   	<ImageView
-	    android:id="@+id/contacts_lv_img"
-	    android:layout_width="48dp"
-	    android:layout_height="48dp"
-	    android:layout_alignParentLeft="true"
-	    android:layout_centerInParent="true"
-	    android:background="@drawable/test_back_buttom"
-    />
-
-	<TextView
-	    android:id="@+id/contacts_lv_name"
-	    android:layout_width="wrap_content"
-	    android:layout_height="wrap_content"
-	    android:layout_alignParentTop="true"
-	    android:layout_centerHorizontal="true"
-	    android:text="name"
-	    android:textSize="20sp" />
+  	    android:id="@+id/contacts_lv_img"
+  	    android:layout_width="48dp"
+  	    android:layout_height="48dp"
+  	    android:layout_alignParentLeft="true"
+  	    android:layout_alignParentTop="true"
+  	    android:background="@drawable/profile" />
 
 	<TextView
 	    android:id="@+id/contacts_lv_status"
 	    android:layout_width="wrap_content"
 	    android:layout_height="wrap_content"
 	    android:layout_below="@+id/contacts_lv_name"
-	    android:layout_centerHorizontal="true"
-	    android:text="status"
+	    android:layout_marginLeft="10dp"
+	    android:layout_toRightOf="@+id/contacts_lv_img"
 	    android:textSize="15sp" />
 
 	<TextView
@@ -40,7 +30,20 @@
 	    android:layout_below="@id/contacts_lv_name"
 	    android:layout_marginRight="10dp"
 	    android:layout_marginTop="10dp"
-	    android:text="points"
-	    android:textSize="20sp" />
+	    android:textColor="@color/black"
+	    android:textSize="20sp"
+	    android:textStyle="bold" />
+
+	<TextView
+	    android:id="@+id/contacts_lv_name"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentTop="true"
+	    android:layout_marginLeft="10dp"
+	    android:layout_marginTop="2dp"
+	    android:layout_toRightOf="@+id/contacts_lv_img"
+	    android:textColor="@color/black"
+	    android:textSize="20sp"
+	    android:textStyle="bold" />
 
 </RelativeLayout>

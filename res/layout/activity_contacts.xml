@@ -5,10 +5,12 @@
     android:background="@drawable/wall3" >
     
      <ListView
-        android:id="@+id/act_contacts_lv"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:visibility="gone" />
+         android:id="@+id/act_contacts_lv"
+         android:layout_width="match_parent"
+         android:layout_height="wrap_content"
+         android:divider="@drawable/horizontal_line"
+         android:dividerHeight="3dp"
+         android:background="@color/trans_blue" />
 
      <ProgressBar
          android:id="@+id/act_contacts_loader"

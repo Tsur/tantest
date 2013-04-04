@@ -12,7 +12,7 @@
 	<string name="test_menu_header_grade">¡Nota final!</string>
 	<string name="menu_header_search">Buscar</string>
 	<string name="menu_help">Ayuda</string>
-	<string name="menu_main_code">Insertar Código Manualmente</string>
+	<string name="menu_main_code">Añadir Dispositivo</string>
 	<string name="act_contacts_title">Selecciona Contacto</string>
 	<string name="act_main_phone">Teléfono</string>
 	<string name="act_main_code">Código Validación</string>

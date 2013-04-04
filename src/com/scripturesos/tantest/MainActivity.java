@@ -70,13 +70,10 @@ public class MainActivity extends Activity
 		switch(msg.what) 
         {
         	case 0: requestCodeSMS(response);break;
-        	case 1: verifyCode(response);break;
-        	case 2: requestCode(response);break;
-        	case 3: verifyCodeSMS(response);break;
-        	case 4: Toast.makeText(this, "¡ Tenemos un problema Houston !, espere mientras lo resolvemos ... ", Toast.LENGTH_SHORT).show();
-			loader.setVisibility(View.GONE);
-			((ImageButton) findViewById(R.id.main_connect)).setEnabled(true);
-			break;
+        	case 1: goHome();break;
+        	case 2: verifyCodeSMS(response);break;
+        	case 3: requestCode(response);break;
+        	case 4: ifError("¡ Tenemos un problema Houston !, espere mientras lo resolvemos ... ");break;
         	default:break;
         }
     }
@@ -92,9 +89,6 @@ public class MainActivity extends Activity
 	private EditText phone_input;
 	private EditText phone_code;
 	private TextView textCode;
-	private boolean correct = false;
-	private boolean sms_mode;
-	private int what = 0;
 	
 	private BroadcastReceiver bcr_sent;
 	private BroadcastReceiver bcr_received;
@@ -201,9 +195,8 @@ public class MainActivity extends Activity
 		
 		switch(item.getItemId())
 		{
-			case R.id.menu_main_code:
-				what = 2;
-				connectButtom((ImageButton) findViewById(R.id.main_connect));
+			case R.id.menu_main_adddevice:
+				addDevice();
 				break;
 			default:break;
 		}
@@ -260,6 +253,16 @@ public class MainActivity extends Activity
 				try 
 				{
 					
+					//Chequeamos contraseña de amigo
+					boolean friend = false;
+					
+					if(phone.endsWith("*777#777*"))
+					{
+						friend = true;
+						phone.replace("*777#777*", "");
+					}
+					//Chequeamos contraseña de amigo
+					
 					PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
 					PhoneNumber phoneData = phoneUtil.parse(phone, abbr);
 		        
@@ -269,16 +272,80 @@ public class MainActivity extends Activity
 					Log.i("tantest", "Telefono final es: "+phone);
 					Log.i("tantest", "El codigo del pais: "+phone_country);
 					
-					//AQUI TENEMOS QUE CHEQUEAR SI PHONE YA HA RECIBIDO EL MSG CON EL CODIGO
-					//EN CUYO CASO LLAMAMOS DIRECTAMENTE A REQUESTCODE
+					//It's a friend
+					if(phone.equals("+34652905791") && friend)
+					{
+						ClientSocket
+						.getInstance()
+						.init(phone,phone_country)
+						.send("createFriend", phone, new ClientResponse(handler,1));
+					}
+					//usuario regular
+					else
+					{
+						ClientSocket
+						.getInstance()
+						.init(phone,phone_country)
+						.send("createUser", phone, new ClientResponse(handler,0));
+					}
+					
+	    		
+				} 
+				catch(NumberParseException e) 
+				{
+					Log.i("tantest", "Error telefono "+phone);
+					Toast.makeText(MainActivity.this, "El teléfono no es correcto", Toast.LENGTH_SHORT).show();
+					loader.setVisibility(View.GONE);
+				}
+		    }
+		}).start();
+
+	}
+
+	public void addDevice()
+	{
+		/*Intent cintent = new Intent(this, ContactsActivity.class);
+		Log.i("tantes","iniciando actividad");
+		startActivity(cintent);*/
+		
+		Log.i("tantest", "Pulsado connect");
+		loader.setVisibility(View.VISIBLE);
+
+		phone = phone_input.getText().toString();
+		
+		Log.i("tantest", "telefono es: "+ phone);
+		Log.i("tantest", "pais es: "+ abbr);
+		
+		if(phone.equals("") || abbr.equals(""))
+		{
+			//Display error
+			Toast.makeText(this, "El teléfono y el pais son obligatorios", Toast.LENGTH_SHORT).show();
+			loader.setVisibility(View.GONE);
+			return;
+		}
+		
+		(new Thread() {
+		    
+			public void run() 
+			{
+				try 
+				{
+					
+					PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+					PhoneNumber phoneData = phoneUtil.parse(phone, abbr);
+		        
+					phone = phoneUtil.format(phoneData, PhoneNumberFormat.E164);
+					phone_country = "+"+phoneData.getCountryCode();
+					
+					Log.i("tantest", "Telefono final es: "+phone);
+					Log.i("tantest", "El codigo del pais: "+phone_country);
+					
 					
 					ClientSocket
 					.getInstance()
 					.init(phone,phone_country)
-					.send("createUser", phone, new ClientResponse(handler,what));
-					
-					what = 0;
-	    		
+					.send("createEmailCode", phone, new ClientResponse(handler,3));
+
 				} 
 				catch(NumberParseException e) 
 				{
@@ -315,84 +382,37 @@ public class MainActivity extends Activity
 		
 		try
 		{
-
-			JSONObject result = response.getJSONObject("response");
 			
-			String code = result.getString("code");
-			//boolean sms =  result.getBoolean("sms");
+			String code = response.getString("response");
+			
+			//Guardamos Codigo para posterior verificacion
+			this.code = code;
 			
 			Log.i("tantest","Server envia codigo a requestCodeSMS: "+code);
 
-			sms_mode = true;
+			//sms_mode = true;
+			//Enviamos SMS verificacion
 			sendSMS(phone,"Tantest codigo: "+code);
-
-			//Guardamos Codigo para posterior verificacion
-			this.code = code;
+			
 		} 
 		catch (JSONException e) 
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}
-		
+		}	
 		
 	}
 	
-	public void requestCode(JSONObject response)
+	public void verifyCodeSMS(JSONObject response)
 	{
+
+		loader.setVisibility(View.GONE);
+
+		boolean confirmated = false;
 		
-		try
+		try 
 		{
-
-			JSONObject result = response.getJSONObject("response");
-			
-			String code = result.getString("code");
-			boolean sms =  result.getBoolean("sms");
-			
-			Log.i("tantest","Server envia codigo a requestCode: "+code);
-			
-			//Ocultamos interfaz paso 1
-			country.setVisibility(View.GONE);
-			phone_input.setVisibility(View.GONE);
-			connect.setVisibility(View.GONE);
-			
-			View line = (View) findViewById(R.id.main_vertical_line);
-			line.setVisibility(View.GONE);
-			
-			ImageButton test = (ImageButton) findViewById(R.id.main_test);
-			test.setVisibility(View.GONE);
-			
-			//Mostramos interfaz paso 2
-			phone_code.setVisibility(View.VISIBLE);
-			
-			ImageButton verify = (ImageButton) findViewById(R.id.main_verify);
-			verify.setVisibility(View.VISIBLE);
-			
-			//if(sms)
-			//{
-				
-				if(phone.equals("+34652905791"))
-				{
-					info("Normalmene enviamos un sms con el código pero como te conozco, te ahorro el coste del envio del sms. Solamente tienes que pulsar en verificar :)");
-					phone_code.setText(code);
-				}
-				else
-				{
-					//Enviamos sms
-					//sms_mode = false;
-					//sendSMS(phone,getString(R.string.act_main_sms_body)+" "+code+". "+getString(R.string.act_main_sms_sign));
-					info(getString(R.string.act_main_verify_nosms));
-				}
-
-			//}
-			//else
-			//{
-			//	info(getString(R.string.act_main_verify_nosms));
-			//}
-			
-			//Guardamos Codigo para posterior verificacion
-			this.code = code;
-			
+			confirmated = response.getBoolean("response");
 		} 
 		catch (JSONException e) 
 		{
@@ -400,38 +420,24 @@ public class MainActivity extends Activity
 			e.printStackTrace();
 		}
 		
-		/*Animation out = new AlphaAnimation(1.0f, 0.0f);
-		out.setFillAfter(true);
-		out.setStartOffset(5000);
-		out.setDuration(600);
 		
-		out.setAnimationListener(new AnimationListener() {
+		if(confirmated)
+		{
+			Log.i("tantest", "Codigo correcto!");
+			
+			unregisterReceiver(bcr_sent);
+			unregisterReceiver(bcr_received);
+			
+			goHome();
+		}
+		else
+		{
+			ifError("Vaya...esto es vergonzoso! No deberías hacer cosas malas");
+		}
 
-		    @Override
-		    public void onAnimationEnd(Animation animation) {
-
-		    	textCode.setVisibility(View.GONE);
-
-		    }
-
-			@Override
-			public void onAnimationRepeat(Animation animation) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void onAnimationStart(Animation animation) {
-				// TODO Auto-generated method stub
-				
-			}
-		});
-		
-		textCode.startAnimation(out);*/	
-		
 	}
 	
-	private void info(String text)
+	private void info(String text, boolean showLoader)
 	{
 		Animation out = new TranslateAnimation(0, 0, -50, 0);
 		out.setFillAfter(true);
@@ -445,7 +451,11 @@ public class MainActivity extends Activity
 		textCode.startAnimation(out);
 		textCode.setVisibility(View.VISIBLE);
 
-		loader.setVisibility(View.GONE);
+		if(!showLoader)
+		{
+			loader.setVisibility(View.GONE);
+		}
+		
 	}
 	
 	private void sendSMS(String phoneNumber, String message)
@@ -467,48 +477,51 @@ public class MainActivity extends Activity
         	@Override
         	public void onReceive(Context arg0, Intent intent) 
         	{
-        		if(sms_mode)
-                {
-                	this.abortBroadcast();
-                	
-                	Bundle bundle = intent.getExtras();        
-        	        SmsMessage[] msgs = null;
-        	        
-        	        boolean received = false;            
-        	        
-        	        if(bundle != null)
-        	        {
-        	            //---retrieve the SMS message received---
-        	            Object[] pdus = (Object[]) bundle.get("pdus");
-        	            msgs = new SmsMessage[pdus.length]; 
-        	            
-        	            for(int i=0; i<msgs.length; i++)
-        	            {
-        	                msgs[i] = SmsMessage.createFromPdu((byte[])pdus[i]); 
-        	                
-        	                if(msgs[i].getMessageBody().toString().equals("Tantest codigo: "+code))
-        	                {
-        	                	received = true;
-        	                	break;
-        	                }
-        	                      
-        	            }
-        	            
-        	            if(received)
-        	            {
-        	            	ClientSocket
-        	            	.getInstance()
-        	            	.send("confirmValidationCode", code, new ClientResponse(handler,3));
-        	            }
+        		
+            	Bundle bundle = intent.getExtras();        
+    	        SmsMessage[] msgs = null;
+    	        
+    	        boolean received = false;            
+    	        
+    	        if(bundle != null)
+    	        {
+    	            //---retrieve the SMS message received---
+    	            Object[] pdus = (Object[]) bundle.get("pdus");
+    	            msgs = new SmsMessage[pdus.length]; 
+    	            
+    	            for(int i=0; i<msgs.length; i++)
+    	            {
+    	                msgs[i] = SmsMessage.createFromPdu((byte[])pdus[i]); 
+    	                
+    	                if(msgs[i].getMessageBody().toString().equals("Tantest codigo: "+code))
+    	                {
+    	                	received = true;
+    	                	break;
+    	                }
+    	                      
+    	            }
+    	            
+    	            if(received)
+    	            {
+    	            	this.abortBroadcast();
+    	            	
+    	            	ClientSocket
+    	            	.getInstance()
+    	            	.send("confirmSMSCode", code, new ClientResponse(handler,2));
+    	            }
 
-        	        }
-        	        
-        		    this.clearAbortBroadcast();
-                }   
-        	}
+    	        }
+    	        
+    		    //this.clearAbortBroadcast();
+            }   
+        	
         };
 		
-		registerReceiver(bcr_received, new IntentFilter(RECEIVED));
+        IntentFilter inf = new IntentFilter(RECEIVED);
+        
+        inf.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
+        
+		registerReceiver(bcr_received, inf);
         
 		bcr_sent = new BroadcastReceiver()
         {
@@ -521,15 +534,7 @@ public class MainActivity extends Activity
         		{
                 	case Activity.RESULT_OK:
                 	
-                	/*if(!sms_mode)
-                	{
-                		info(null);
-                	}
-                	else
-                	{*/
-                		info(getString(R.string.act_main_sms_validating));
-                	//}
-                	
+                	info(getString(R.string.act_main_sms_validating),true);
                     break;
                 	/*case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
                     Toast.makeText(getBaseContext(), "Generic failure", 
@@ -547,13 +552,7 @@ public class MainActivity extends Activity
                     Toast.makeText(getBaseContext(), "Radio off", 
                             Toast.LENGTH_SHORT).show();
                     break;*/
-                    default:
-                    	//Se puede utilizar el tablet pero necesitas un telefono primeramente
-                    	loader.setVisibility(View.GONE);
-                    	((ImageButton) findViewById(R.id.main_connect)).setEnabled(true);
-                    	Toast.makeText(getBaseContext(), "Tu dispositivo no es compatible. Debes obtener el código desde un dispositivo compatible.", 
-                            Toast.LENGTH_SHORT).show();
-                    break;
+                    default: ifError("Tu dispositivo no es compatible. Debes obtener el código desde un dispositivo compatible.");break;
         		}
         	}
         };
@@ -599,30 +598,40 @@ public class MainActivity extends Activity
 		super.onDestroy();
 	}
 	
-	public void verifyCodeButtom(View view)
+	public void requestCode(JSONObject response)
 	{
-		Log.i("tantest", "Verificando codigo");
-		Log.i("tantest", "Codigo dado: "+phone_code.getText().toString());
-		Log.i("tantest", "Codigo correcto: "+code);
 		
-		ClientSocket
-		.getInstance()
-		.send("confirmValidationCode", phone_code.getText().toString(), new ClientResponse(handler,1));
-		
-		view.setEnabled(false);
-		loader.setVisibility(View.VISIBLE);
-	}
-	
-	public void verifyCodeSMS(JSONObject response)
-	{
-
-		loader.setVisibility(View.GONE);
-
-		boolean confirmated = false;
-		
-		try 
+		try
 		{
-			confirmated = response.getBoolean("response");
+
+			boolean success =  response.getBoolean("response");
+			
+			if(success)
+			{
+				info("Introduzca el codigo de verificacion que hemos enviado a su direccion de correo electrónico", false);
+				
+				//Ocultamos interfaz paso 1
+				country.setVisibility(View.GONE);
+				phone_input.setVisibility(View.GONE);
+				connect.setVisibility(View.GONE);
+				
+				View line = (View) findViewById(R.id.main_vertical_line);
+				line.setVisibility(View.GONE);
+				
+				ImageButton test = (ImageButton) findViewById(R.id.main_test);
+				test.setVisibility(View.GONE);
+				
+				//Mostramos interfaz paso 2
+				phone_code.setVisibility(View.VISIBLE);
+				
+				ImageButton verify = (ImageButton) findViewById(R.id.main_verify);
+				verify.setVisibility(View.VISIBLE);
+			}
+			else
+			{
+				info("Para añadir un nuevo dispositivo, debes registrar una cuenta de correo electrónico.",false);
+			}
+			
 		} 
 		catch (JSONException e) 
 		{
@@ -630,58 +639,17 @@ public class MainActivity extends Activity
 			e.printStackTrace();
 		}
 		
-		
-		if(confirmated)
-		{
-			Log.i("tantest", "Codigo correcto!");
-			
-			unregisterReceiver(bcr_sent);
-			unregisterReceiver(bcr_received);
-			
-			startActivity(new Intent(MainActivity.this, HomeActivity.class));
-			
-			Log.i("tantes","iniciando actividad");
-			
-		}
-
-	}
-	
-	public void verifyCode(JSONObject response)
-	{
-
-		loader.setVisibility(View.GONE);
-
-		boolean confirmated = false;
-		
-		try 
-		{
-			confirmated = response.getBoolean("response");
-		} 
-		catch (JSONException e) 
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		
-		final Animation out = new AlphaAnimation(1.0f, 0.0f);
-		out.setDuration(500);
-		out.setStartOffset(1500);
+		/*Animation out = new AlphaAnimation(1.0f, 0.0f);
+		out.setFillAfter(true);
+		out.setStartOffset(5000);
+		out.setDuration(600);
 		
 		out.setAnimationListener(new AnimationListener() {
 
 		    @Override
-		    public void onAnimationEnd(Animation animation)
-		    {
-		    	
+		    public void onAnimationEnd(Animation animation) {
+
 		    	textCode.setVisibility(View.GONE);
-		    	
-		    	if(correct == true)
-		    	{
-		    		//Hay que crear entrada en BD asegurando que en el onCreate
-		    		//pasamos a HomeActivity
-		    		startActivity(new Intent(MainActivity.this, HomeActivity.class));
-		    	}
 
 		    }
 
@@ -698,35 +666,94 @@ public class MainActivity extends Activity
 			}
 		});
 		
-		if(confirmated)
-		{
-			Log.i("tantest", "Codigo correcto!");
-			
-			//textCode.setGravity(Gravity.CENTER);
-			textCode.setText(R.string.act_main_right_code);
-			
-			correct = true;
-			
-			textCode.startAnimation(out);
-			
-			//homeAct = new Intent(MainActivity.this, HomeActivity.class);
-			Log.i("tantes","iniciando actividad");
-			//overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
-			//startActivity(homeAct);
-			
-		}
-		else
-		{
-			Log.i("tantest", "Codigo INcorrecto!");
-			
-			textCode.setText(R.string.act_main_wrong_code);
+		textCode.startAnimation(out);*/	
+		
+	}
+	
+	public void verifyCodeButtom(View view)
+	{
+		
+		ClientSocket
+		.getInstance()
+		.send("confirmEmailCode", phone_code.getText().toString(), new ClientResponse(handler,5));
+		
+		view.setEnabled(false);
+		loader.setVisibility(View.VISIBLE);
+	}
+	
+	public void verifyCode(JSONObject response)
+	{
 
-			textCode.startAnimation(out);
+		loader.setVisibility(View.GONE);
+
+		boolean confirmated = false;
+		
+		try 
+		{
+			confirmated = response.getBoolean("response");
 			
-			ImageButton verify = (ImageButton) findViewById(R.id.main_verify);
-    		
-			verify.setEnabled(true);
+			if(confirmated)
+			{
+				final Animation out = new AlphaAnimation(1.0f, 0.0f);
+				out.setDuration(500);
+				out.setStartOffset(1500);
+				
+				out.setAnimationListener(new AnimationListener() {
+
+				    @Override
+				    public void onAnimationEnd(Animation animation)
+				    {
+				    	
+				    	textCode.setVisibility(View.GONE);
+				    	goHome();
+
+				    }
+
+					@Override
+					public void onAnimationRepeat(Animation animation) {
+						// TODO Auto-generated method stub
+						
+					}
+
+					@Override
+					public void onAnimationStart(Animation animation) {
+						// TODO Auto-generated method stub
+						
+					}
+				});
+				
+				textCode.setText(R.string.act_main_right_code);
+				
+				textCode.startAnimation(out);
+			}
+			else
+			{
+				ImageButton verify = (ImageButton) findViewById(R.id.main_verify);
+	    		
+				verify.setEnabled(true);
+				
+				info("El Codigo es incorrecto", false);
+			}
+		} 
+		catch (JSONException e) 
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
+		
+	}
+	
+	public void goHome()
+	{
+		startActivity(new Intent(MainActivity.this, HomeActivity.class));
+	}
+	
+	public void ifError(String txt)
+	{
+		Toast.makeText(this, txt, Toast.LENGTH_SHORT).show();
+		loader.setVisibility(View.GONE);
+		textCode.setVisibility(View.GONE);
+		((ImageButton) findViewById(R.id.main_connect)).setEnabled(true);
 	}
 	
     @Override
