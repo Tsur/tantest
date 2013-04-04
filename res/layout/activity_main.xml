@@ -24,7 +24,7 @@
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="28dp"
             android:paddingBottom="5dp"
-            android:paddingLeft="8dp"
+            android:paddingLeft="5dp"
             android:visibility="gone" />
 
     </RelativeLayout>
@@ -104,7 +104,7 @@
             android:layout_centerInParent="true"
             android:background="@color/black"
             android:cacheColorHint="@color/black"
-            android:divider="@drawable/horizontal_line"
+            android:divider="@drawable/horizontal_line_gray"
             android:dividerHeight="3dp"
             android:drawSelectorOnTop="true"
             android:padding="5dp"

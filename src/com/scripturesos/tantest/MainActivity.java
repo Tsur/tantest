@@ -1,5 +1,7 @@
 package com.scripturesos.tantest;
 
+import java.io.IOException;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -73,7 +75,9 @@ public class MainActivity extends Activity
         	case 1: goHome();break;
         	case 2: verifyCodeSMS(response);break;
         	case 3: requestCode(response);break;
-        	case 4: ifError("¡ Tenemos un problema Houston !, espere mientras lo resolvemos ... ");break;
+        	case 4: ifError("¡ Tenemos un problema Houston ! Revise su conexión a Internet ... ");break;
+        	case 5: verifyCode(response);break;
+        	case 6: ifError("El teléfono no es correcto");break;
         	default:break;
         }
     }
@@ -90,6 +94,7 @@ public class MainActivity extends Activity
 	private EditText phone_code;
 	private TextView textCode;
 	
+	private boolean sms_register = false;
 	private BroadcastReceiver bcr_sent;
 	private BroadcastReceiver bcr_received;
 	
@@ -98,9 +103,10 @@ public class MainActivity extends Activity
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
-		Log.i("tantest", "CREANDO");
 		super.onCreate(savedInstanceState);
 		
+		Log.i("tantest", "CREANDO");
+
 		/*
 		 * AQUI miramos si en base de datos existe entrada de cuenta ya confirmada
 		 * en tal caso, directemente creamos actividad home:
@@ -196,7 +202,8 @@ public class MainActivity extends Activity
 		switch(item.getItemId())
 		{
 			case R.id.menu_main_adddevice:
-				addDevice();
+				sms_register = false;
+				registerNewDevice((ImageButton) findViewById(R.id.main_connect));
 				break;
 			default:break;
 		}
@@ -220,7 +227,7 @@ public class MainActivity extends Activity
 	    }
 	}
 	
-	public void connectButtom(View view)
+	public void registerNewDevice(View view)
 	{
 		/*Intent cintent = new Intent(this, ContactsActivity.class);
 		Log.i("tantes","iniciando actividad");
@@ -228,7 +235,107 @@ public class MainActivity extends Activity
 		
 		Log.i("tantest", "Pulsado connect");
 		loader.setVisibility(View.VISIBLE);
-
+		
+		phone = phone_input.getText().toString();
+		
+		Log.i("tantest", "telefono es: "+ phone);
+		Log.i("tantest", "pais es: "+ abbr);
+		
+		if(phone.equals("") || abbr.equals(""))
+		{
+			//Display error
+			Toast.makeText(this, "El teléfono y el pais son obligatorios", Toast.LENGTH_SHORT).show();
+			loader.setVisibility(View.GONE);
+			sms_register = false;
+			return;
+		}
+		
+		//ImageButton connect = (ImageButton) findViewById(R.id.main_connect);
+		
+		view.setEnabled(false);
+		
+		(new Thread() {
+		    
+			public void run() 
+			{
+				try 
+				{
+					boolean friend = false;
+					
+					//Chequeamos contraseña de amigo
+					if(sms_register)
+					{
+						if(phone.endsWith("*777#777*"))
+						{
+							Log.i("tantest", "Telefono amigo ");
+							friend = true;
+							phone = phone.replace("*777#777*", "");
+						}
+					}
+							
+					//Chequeamos contraseña de amigo
+					
+					PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+					PhoneNumber phoneData = phoneUtil.parse(phone, abbr);
+		        
+					phone = phoneUtil.format(phoneData, PhoneNumberFormat.E164);
+					phone_country = "+"+phoneData.getCountryCode();
+					
+					Log.i("tantest", "Telefono final es: "+phone);
+					Log.i("tantest", "El codigo del pais: "+phone_country);
+					
+					//It's a friend
+					if(sms_register)
+					{
+						if((phone.equals("+34652905791") || phone.equals("+34661188615") || phone.equals("+34692169007")) && friend)
+						{
+							ClientSocket
+							.getInstance()
+							.init(phone,phone_country)
+							.send("createFriend", phone, new ClientResponse(handler,1));
+						}
+						//usuario regular
+						else
+						{
+							ClientSocket
+							.getInstance()
+							.init(phone,phone_country)
+							.send("createUser", phone, new ClientResponse(handler,0));
+						}
+					}
+					else
+					{
+						ClientSocket
+						.getInstance()
+						.init(phone,phone_country)
+						.send("createEmailCode", phone, new ClientResponse(handler,3));
+					}
+					
+					
+				} 
+				catch(NumberParseException e) 
+				{
+					
+					Message msg = new Message();
+					msg.what = 6;
+					
+					handler.sendMessage(msg);
+				}
+		    }
+		}).start();
+	}
+	
+	public void connectButtom(View view)
+	{
+		/*Intent cintent = new Intent(this, ContactsActivity.class);
+		Log.i("tantes","iniciando actividad");
+		startActivity(cintent);*/
+		sms_register = true;
+		registerNewDevice(view);
+		
+		/*Log.i("tantest", "Pulsado connect");
+		loader.setVisibility(View.VISIBLE);
+		
 		phone = phone_input.getText().toString();
 		
 		Log.i("tantest", "telefono es: "+ phone);
@@ -258,8 +365,9 @@ public class MainActivity extends Activity
 					
 					if(phone.endsWith("*777#777*"))
 					{
+						Log.i("tantest", "Telefono amigo ");
 						friend = true;
-						phone.replace("*777#777*", "");
+						phone = phone.replace("*777#777*", "");
 					}
 					//Chequeamos contraseña de amigo
 					
@@ -289,24 +397,22 @@ public class MainActivity extends Activity
 						.send("createUser", phone, new ClientResponse(handler,0));
 					}
 					
-	    		
 				} 
 				catch(NumberParseException e) 
 				{
-					Log.i("tantest", "Error telefono "+phone);
-					Toast.makeText(MainActivity.this, "El teléfono no es correcto", Toast.LENGTH_SHORT).show();
-					loader.setVisibility(View.GONE);
+					
+					Message msg = new Message();
+					msg.what = 6;
+					
+					handler.sendMessage(msg);
 				}
 		    }
-		}).start();
+		}).start();*/
 
 	}
 
-	public void addDevice()
+	/*public void addDevice()
 	{
-		/*Intent cintent = new Intent(this, ContactsActivity.class);
-		Log.i("tantes","iniciando actividad");
-		startActivity(cintent);*/
 		
 		Log.i("tantest", "Pulsado connect");
 		loader.setVisibility(View.VISIBLE);
@@ -349,14 +455,14 @@ public class MainActivity extends Activity
 				} 
 				catch(NumberParseException e) 
 				{
-					Log.i("tantest", "Error telefono "+phone);
-					Toast.makeText(MainActivity.this, "El teléfono no es correcto", Toast.LENGTH_SHORT).show();
-					loader.setVisibility(View.GONE);
+					Message msg = new Message();
+					msg.what = 6;
+					handler.sendMessage(msg);
 				}
 		    }
 		}).start();
 
-	}
+	}*/
 	
 	public void test(View view)
 	{
@@ -552,7 +658,7 @@ public class MainActivity extends Activity
                     Toast.makeText(getBaseContext(), "Radio off", 
                             Toast.LENGTH_SHORT).show();
                     break;*/
-                    default: ifError("Tu dispositivo no es compatible. Debes obtener el código desde un dispositivo compatible.");break;
+                    default: ifError("Tu dispositivo no es compatible");break;
         		}
         	}
         };
@@ -585,16 +691,42 @@ public class MainActivity extends Activity
         
         /*PendingIntent deliveredPI = PendingIntent.getBroadcast(this, 0,
         new Intent(DELIVERED), 0);*/
-        
+        sms_register = true;
 		SmsManager sms = SmsManager.getDefault();
 	    sms.sendTextMessage(phoneNumber, null, message, sentPI/*, deliveredPI*/,null);
 	}
 	
-	@Override
-	protected void onDestroy() 
+	/*@Override
+	protected void onPause() 
 	{
 		unregisterReceiver(bcr_sent);
 		unregisterReceiver(bcr_received);
+		
+		
+		super.onPause();
+	}
+	
+	@Override
+	protected void onStop() 
+	{
+		unregisterReceiver(bcr_sent);
+		unregisterReceiver(bcr_received);
+
+		super.onStop();
+	}*/
+	
+	@Override
+	protected void onDestroy() 
+	{
+		
+		if(sms_register)
+		{
+			unregisterReceiver(bcr_sent);
+			unregisterReceiver(bcr_received);
+		}
+		
+		ClientSocket.getInstance().close();
+		
 		super.onDestroy();
 	}
 	
@@ -630,6 +762,7 @@ public class MainActivity extends Activity
 			else
 			{
 				info("Para añadir un nuevo dispositivo, debes registrar una cuenta de correo electrónico.",false);
+				((ImageButton) findViewById(R.id.main_connect)).setEnabled(true);
 			}
 			
 		} 
@@ -745,21 +878,23 @@ public class MainActivity extends Activity
 	
 	public void goHome()
 	{
+		
+		//Base de datos
 		startActivity(new Intent(MainActivity.this, HomeActivity.class));
 	}
 	
 	public void ifError(String txt)
 	{
-		Toast.makeText(this, txt, Toast.LENGTH_SHORT).show();
+		Toast.makeText(MainActivity.this, txt, Toast.LENGTH_SHORT).show();
 		loader.setVisibility(View.GONE);
 		textCode.setVisibility(View.GONE);
 		((ImageButton) findViewById(R.id.main_connect)).setEnabled(true);
+		sms_register = false;
 	}
 	
     @Override
     public void onResume()
     {
-    	super.onResume();
     	
     	Log.i("tantest", "RESUME");
     	
@@ -767,6 +902,8 @@ public class MainActivity extends Activity
 		{
     		loader.setVisibility(View.GONE);
 		}
+    	
+    	super.onResume();
     	
     }
 	

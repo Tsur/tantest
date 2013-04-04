@@ -45,7 +45,22 @@ public class ClientSocket extends Thread
 	    return InstanceHolder.instance;
 	}
 	
-	public final ClientSocket init(String client, String country) 
+	public void close()
+	{
+		if(clientSocket != null && clientSocket.isConnected())
+		{
+			try 
+			{
+				clientSocket.close();
+			} 
+			catch (IOException e) 
+			{
+				Log.i("tantest","Error cerrando conexion");
+			}
+		}
+	}
+	
+	public ClientSocket init(String client, String country) 
     {
         //assert clientSocket == null;
 		/*if(clientSocket != null)
@@ -61,23 +76,25 @@ public class ClientSocket extends Thread
 			}
     	}*/
 		
-		if(clientSocket != null)
+		if(clientSocket != null && clientSocket.isConnected())
 		{
 			return this;
 		}
         
     	try 
         {
-            clientID = client;
+    		//Log.i("tantest", "Conectando");
+    		clientID = client;
             countryCode = country;
             //commands = new ArrayList<String>();
             //responseHandlers = new HashMap<String,ClientResponse>();
-            //Log.i("tantest", "Conectando");
+            Log.i("tantest", "Conectando a: "+IP+":"+PORT);
             clientSocket = new Socket(IP, PORT); 
             //Log.i("tantest", "Conectado");
 			in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 			out = new PrintWriter(clientSocket.getOutputStream(), true);
-			//Log.i("tantest", "Buffers arrancados");
+			Log.i("tantest", "Buffers arrancados");
+			
             start();
             
             return this;
@@ -85,6 +102,7 @@ public class ClientSocket extends Thread
         catch (Exception e) 
         {
         	Log.i("tantest", "Error conexion");
+        	
         	ClientResponse response = responseHandlers.get("error");
 			
 			//Compose the message including the JSON object
@@ -92,13 +110,18 @@ public class ClientSocket extends Thread
 			msg.what = response.what;
 			
 			response.handler.sendMessage(msg);
-        	
+			
+			return this;
         }
-
-    	return null;
+    	
     }
     
-    public String getClient()
+	public Socket getSocket()
+    {
+    	return clientSocket;
+    }
+	
+	public String getClient()
     {
     	return clientID;
     }
@@ -127,76 +150,83 @@ public class ClientSocket extends Thread
     public void send(String method, String argument, ClientResponse controller)
     {
 
-    	if(clientSocket == null)
+    	if(clientSocket !=null && clientSocket.isConnected())
     	{
-    		return;
+	    	String id = UUID.randomUUID().toString();
+	
+	    	responseHandlers.put(id, controller);
+	
+			out.write("{\"client\":\""+getClient()+
+	    			"\",\"method\":\""+method+
+	    			"\",\"id\":\""+id+
+	    			"\",\"arguments\":[\""+argument+"\"]}");
+			
+			out.flush();
+			
+			Log.i("tantest", "Mensaje enviado");
     	}
-    		
-    	String id = UUID.randomUUID().toString();
-
-    	responseHandlers.put(id, controller);
-
-		out.write("{\"client\":\""+getClient()+
-    			"\",\"method\":\""+method+
-    			"\",\"id\":\""+id+
-    			"\",\"arguments\":[\""+argument+"\"]}");
-		
-		out.flush();
-		
-		Log.i("tantest", "Mensaje enviado");
     	
     }
     
     public void send(String method, Collection<String> arguments, ClientResponse controller)
     {
     	
-    	if(clientSocket == null)
+    	if(clientSocket !=null && clientSocket.isConnected())
     	{
-    		return;
+    	
+	    	String id = UUID.randomUUID().toString();
+	    	
+	    	String command = "{\"client\":\""+getClient()+
+	    			"\",\"method\":\""+method+
+	    			"\",\"id\":\""+id+
+	    			"\",\"arguments\":";
+	    	
+	    	String args = "[";
+	    	
+	    	Iterator<String> it = arguments.iterator();
+	    	String elem;
+	    	
+	    	while(it.hasNext())
+	    	{
+	    		elem = it.next();
+	    		
+	    		if(elem.startsWith("["))
+	    		{
+	    			args += elem+",";
+	    		}
+	    		else
+	    		{
+	    			if(elem.startsWith("\"") && elem.endsWith("\""))
+	    			{
+	    				args += elem+",";
+	    			}
+	    			else
+	    			{
+	    				args += "\""+elem+"\",";
+	    			}
+	    				
+	    		}
+	    		
+	    	}
+	    	
+	    	if(arguments.size() > 0)
+	    	{
+	    		args = args.substring(0,args.length()-1);
+	    	}
+	
+	    	args += "]}";
+	    	
+	    	command += args;
+	    	
+	    	responseHandlers.put(id, controller);
+	    	
+	    	//commands.add(command);
+	    	Log.i("tantest","Al server: "+command);
+	    	
+	    	out.write(command);
+			out.flush();
+		
     	}
-    	
-    	String id = UUID.randomUUID().toString();
-    	
-    	String command = "{\"client\":\""+getClient()+
-    			"\",\"method\":\""+method+
-    			"\",\"id\":\""+id+
-    			"\",\"arguments\":";
-    	
-    	String args = "[";
-    	
-    	Iterator<String> it = arguments.iterator();
-    	String elem;
-    	
-    	while(it.hasNext())
-    	{
-    		elem = it.next();
-    		
-    		if(elem.startsWith("["))
-    		{
-    			args += elem+",";
-    		}
-    		else
-    		{
-    			args += "\""+elem+"\",";
-    		}
-    		
-    	}
-    	
-    	if(arguments.size() > 0)
-    	{
-    		args = args.substring(0,args.length()-1);
-    	}
-
-    	args += "]}";
-    	
-    	command += args;
-    	
-    	responseHandlers.put(id, controller);
-    	
-    	//commands.add(command);
-    	
-    	out.write(command);
-		out.flush();
     }
     
     private void processResponse(String response)
@@ -312,7 +342,8 @@ public class ClientSocket extends Thread
  	   
     }
 	
-	private final String IP = "54.246.107.200";
+	//private final String IP = "54.246.107.200";
+	private final String IP = "192.168.1.131";
     private final int PORT = 3000;
     private final int INTERVAL = 1000;
     //private final int CON_INTERVAL = 100;

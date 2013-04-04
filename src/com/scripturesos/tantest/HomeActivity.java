@@ -1,7 +1,24 @@
 package com.scripturesos.tantest;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.List;
+
+import a_vcard.android.syncml.pim.PropertyNode;
+import a_vcard.android.syncml.pim.VDataBuilder;
+import a_vcard.android.syncml.pim.VNode;
+import a_vcard.android.syncml.pim.vcard.VCardException;
+import a_vcard.android.syncml.pim.vcard.VCardParser;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -9,6 +26,8 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+import com.ipaulpro.afilechooser.utils.FileUtils;
+import com.scripturesos.tantest.connection.ClientSocket;
 
 public class HomeActivity extends ActionBarActivity {
 
@@ -44,6 +63,8 @@ public class HomeActivity extends ActionBarActivity {
     		loader.setVisibility(View.GONE);
 		}
     	
+    	ClientSocket.getInstance().init("phone","country");
+    	
     	super.onResume();
     }
 	
@@ -59,7 +80,7 @@ public class HomeActivity extends ActionBarActivity {
     @Override
     public void onBackPressed() 
     {
-      moveTaskToBack(true);
+    	moveTaskToBack(true);
     }
 	
     public void showContacts(View v)
@@ -97,7 +118,7 @@ public class HomeActivity extends ActionBarActivity {
 			case R.id.menu_header_social:
 				Intent cintent = new Intent(this, ContactsActivity.class);
 				Log.i("tantes","iniciando actividad");
-				startActivity(cintent);
+				startActivityForResult(cintent,0);
 				break;
 			case R.id.menu_settings:
 
@@ -107,6 +128,26 @@ public class HomeActivity extends ActionBarActivity {
 		
 		return true;
 	}
+	
+	@Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) 
+	{
+        super.onActivityResult(requestCode, resultCode, data);
+        
+        switch(requestCode) 
+        {
+            case 0:      
+            if (resultCode == RESULT_OK) 
+            {  
+            	Bundle b = data.getExtras();
+            	
+            	Log.i("tantest","ContactsActivity me manda saludos: "+b.getString("saludos"));
+            	//Guardo estado que viene en data
+            }
+               
+        }
+        
+    }
 	
 	/*private class MYGIFView extends View{
 

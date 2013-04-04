@@ -5,9 +5,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +29,9 @@ import android.content.ActivityNotFoundException;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -40,6 +45,10 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;
+import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import com.ipaulpro.afilechooser.utils.FileUtils;
 import com.scripturesos.tantest.connection.ClientResponse;
 import com.scripturesos.tantest.connection.ClientSocket;
@@ -57,6 +66,8 @@ public class ContactsActivity extends ActionBarActivity {
 		setTitle(R.string.act_contacts_title);
 		
 		super.onCreate(savedInstanceState);
+		
+		Log.i("tantest","Creating contacts");
 		
 		/* INIT CONTENT VIEW */
 		setContentView(R.layout.activity_contacts);
@@ -109,48 +120,59 @@ public class ContactsActivity extends ActionBarActivity {
 		if(cursor.moveToFirst())
 		{
 			
-			String contactId =
-					cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
-			
-			String name =
-					cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-	        //
-	        //  Get all phone numbers.
-	        //
-			Cursor phones = cr.query(Phone.CONTENT_URI, null,
-		            Phone.CONTACT_ID + " = " + contactId, null, null);
-
-			String country = ClientSocket.getInstance().getCountry();
-			
-			while(phones.moveToNext())
+			while(!cursor.isAfterLast())
 			{
 				
-				String number = phones.getString(phones.getColumnIndex(Phone.NUMBER)).trim();
+				String contactId =
+						cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
 				
-				if(!number.startsWith("+"))
+				String name =
+						cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
+		        //
+		        //  Get all phone numbers.
+		        //
+				Cursor phones = cr.query(Phone.CONTENT_URI, null,
+			            Phone.CONTACT_ID + " = " + contactId, null, null);
+	
+				String country = ClientSocket.getInstance().getCountry();
+				
+				while(phones.moveToNext())
 				{
-					number = country+number;
+					
+					String number = phones.getString(phones.getColumnIndex(Phone.NUMBER)).trim();
+					
+					if(!number.startsWith("+"))
+					{
+						number = country+number;
+					}
+					
+					number = number.replace("-","");
+					number = number.replace(")","");
+					number = number.replace("(","");
+					number = number.replace(" ","");
+					
+					Log.i("tantest",number);
+					phonesList.put("\""+number+"\"",name);
+	
+					/*int type = phones.getInt(phones.getColumnIndex(Phone.TYPE));
+					
+					switch (type) {
+			                case Phone.TYPE_HOME:
+			                    // do something with the Home number here...
+			                    break;
+			                case Phone.TYPE_MOBILE:
+			                    // do something with the Mobile number here...
+			                    break;
+			                case Phone.TYPE_WORK:
+			                    // do something with the Work number here...
+			                    break;
+			    	}*/
 				}
 				
-				phonesList.put("\""+number+"\"",name);
-
-				/*int type = phones.getInt(phones.getColumnIndex(Phone.TYPE));
-				
-				switch (type) {
-		                case Phone.TYPE_HOME:
-		                    // do something with the Home number here...
-		                    break;
-		                case Phone.TYPE_MOBILE:
-		                    // do something with the Mobile number here...
-		                    break;
-		                case Phone.TYPE_WORK:
-		                    // do something with the Work number here...
-		                    break;
-		    	}*/
+			    phones.close();
+			    cursor.moveToNext();
 			}
 			
-		    phones.close();
-		       
 		}
 		
 		//Tenemos en phoneList un diccionario/ mapa de numeros -> nombre
@@ -159,14 +181,9 @@ public class ContactsActivity extends ActionBarActivity {
 		//Conectamos con el servidor y mandamos telefonos
 		if(phonesList.size() > 0)
 		{
-			List<String> args = new ArrayList<String>();
-			
-			args.add(phonesList.keySet().toString());
-			args.add(ClientSocket.getInstance().getCountry());
-			
 			ClientSocket
 			.getInstance()
-			.send("getContacts", args, new ClientResponse(handler,0));	
+			.send("getContacts", phonesList.keySet(), new ClientResponse(handler,0));	
 		}
 		else
 		{
@@ -355,16 +372,28 @@ public class ContactsActivity extends ActionBarActivity {
         
     }
 	
-	public void displayContacts(JSONObject serverContacts)
+	@Override
+	public void onBackPressed() 
+	{
+	    Bundle bundle = new Bundle();
+	    bundle.putString("saludos", "Hola");
+
+	    Intent mIntent = new Intent();
+	    mIntent.putExtras(bundle);
+	    setResult(RESULT_OK, mIntent);
+	    super.onBackPressed();
+	}
+	
+	public void makeContactsList(JSONObject serverContacts)
 	{
 		
 		contactsListView = (ListView) findViewById(R.id.act_contacts_lv);
 		
-		ArrayList<ContactItemListView> contactItems = new ArrayList<ContactItemListView>();
-		JSONArray contacts;
-		JSONObject jsonContact;
-		String id = null;
-		ContactItemListView contact;
+		//ArrayList<ContactItemListView> contactItems = new ArrayList<ContactItemListView>();
+		final JSONArray contacts;
+		//JSONObject jsonContact;
+		//String id = null;
+		//ContactItemListView contact;
 		
 		//Recorremos respuesta del servidor y generamos el listView
 		try 
@@ -377,34 +406,73 @@ public class ContactsActivity extends ActionBarActivity {
 			}
 			else
 			{
-				for(int i = 0; i < contacts.length(); i++)
-				{
 				
-					jsonContact = contacts.getJSONObject(i);
-					id = jsonContact.getString("client");
-					
-					if(phonesList.containsKey("\""+id+"\"") == true)
+				(new Thread() {
+				    
+					public void run() 
 					{
-						contact = new ContactItemListView(
-								Long.parseLong(id.substring(1)), 
-								jsonContact.getString("name").equals("") ? phonesList.get("\""+id+"\"") : jsonContact.getString("name"), 
-								jsonContact.getString("status"), 
-								jsonContact.getString("points"), 
-								jsonContact.getString("photo"));
 						
-						contactItems.add(contact);
-						Log.i("tantest",id);
-					}
-					
-				} 
-				
-				ContactListAdapter adapter = new ContactListAdapter(this, contactItems);
-		         
-			    contactsListView.setAdapter(adapter);
-			    
-			    contactsListView.setVisibility(View.VISIBLE);
-			    
-			    progress.setVisibility(View.GONE);
+						 ArrayList<ContactItemListView> contactItems = new ArrayList<ContactItemListView>();
+				 		 JSONObject jsonContact;
+				 		 String id = null;
+				 		 String imgUrl = null;
+				 		 ContactItemListView contact;
+				 		 
+				         for(int i = 0; i < contacts.length(); i++)
+						 {
+				        	 Drawable img = null;
+				        	 
+				        	 try 
+								{
+									
+									jsonContact = contacts.getJSONObject(i);
+									id = jsonContact.getString("client");
+									imgUrl = jsonContact.getString("photo");
+									
+									if(phonesList.containsKey("\""+id+"\"") == true)
+									{
+										contact = new ContactItemListView(
+											Long.parseLong(id.substring(1)), 
+											jsonContact.getString("name").equals("") ? phonesList.get("\""+id+"\"") : jsonContact.getString("name"), 
+											jsonContact.getString("status"), 
+											jsonContact.getString("points"), 
+											imgUrl);
+									
+										contactItems.add(contact);
+									}
+								
+									/*HttpURLConnection connection = (HttpURLConnection)new URL(contact.getImg()).openConnection();
+								    connection.setRequestProperty("User-agent","Mozilla/4.0");
+
+								    connection.connect();
+								    InputStream input = connection.getInputStream();*/
+									InputStream is = (InputStream) new URL(imgUrl).getContent();
+									img = Drawable.createFromStream(is, imgUrl);
+									
+									
+								} 
+								catch (MalformedURLException e) 
+								{
+									
+								} 
+								catch (IOException e) 
+								{
+									
+								} 
+								catch (JSONException e) 
+								{
+									
+								}	
+								
+								ContactListAdapter.Cache.images.put(i, img);
+						}
+				         
+						Message msg = new Message();
+						msg.what = 3;
+						msg.obj = contactItems;
+						handler.sendMessage(msg);	
+				    }
+				}).start();
 			}
 			
 		}
@@ -415,6 +483,27 @@ public class ContactsActivity extends ActionBarActivity {
 		}
 
 	}
+	
+	public void displayContactsList(ArrayList<ContactItemListView> contactItems)
+	{
+		 ContactListAdapter adapter = new ContactListAdapter(ContactsActivity.this, contactItems);
+		
+		 contactsListView.setAdapter(adapter);
+		    
+		 contactsListView.setVisibility(View.VISIBLE);
+		    
+		 progress.setVisibility(View.GONE);
+	}
+	
+    @Override
+    public void onResume()
+    {
+    	Log.i("tantest","RESUME CONTACTS ACTIVITY");
+    	
+    	ClientSocket.getInstance().init("phone","country");
+    	
+    	super.onResume();
+    }
 	
 	public class ContactsActivityHandler extends Handler 
 	{
@@ -435,9 +524,10 @@ public class ContactsActivity extends ActionBarActivity {
 	{
         switch(msg.what) 
         {
-        	case 0: displayContacts((JSONObject)msg.obj);break;
+        	case 0: makeContactsList((JSONObject)msg.obj);break;
         	case 1: displayNoAgenda(null);break;
         	case 2: displayNoAgenda(getString(R.string.contacts_no_agenda_import));break;
+        	case 3: displayContactsList((ArrayList<ContactItemListView>)msg.obj);break;
             default:break;
         }
     }

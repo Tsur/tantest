@@ -4,12 +4,13 @@
 android:shape="line">
 
     <stroke
-       android:color="#FFFFFF"
-       android:dashWidth="2dp"
-       android:dashGap="8dp"
-       android:width="1dp" />
+       android:color="#0D4D66"
+       android:dashWidth="0dp"
+       android:dashGap="0dp"
+       android:width="1px"
+       android:height="1px" />
     
     <size
-        android:height="3dp"
+        android:height="1px"
     />
 </shape>
