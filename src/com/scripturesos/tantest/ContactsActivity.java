@@ -53,7 +53,7 @@ import com.ipaulpro.afilechooser.utils.FileUtils;
 import com.scripturesos.tantest.connection.ClientResponse;
 import com.scripturesos.tantest.connection.ClientSocket;
 
-public class ContactsActivity extends ActionBarActivity {
+public class ContactsActivity extends Application {
 
 	//TextView debug;
 	private ListView contactsListView;
@@ -63,9 +63,7 @@ public class ContactsActivity extends ActionBarActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
-		setTitle(R.string.act_contacts_title);
-		
-		super.onCreate(savedInstanceState);
+		super.onCreate(savedInstanceState, R.string.act_contacts_title);
 		
 		Log.i("tantest","Creating contacts");
 		
@@ -372,7 +370,7 @@ public class ContactsActivity extends ActionBarActivity {
         
     }
 	
-	@Override
+	/*@Override
 	public void onBackPressed() 
 	{
 	    Bundle bundle = new Bundle();
@@ -382,7 +380,7 @@ public class ContactsActivity extends ActionBarActivity {
 	    mIntent.putExtras(bundle);
 	    setResult(RESULT_OK, mIntent);
 	    super.onBackPressed();
-	}
+	}*/
 	
 	public void makeContactsList(JSONObject serverContacts)
 	{

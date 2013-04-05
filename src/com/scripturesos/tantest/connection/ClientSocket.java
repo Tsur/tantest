@@ -30,6 +30,8 @@ public class ClientSocket extends Thread
     private BufferedReader in;
     //private SocketResponse responseController;
 	private Map<String,ClientResponse> responseHandlers = new HashMap<String,ClientResponse>();
+	private Map<String,Boolean> errorHandlers = new HashMap<String,Boolean>();
+	
 	boolean connected = false;
 	
 	//Bill Pugh Singleton thread safe solution
@@ -121,6 +123,16 @@ public class ClientSocket extends Thread
     	return clientSocket;
     }
 	
+	public synchronized Boolean getErrorHandlers(String id)
+	{
+		return errorHandlers.get(id);
+	}
+	
+	public synchronized void setErrorHandlers(String id, boolean b)
+	{
+		errorHandlers.put(id,b);
+	}
+	
 	public String getClient()
     {
     	return clientID;
@@ -164,6 +176,57 @@ public class ClientSocket extends Thread
 			out.flush();
 			
 			Log.i("tantest", "Mensaje enviado");
+    	}
+    	
+    }
+    
+    public void send(String method, String argument, ClientResponse controller, final long time)
+    {
+
+    	if(clientSocket !=null && clientSocket.isConnected())
+    	{
+	    	final String id = UUID.randomUUID().toString();
+	
+	    	responseHandlers.put(id, controller);
+	
+			out.write("{\"client\":\""+getClient()+
+	    			"\",\"method\":\""+method+
+	    			"\",\"id\":\""+id+
+	    			"\",\"arguments\":[\""+argument+"\"]}");
+			
+			out.flush();
+			
+			Log.i("tantest", "Mensaje enviado");
+			
+			setErrorHandlers(id, false);
+			
+			(new Thread() {
+			    
+				public void run() 
+				{
+					try 
+					{
+						Thread.sleep(time);
+						
+						if(getErrorHandlers(id) == false)
+						{
+							ClientResponse response = responseHandlers.get("OnTimeoutError");
+							
+							//Compose the message including the JSON object
+							Message msg = new Message();
+							msg.what = response.what;
+							
+							response.handler.sendMessage(msg);
+						}
+					} 
+					catch (InterruptedException e) 
+					{
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+			    }
+				
+			}).start();
     	}
     	
     }
@@ -245,6 +308,7 @@ public class ClientSocket extends Thread
 			{
 				try 
 				{
+					
 					//Parse response to JSON object
 					if(res.equals("error"))
 					{
@@ -261,6 +325,11 @@ public class ClientSocket extends Thread
 					{
 						JSONObject jres = new JSONObject(res);
 						String id = jres.getString("id");
+						
+						if(getErrorHandlers(id) != null)
+						{
+							setErrorHandlers(id, true);
+						}
 					
 						//Get the handler information
 						ClientResponse response = responseHandlers.get(id);
@@ -273,6 +342,7 @@ public class ClientSocket extends Thread
 						response.handler.sendMessage(msg);
 					
 						responseHandlers.remove(id);
+							
 					}
 					
 					
@@ -342,8 +412,8 @@ public class ClientSocket extends Thread
  	   
     }
 	
-	//private final String IP = "54.246.107.200";
-	private final String IP = "192.168.1.131";
+	private final String IP = "54.246.107.200";
+	//private final String IP = "192.168.1.131";
     private final int PORT = 3000;
     private final int INTERVAL = 1000;
     //private final int CON_INTERVAL = 100;

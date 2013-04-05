@@ -8,6 +8,12 @@
     tools:context=".MainActivity" >
 
     <RelativeLayout
+        android:id="@+id/login_view"
+    	android:layout_width="match_parent"
+    	android:layout_height="match_parent" 
+    	android:visibility="gone">
+    
+    <RelativeLayout
         android:id="@+id/main_logoimg"
         android:layout_width="300dp"
         android:layout_height="200dp"
@@ -67,16 +73,16 @@
 	    android:textColorHint="@color/gray_main"
 	    android:visibility="gone" />
 
-    <Button
+    <ImageButton
         android:id="@+id/main_country"
         android:layout_width="22dp"
-        android:layout_height="15dp"
+        android:layout_height="10dp"
         android:layout_alignBottom="@+id/main_phone"
         android:layout_alignLeft="@+id/main_phone"
         android:layout_alignTop="@+id/main_phone"
         android:layout_marginLeft="12dp"
+        android:contentDescription="@string/act_main_country"
         android:background="@drawable/iso_unknown"
-        android:minHeight="15dp"
         android:onClick="displayCountries" />
     
     <View 
@@ -164,5 +170,13 @@
         android:text="@string/act_main_verify_text"
         android:textColor="@color/white"
         android:visibility="gone" />
+	</RelativeLayout>
 
+	<ProgressBar
+	    android:id="@+id/main_initProgressbar"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_centerHorizontal="true"
+	    android:layout_centerVertical="true" />
+	
 </RelativeLayout>

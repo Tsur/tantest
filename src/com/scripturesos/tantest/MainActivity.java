@@ -1,7 +1,5 @@
 package com.scripturesos.tantest;
 
-import java.io.IOException;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -12,7 +10,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.graphics.drawable.Drawable;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -21,6 +20,7 @@ import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,11 +30,11 @@ import android.view.animation.Animation.AnimationListener;
 import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,6 +44,7 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import com.scripturesos.tantest.connection.ClientResponse;
 import com.scripturesos.tantest.connection.ClientSocket;
+import com.scripturesos.tantest.connection.DatabaseHelper;
 
 public class MainActivity extends Activity 
 {
@@ -72,19 +73,21 @@ public class MainActivity extends Activity
 		switch(msg.what) 
         {
         	case 0: requestCodeSMS(response);break;
-        	case 1: goHome();break;
+        	case 1: goHome(true);break;
         	case 2: verifyCodeSMS(response);break;
         	case 3: requestCode(response);break;
         	case 4: ifError("¡ Tenemos un problema Houston ! Revise su conexión a Internet ... ");break;
         	case 5: verifyCode(response);break;
         	case 6: ifError("El teléfono no es correcto");break;
+        	case 7: loginGUI();break;
+        	case 8: ifError("Tenemos algunos problemillas, intentalo de nuevo más tarde por favor.");break;
         	default:break;
         }
     }
 	
 	private ProgressBar loader;
 	private ListView countriesContainer;
-	private Button country;
+	private ImageButton country;
 	private ImageButton connect;
 	private String abbr = "";
 	private String phone;
@@ -98,8 +101,7 @@ public class MainActivity extends Activity
 	private BroadcastReceiver bcr_sent;
 	private BroadcastReceiver bcr_received;
 	
-	@SuppressWarnings("deprecation")
-	@TargetApi(16)
+	@TargetApi(11)
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -107,85 +109,46 @@ public class MainActivity extends Activity
 		
 		Log.i("tantest", "CREANDO");
 
-		/*
-		 * AQUI miramos si en base de datos existe entrada de cuenta ya confirmada
-		 * en tal caso, directemente creamos actividad home:
-		 * 
-		 * Intent intent = new Intent(MainActivity.this, HomeActivity.class);
-		   intent.putExtra("extra", "load");//Indica a la actividad Home que carga los chats abiertos
-		   startActivity(intent);
-		 */
-		handler = new MainActivityHandler(this);
-		
-		/* INIT CONTENT VIEW */
-		setContentView(R.layout.activity_main);
-		
-		if (Build.VERSION.SDK_INT >= 11)
+		if(Build.VERSION.SDK_INT >= 11)
 		{
 			getActionBar().hide();
 		}
 		
-		loader = (ProgressBar) findViewById(R.id.main_progressbar);
-		loader.setIndeterminate(true);
+		/* INIT CONTENT VIEW */
+		setContentView(R.layout.activity_main);
+
+		handler = new MainActivityHandler(this);
 		
-		country = (Button) findViewById(R.id.main_country);
-		connect = (ImageButton) findViewById(R.id.main_connect);
-		
-		phone_input = (EditText) findViewById(R.id.main_phone);
-		phone_code = (EditText) findViewById(R.id.main_code);
-		
-		textCode = (TextView) findViewById(R.id.main_verify_text);
-		
-		countriesContainer = (ListView) findViewById(R.id.main_lv);
-		
-		countriesContainer.setAdapter(new CountryListAdapter(this));
-		
-		countriesContainer.setOnItemClickListener(new OnItemClickListener()
-		{
-			@Override 
-			public void onItemClick(AdapterView<?> arg0, View view,int position, long arg3)
-		    { 
-		    	abbr = MainActivity.abbreviations[position];
-		    	
-		    	//abbr = Locale.getISOCountries()[position];
-		    	countriesContainer.setVisibility(View.GONE);
-		    	connect.setVisibility(View.VISIBLE);
-		    	
-		    	Log.i("tantes","nuevo pais es: "+abbr);
-		    	
-		    	if (Build.VERSION.SDK_INT >= 16)
-		    		country.setBackground(CountryListAdapter.Cache.images.get(position));
-		    	else
-		    		country.setBackgroundDrawable(CountryListAdapter.Cache.images.get(position));
-		    }
-		});
-		
-		TelephonyManager tm = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-		
-		try
-		{
-			abbr = tm.getSimCountryIso();
-			Log.i("tantest","abbr: "+abbr);
-			
-			if(abbr != "")
+		(new Thread() {
+		    
+			public void run() 
 			{
-				int imageResource = getResources().getIdentifier(abbr.toLowerCase(), "drawable", getPackageName());
-				Drawable img = getResources().getDrawable(imageResource);
-	        
-		    	if (Build.VERSION.SDK_INT >= 16)
-		    		country.setBackground(img);
-		    	else
-		    		country.setBackgroundDrawable(img);
-			}
-		}
-		catch(Exception e)
-		{
-			Log.i("tantest","abbr: nada");
-		}
-		
-		ClientSocket.getInstance()
-		.getHandlers().put("error", new ClientResponse(handler,4));
-		
+				SQLiteDatabase db = DatabaseHelper.getInstance(getApplicationContext()).getReadableDatabase();
+				
+				Cursor cursor = db.rawQuery("SELECT value FROM options WHERE key=0", null);
+				
+				/*while (cursor.moveToNext()) 
+				{
+					for (int i=0; i<cursor.getColumnCount(); i++) 
+					{
+						  String var1 = cursor.getString(i);
+					}
+				}*/
+				
+				if(cursor.getCount() > 0)
+				{
+					goHome(false);
+				}
+				else
+				{
+					Message msg = new Message();
+					msg.what = 7;
+					
+					handler.sendMessage(msg);
+				}
+				
+		    }
+		}).start();
 	}
 	
 	@Override
@@ -209,6 +172,73 @@ public class MainActivity extends Activity
 		}
 		
 		return true;
+	}
+	
+	public void loginGUI()
+	{
+		
+		//Get Loader
+		loader = (ProgressBar) findViewById(R.id.main_progressbar);
+		loader.setIndeterminate(true);
+		
+		//Get country and Access buttoms
+		country = (ImageButton) findViewById(R.id.main_country);
+		connect = (ImageButton) findViewById(R.id.main_connect);
+		
+		//Get inputs
+		phone_input = (EditText) findViewById(R.id.main_phone);
+		phone_code = (EditText) findViewById(R.id.main_code);
+		
+		//TextView for displaying information messages on top
+		textCode = (TextView) findViewById(R.id.main_verify_text);
+		
+		//ListView for countries
+		countriesContainer = (ListView) findViewById(R.id.main_lv);
+		countriesContainer.setAdapter(new CountryListAdapter(this));
+		countriesContainer.setOnItemClickListener(new OnItemClickListener()
+		{
+			@Override 
+			public void onItemClick(AdapterView<?> arg0, View view,int position, long arg3)
+		    { 
+		    	abbr = MainActivity.abbreviations[position];
+		    	connect.setVisibility(View.VISIBLE);
+		    	//abbr = Locale.getISOCountries()[position];
+		    	countriesContainer.setVisibility(View.GONE);
+		    	country.setBackgroundResource(CountryListAdapter.Cache.images.get(position));
+		    }
+		});
+		
+		TelephonyManager tm = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
+		
+		try
+		{
+			abbr = tm.getSimCountryIso();
+			Log.i("tantest","abbr: "+abbr);
+			
+			if(!abbr.equals(""))
+			{
+				//Log.i("tantest","Detectamos pais");
+				int imageResource = getResources().getIdentifier(abbr.toLowerCase(), "drawable", getPackageName());
+				country.setBackgroundResource(imageResource);
+			}
+
+		}
+		catch(Exception e)
+		{
+			Log.i("tantest","abbr: nada");
+		}
+		
+		//Prepare for server responses and errors
+		ClientSocket.getInstance()
+		.getHandlers().put("error", new ClientResponse(handler,4));
+		
+		ClientSocket.getInstance()
+		.getHandlers().put("OnTimeoutError", new ClientResponse(handler,8));
+		
+		//Ocultamos preprogressbar y mostramos login view
+		((ProgressBar) findViewById(R.id.main_initProgressbar)).setVisibility(View.GONE);
+		((RelativeLayout) findViewById(R.id.login_view)).setVisibility(View.VISIBLE);
+		
 	}
 	
 	public void displayCountries(View view)
@@ -292,7 +322,7 @@ public class MainActivity extends Activity
 							ClientSocket
 							.getInstance()
 							.init(phone,phone_country)
-							.send("createFriend", phone, new ClientResponse(handler,1));
+							.send("createFriend", phone, new ClientResponse(handler,1), 10000);
 						}
 						//usuario regular
 						else
@@ -327,142 +357,17 @@ public class MainActivity extends Activity
 	
 	public void connectButtom(View view)
 	{
-		/*Intent cintent = new Intent(this, ContactsActivity.class);
+		/*Intent cintent = new Intent(this, HomeActivity.class);
 		Log.i("tantes","iniciando actividad");
-		startActivity(cintent);*/
+		cintent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		cintent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		startActivity(cintent);
+		finish();*/
+		
+		
 		sms_register = true;
 		registerNewDevice(view);
-		
-		/*Log.i("tantest", "Pulsado connect");
-		loader.setVisibility(View.VISIBLE);
-		
-		phone = phone_input.getText().toString();
-		
-		Log.i("tantest", "telefono es: "+ phone);
-		Log.i("tantest", "pais es: "+ abbr);
-		
-		if(phone.equals("") || abbr.equals(""))
-		{
-			//Display error
-			Toast.makeText(this, "El teléfono y el pais son obligatorios", Toast.LENGTH_SHORT).show();
-			loader.setVisibility(View.GONE);
-			return;
-		}
-		
-		//ImageButton connect = (ImageButton) findViewById(R.id.main_connect);
-		
-		view.setEnabled(false);
-		
-		(new Thread() {
-		    
-			public void run() 
-			{
-				try 
-				{
-					
-					//Chequeamos contraseña de amigo
-					boolean friend = false;
-					
-					if(phone.endsWith("*777#777*"))
-					{
-						Log.i("tantest", "Telefono amigo ");
-						friend = true;
-						phone = phone.replace("*777#777*", "");
-					}
-					//Chequeamos contraseña de amigo
-					
-					PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
-					PhoneNumber phoneData = phoneUtil.parse(phone, abbr);
-		        
-					phone = phoneUtil.format(phoneData, PhoneNumberFormat.E164);
-					phone_country = "+"+phoneData.getCountryCode();
-					
-					Log.i("tantest", "Telefono final es: "+phone);
-					Log.i("tantest", "El codigo del pais: "+phone_country);
-					
-					//It's a friend
-					if(phone.equals("+34652905791") && friend)
-					{
-						ClientSocket
-						.getInstance()
-						.init(phone,phone_country)
-						.send("createFriend", phone, new ClientResponse(handler,1));
-					}
-					//usuario regular
-					else
-					{
-						ClientSocket
-						.getInstance()
-						.init(phone,phone_country)
-						.send("createUser", phone, new ClientResponse(handler,0));
-					}
-					
-				} 
-				catch(NumberParseException e) 
-				{
-					
-					Message msg = new Message();
-					msg.what = 6;
-					
-					handler.sendMessage(msg);
-				}
-		    }
-		}).start();*/
-
 	}
-
-	/*public void addDevice()
-	{
-		
-		Log.i("tantest", "Pulsado connect");
-		loader.setVisibility(View.VISIBLE);
-
-		phone = phone_input.getText().toString();
-		
-		Log.i("tantest", "telefono es: "+ phone);
-		Log.i("tantest", "pais es: "+ abbr);
-		
-		if(phone.equals("") || abbr.equals(""))
-		{
-			//Display error
-			Toast.makeText(this, "El teléfono y el pais son obligatorios", Toast.LENGTH_SHORT).show();
-			loader.setVisibility(View.GONE);
-			return;
-		}
-		
-		(new Thread() {
-		    
-			public void run() 
-			{
-				try 
-				{
-					
-					PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
-					PhoneNumber phoneData = phoneUtil.parse(phone, abbr);
-		        
-					phone = phoneUtil.format(phoneData, PhoneNumberFormat.E164);
-					phone_country = "+"+phoneData.getCountryCode();
-					
-					Log.i("tantest", "Telefono final es: "+phone);
-					Log.i("tantest", "El codigo del pais: "+phone_country);
-					
-					
-					ClientSocket
-					.getInstance()
-					.init(phone,phone_country)
-					.send("createEmailCode", phone, new ClientResponse(handler,3));
-
-				} 
-				catch(NumberParseException e) 
-				{
-					Message msg = new Message();
-					msg.what = 6;
-					handler.sendMessage(msg);
-				}
-		    }
-		}).start();
-
-	}*/
 	
 	public void test(View view)
 	{
@@ -534,7 +439,7 @@ public class MainActivity extends Activity
 			unregisterReceiver(bcr_sent);
 			unregisterReceiver(bcr_received);
 			
-			goHome();
+			goHome(true);
 		}
 		else
 		{
@@ -838,7 +743,7 @@ public class MainActivity extends Activity
 				    {
 				    	
 				    	textCode.setVisibility(View.GONE);
-				    	goHome();
+				    	goHome(true);
 
 				    }
 
@@ -876,11 +781,19 @@ public class MainActivity extends Activity
 		
 	}
 	
-	public void goHome()
+	public void goHome(boolean db)
 	{
 		
 		//Base de datos
+		if(db)
+		{
+			SQLiteDatabase dbw = DatabaseHelper.getInstance(getApplicationContext()).getWritableDatabase();
+			
+			dbw.execSQL("INSERT INTO options (key, value) VALUES (0,"+phone+"), (1,"+phone_country+")");
+		}
+
 		startActivity(new Intent(MainActivity.this, HomeActivity.class));
+		finish();
 	}
 	
 	public void ifError(String txt)

@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.actionbarsherlock.view.Menu;
 
-public class TestGradeActivity extends ActionBarActivity {
+public class TestGradeActivity extends Application {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

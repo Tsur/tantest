@@ -71,11 +71,13 @@ public class CountryListAdapter extends BaseAdapter
             //Log.i("tantest","img: "+MainActivity.abbreviations[position]);
             
         	int imageResource = activity.getResources().getIdentifier(MainActivity.abbreviations[position].toLowerCase(), "drawable", activity.getPackageName());
-			Drawable img = activity.getResources().getDrawable(imageResource);
-            Cache.images.put(position, img);
+			//Drawable img = activity.getResources().getDrawable(imageResource);
+            //Cache.images.put(position, img);
+			Cache.images.put(position, imageResource);
         }
         
-		holder.image.setImageDrawable(Cache.images.get(position));
+        holder.image.setBackgroundResource(Cache.images.get(position));
+		//holder.image.setImageDrawable(Cache.images.get(position));
 		holder.name.setText(MainActivity.countries[position]);
 		
 		return vi;
@@ -89,6 +91,7 @@ public class CountryListAdapter extends BaseAdapter
 	 
 	 static class Cache
 	 {
-	 	static SparseArray<Drawable> images = new SparseArray<Drawable>();
+	 	//static SparseArray<Drawable> images = new SparseArray<Drawable>();
+	 	static SparseArray<Integer> images = new SparseArray<Integer>();
 	 }
 }

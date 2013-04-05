@@ -48,7 +48,7 @@ import com.scripturesos.tantest.test.TestSolutionCheck;
 import com.scripturesos.tantest.test.TestSolutionRadio;
 import com.scripturesos.tantest.test.TestUtil;
 
-public class TestActivity extends ActionBarActivity {
+public class TestActivity extends Application {
 	
 	private Test test;
 	

@@ -29,7 +29,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.ipaulpro.afilechooser.utils.FileUtils;
 import com.scripturesos.tantest.connection.ClientSocket;
 
-public class HomeActivity extends ActionBarActivity {
+public class HomeActivity extends Application {
 
 	private ProgressBar loader;
 
@@ -80,7 +80,9 @@ public class HomeActivity extends ActionBarActivity {
     @Override
     public void onBackPressed() 
     {
+    	//mismo efecto que si pulsa el boton home: moveTaskToBackGround
     	moveTaskToBack(true);
+    	//super.onBackPressed();
     }
 	
     public void showContacts(View v)
@@ -148,41 +150,5 @@ public class HomeActivity extends ActionBarActivity {
         }
         
     }
-	
-	/*private class MYGIFView extends View{
-
-		Movie movie;
-		InputStream is=null;
-		long moviestart;
-		
-		public MYGIFView(Context context)
-		{
-			super(context);
-
-			is=context.getResources().openRawResource(R.drawable.loader);
-			movie=Movie.decodeStream(is);
-		}
-
-		@Override
-		protected void onDraw(Canvas canvas)
-		{
-
-			canvas.drawColor(Color.TRANSPARENT);
-			super.onDraw(canvas);
-			long now = android.os.SystemClock.uptimeMillis();
-
-			if(moviestart == 0)
-			{ 
-				// first time
-				moviestart = now;
-			}
-			
-			int relTime = (int)((now - moviestart) % movie.duration()) ;
-		
-			movie.setTime(relTime);
-			movie.draw(canvas,this.getWidth()/2-11,this.getHeight()/2+27);
-			this.invalidate();
-		}
-	}*/
 
 }
