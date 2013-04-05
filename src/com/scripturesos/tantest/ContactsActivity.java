@@ -63,7 +63,9 @@ public class ContactsActivity extends Application {
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
-		super.onCreate(savedInstanceState, R.string.act_contacts_title);
+		setTitle(R.string.act_contacts_title);
+		
+		super.onCreate(savedInstanceState);
 		
 		Log.i("tantest","Creating contacts");
 		
@@ -498,7 +500,7 @@ public class ContactsActivity extends Application {
     {
     	Log.i("tantest","RESUME CONTACTS ACTIVITY");
     	
-    	ClientSocket.getInstance().init("phone","country");
+    	//ClientSocket.getInstance().init("phone","country");
     	
     	super.onResume();
     }

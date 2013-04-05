@@ -105,7 +105,7 @@ public class ClientSocket extends Thread
         {
         	Log.i("tantest", "Error conexion");
         	
-        	ClientResponse response = responseHandlers.get("error");
+        	ClientResponse response = responseHandlers.get("onConnectionError");
 			
 			//Compose the message including the JSON object
 			Message msg = new Message();
@@ -308,11 +308,19 @@ public class ClientSocket extends Thread
 			{
 				try 
 				{
+					JSONObject jres = new JSONObject(res);
+					String id = jres.getString("id");
 					
-					//Parse response to JSON object
-					if(res.equals("error"))
+					//Error timeout
+					if(getErrorHandlers(id) != null)
 					{
-						ClientResponse response = responseHandlers.get("error");
+						setErrorHandlers(id, true);
+					}
+					
+					//Error transmicion datos, db, ...etc
+					if(jres.getBoolean("error"))
+					{
+						ClientResponse response = responseHandlers.get("onServerError");
 						
 						//Compose the message including the JSON object
 						Message msg = new Message();
@@ -323,14 +331,6 @@ public class ClientSocket extends Thread
 					}
 					else
 					{
-						JSONObject jres = new JSONObject(res);
-						String id = jres.getString("id");
-						
-						if(getErrorHandlers(id) != null)
-						{
-							setErrorHandlers(id, true);
-						}
-					
 						//Get the handler information
 						ClientResponse response = responseHandlers.get(id);
 					

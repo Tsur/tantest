@@ -1,38 +1,31 @@
 package com.scripturesos.tantest;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
+import org.json.JSONObject;
 
-import a_vcard.android.syncml.pim.PropertyNode;
-import a_vcard.android.syncml.pim.VDataBuilder;
-import a_vcard.android.syncml.pim.VNode;
-import a_vcard.android.syncml.pim.vcard.VCardException;
-import a_vcard.android.syncml.pim.vcard.VCardParser;
 import android.content.Intent;
-import android.net.Uri;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.ipaulpro.afilechooser.utils.FileUtils;
+import com.scripturesos.tantest.connection.ClientResponse;
 import com.scripturesos.tantest.connection.ClientSocket;
+import com.scripturesos.tantest.connection.DatabaseHelper;
 
 public class HomeActivity extends Application {
 
 	private ProgressBar loader;
-
+	private String client_id;
+	private String country_id;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -43,6 +36,17 @@ public class HomeActivity extends Application {
 		setContentView(R.layout.activity_home);
 		
 		loader = (ProgressBar) findViewById(R.id.home_progressbar);
+		
+		handler = new HomeActivityHandler(this);
+		
+		ClientSocket.getInstance()
+		.getHandlers().put("onServerError", new ClientResponse(handler,0));
+		
+		ClientSocket.getInstance()
+		.getHandlers().put("onConnectionError", new ClientResponse(handler,1));
+		
+		ClientSocket.getInstance()
+		.getHandlers().put("OnTimeoutError", new ClientResponse(handler,2));
 	}
 
 	@Override
@@ -63,7 +67,39 @@ public class HomeActivity extends Application {
     		loader.setVisibility(View.GONE);
 		}
     	
-    	ClientSocket.getInstance().init("phone","country");
+    	(new Thread() {
+		    
+			public void run() 
+			{
+				if(client_id == null || country_id == null)
+				{
+					SQLiteDatabase db = DatabaseHelper.getInstance(getApplicationContext()).getReadableDatabase();
+					
+					Cursor cursor = db.rawQuery("SELECT value FROM options WHERE key=0 OR key=1", null);
+					
+					cursor.moveToFirst();
+					
+					client_id = cursor.getString(0);
+					
+					cursor.moveToNext();
+					
+					country_id = cursor.getString(0);
+					
+					cursor.close();
+					
+					db.close();
+					
+					Log.i("tantest","phone: "+client_id);
+					Log.i("tantest","country: "+country_id);
+					
+				}
+				
+				ClientSocket.getInstance().init(client_id,country_id);
+				
+		    }
+		}).start();
+    	
+    	
     	
     	super.onResume();
     }
@@ -150,5 +186,40 @@ public class HomeActivity extends Application {
         }
         
     }
+	
+	public class HomeActivityHandler extends Handler 
+	{
+        private HomeActivity parent;
+
+        public HomeActivityHandler(HomeActivity parent) 
+        {
+            this.parent = parent;
+        }
+
+        public void handleMessage(Message msg) 
+        {
+            parent.handleMessage(msg);
+        }
+    }
+	
+	public HomeActivityHandler handler;
+	
+	public void handleMessage(Message msg) 
+	{
+        JSONObject response = (JSONObject) msg.obj;
+        
+		switch(msg.what) 
+        {
+        	case 0: ifError("Tenemos algunos problemillas... pero tu sonrie que Dios te ama");break;
+        	case 1: ifError("Revise su conexión a Internet y sonrie que Dios te ama");break;
+        	case 2: ifError("Tenemos algunos problemillas... pero tu sonrie que Dios te ama");break;
+        	default:break;
+        }
+    }
+	
+	public void ifError(String txt)
+	{
+		Toast.makeText(HomeActivity.this, txt, Toast.LENGTH_SHORT).show();
+	}
 
 }

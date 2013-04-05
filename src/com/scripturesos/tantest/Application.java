@@ -35,11 +35,11 @@ public class Application extends SherlockActivity
 
 	}
 	
-	protected void onCreate(Bundle savedInstanceState, int title)
+	/*protected void onCreate(Bundle savedInstanceState, int title)
 	{
 		setTitle(title);
 		
-		this.onCreate(savedInstanceState);
-	}
+		onCreate(savedInstanceState);
+	}*/
 
 }

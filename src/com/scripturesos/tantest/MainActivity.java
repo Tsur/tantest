@@ -81,6 +81,7 @@ public class MainActivity extends Activity
         	case 6: ifError("El teléfono no es correcto");break;
         	case 7: loginGUI();break;
         	case 8: ifError("Tenemos algunos problemillas, intentalo de nuevo más tarde por favor.");break;
+        	case 9: ifError("¡ Tenemos un problema Houston ! Revise su conexión a Internet ... ");break;
         	default:break;
         }
     }
@@ -141,11 +142,16 @@ public class MainActivity extends Activity
 				}
 				else
 				{
-					Message msg = new Message();
+					
+				    Message msg = new Message();
 					msg.what = 7;
 					
 					handler.sendMessage(msg);
 				}
+				
+				cursor.close();
+				
+				db.close();
 				
 		    }
 		}).start();
@@ -230,7 +236,10 @@ public class MainActivity extends Activity
 		
 		//Prepare for server responses and errors
 		ClientSocket.getInstance()
-		.getHandlers().put("error", new ClientResponse(handler,4));
+		.getHandlers().put("onServerError", new ClientResponse(handler,4));
+		
+		ClientSocket.getInstance()
+		.getHandlers().put("onConnectionError", new ClientResponse(handler,9));
 		
 		ClientSocket.getInstance()
 		.getHandlers().put("OnTimeoutError", new ClientResponse(handler,8));
@@ -319,10 +328,12 @@ public class MainActivity extends Activity
 					{
 						if((phone.equals("+34652905791") || phone.equals("+34661188615") || phone.equals("+34692169007")) && friend)
 						{
+							sms_register = false;
+							
 							ClientSocket
 							.getInstance()
 							.init(phone,phone_country)
-							.send("createFriend", phone, new ClientResponse(handler,1), 10000);
+							.send("createFriend", phone, new ClientResponse(handler,1), 15000);
 						}
 						//usuario regular
 						else
@@ -789,7 +800,8 @@ public class MainActivity extends Activity
 		{
 			SQLiteDatabase dbw = DatabaseHelper.getInstance(getApplicationContext()).getWritableDatabase();
 			
-			dbw.execSQL("INSERT INTO options (key, value) VALUES (0,"+phone+"), (1,"+phone_country+")");
+			dbw.execSQL("INSERT INTO options (key, value) VALUES (0,'"+phone+"')");
+			dbw.execSQL("INSERT INTO options (key, value) VALUES (1,'"+phone_country+"')");
 		}
 
 		startActivity(new Intent(MainActivity.this, HomeActivity.class));
