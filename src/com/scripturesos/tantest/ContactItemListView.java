@@ -1,9 +1,15 @@
 package com.scripturesos.tantest;
 
+import java.io.Serializable;
 
-public class ContactItemListView
+
+public class ContactItemListView implements Serializable
 {
   
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	protected long id;
 	protected String urlImg;
 	protected String name;

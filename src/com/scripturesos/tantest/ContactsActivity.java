@@ -9,7 +9,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,7 +30,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -42,16 +40,13 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.google.i18n.phonenumbers.NumberParseException;
-import com.google.i18n.phonenumbers.PhoneNumberUtil;
-import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;
-import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 import com.ipaulpro.afilechooser.utils.FileUtils;
-import com.scripturesos.tantest.connection.ClientResponse;
 import com.scripturesos.tantest.connection.ClientSocket;
+import com.scripturesos.tantest.connection.HttpUtil;
 
 public class ContactsActivity extends Application {
 
@@ -59,7 +54,9 @@ public class ContactsActivity extends Application {
 	private ListView contactsListView;
 	private ProgressBar progress;
 	private Map<String,String> phonesList;
+	//private ArrayList<ContactItemListView> contactItems;
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -76,14 +73,43 @@ public class ContactsActivity extends Application {
 		
 		progress = (ProgressBar) findViewById(R.id.act_contacts_loader);
 		
-		(new Thread() {
-		    
-			public void run() 
-			{
-				getContacts();
-		    }
-		}).start();
+		Bundle extras = getIntent().getExtras();
 		
+		if(extras != null && extras.containsKey("contacts"))
+    	{
+			try 
+			{
+				Log.i("tantest","no pasamos por todo el proceso!");
+				
+				displayContactsList((ArrayList<ContactItemListView>) HttpUtil.fromString(extras.getString("contacts")));
+			} 
+			catch (Exception e) 
+			{
+				Log.i("tantest","pasamos por todo el proceso!");
+				
+				(new Thread() {
+				    
+					public void run() 
+					{
+						getContacts();
+				    }
+				}).start();
+			}
+
+    	}
+		else
+		{
+			Log.i("tantest","pasamos por todo el proceso!");
+			
+			(new Thread() {
+			    
+				public void run() 
+				{
+					getContacts();
+			    }
+			}).start();
+		}
+
 	}
 
 	@Override
@@ -181,17 +207,29 @@ public class ContactsActivity extends Application {
 		//Conectamos con el servidor y mandamos telefonos
 		if(phonesList.size() > 0)
 		{
-			ClientSocket
-			.getInstance()
-			.send("getContacts", phonesList.keySet(), new ClientResponse(handler,0));	
+			
+			try 
+			{
+				Message msg = new Message();
+				msg.what = 0;
+				msg.obj = HttpUtil.post(HttpUtil.GET_CONTACTS,new String[]{phonesList.keySet().toString()});
+				handler.sendMessage(msg);
+			}
+			catch (Exception e) 
+			{
+				//Error diversas causas: conexion, parseo, ...
+				Message msg = new Message();
+				msg.what = 12;
+				handler.sendMessage(msg);
+			}
+			
+			
 		}
 		else
 		{
-			
+			//Le decimos que importe desde fichero
 			Message msg = new Message();
-			
-			msg.what = 1;
-			
+			msg.what = 11;
 			handler.sendMessage(msg);
 		}
 		
@@ -334,20 +372,17 @@ public class ContactsActivity extends Application {
         			        
         			        if(phonesList.size() > 0)
         					{
+        			        	Message msg = new Message();
+        						msg.what = 0;
+        						msg.obj = HttpUtil.post(HttpUtil.GET_CONTACTS,new String[]{phonesList.keySet().toString()});
+        						handler.sendMessage(msg);
         						
-        						/*
-        						ClientSocket
-        						.getInstance()
-        						.send("getContacts", phonesList.keySet(), new ClientResponse(handler,0));
-        						*/	
         					}
         					else
         					{
-        						
+        						//Esta vacio el fichero importado
         						Message msg = new Message();
-        						
-        						msg.what = 2;
-        						
+        						msg.what = 10;
         						handler.sendMessage(msg);
         					}
         				} 
@@ -363,7 +398,10 @@ public class ContactsActivity extends Application {
         				} catch (VCardException e) {
         					// TODO Auto-generated catch block
         					e.printStackTrace();
-        				}
+        				} catch (JSONException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
         		    }
         		}).start();
             }           
@@ -375,20 +413,33 @@ public class ContactsActivity extends Application {
 	/*@Override
 	public void onBackPressed() 
 	{
-	    Bundle bundle = new Bundle();
-	    bundle.putString("saludos", "Hola");
+	    
+	     Intent mIntent = new Intent();
+	     
+	    try 
+	    {
+	    	if(contactItems != null)
+		    {
+		    	Bundle bundle = new Bundle();
+		    	
+				bundle.putString("contacts", HttpUtil.toString(contactItems));
+				
+				mIntent.putExtras(bundle);
+			} 
 
-	    Intent mIntent = new Intent();
-	    mIntent.putExtras(bundle);
+	    }
+	    catch (IOException e) 
+    	{
+			
+		}
+	    
 	    setResult(RESULT_OK, mIntent);
 	    super.onBackPressed();
 	}*/
 	
 	public void makeContactsList(JSONObject serverContacts)
 	{
-		
-		contactsListView = (ListView) findViewById(R.id.act_contacts_lv);
-		
+
 		//ArrayList<ContactItemListView> contactItems = new ArrayList<ContactItemListView>();
 		final JSONArray contacts;
 		//JSONObject jsonContact;
@@ -443,7 +494,7 @@ public class ContactsActivity extends Application {
 								
 									/*HttpURLConnection connection = (HttpURLConnection)new URL(contact.getImg()).openConnection();
 								    connection.setRequestProperty("User-agent","Mozilla/4.0");
-
+	
 								    connection.connect();
 								    InputStream input = connection.getInputStream();*/
 									InputStream is = (InputStream) new URL(imgUrl).getContent();
@@ -466,11 +517,33 @@ public class ContactsActivity extends Application {
 								
 								ContactListAdapter.Cache.images.put(i, img);
 						}
-				         
-						Message msg = new Message();
-						msg.what = 3;
-						msg.obj = contactItems;
-						handler.sendMessage(msg);	
+
+				 	    try 
+				 	    {
+				 	    	Intent mIntent = new Intent();
+				 	    	
+				 	    	if(contactItems != null)
+				 		    {
+				 		    	Bundle bundle = new Bundle();
+				 		    	
+				 				bundle.putString("contacts", HttpUtil.toString(contactItems));
+				 				
+				 				mIntent.putExtras(bundle);
+				 			} 
+				 	    	
+				 	    	setResult(RESULT_OK, mIntent);
+				 	    
+							Message msg = new Message();
+							msg.what = 3;
+							msg.obj = contactItems;
+							handler.sendMessage(msg);	
+
+				 	    }
+				 	    catch (IOException e) 
+				     	{
+				 			
+				 		}
+
 				    }
 				}).start();
 			}
@@ -481,13 +554,15 @@ public class ContactsActivity extends Application {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+	
 	}
 	
 	public void displayContactsList(ArrayList<ContactItemListView> contactItems)
 	{
 		 ContactListAdapter adapter = new ContactListAdapter(ContactsActivity.this, contactItems);
-		
+		 
+		 contactsListView = (ListView) findViewById(R.id.act_contacts_lv);
+		 
 		 contactsListView.setAdapter(adapter);
 		    
 		 contactsListView.setVisibility(View.VISIBLE);
@@ -525,12 +600,18 @@ public class ContactsActivity extends Application {
         switch(msg.what) 
         {
         	case 0: makeContactsList((JSONObject)msg.obj);break;
-        	case 1: displayNoAgenda(null);break;
-        	case 2: displayNoAgenda(getString(R.string.contacts_no_agenda_import));break;
+        	case 10: displayNoAgenda("El fichero importado no contiene información suficiente. Por favor, utilize otro");break;
+        	case 11: displayNoAgenda(getString(R.string.contacts_no_agenda_import));break;
+        	case 12: ifError("Inténtalo de nuevo más tarde por favor");
         	case 3: displayContactsList((ArrayList<ContactItemListView>)msg.obj);break;
             default:break;
         }
     }
+	
+	public void ifError(String txt)
+	{
+		Toast.makeText(ContactsActivity.this, txt, Toast.LENGTH_SHORT).show();
+	}
 	
 	public ContactsActivityHandler handler;
 

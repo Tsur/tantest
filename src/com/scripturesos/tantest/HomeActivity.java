@@ -25,7 +25,7 @@ public class HomeActivity extends Application {
 	private ProgressBar loader;
 	private String client_id;
 	private String country_id;
-	
+	private String contacts_serialized;
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -140,8 +140,16 @@ public class HomeActivity extends Application {
     public void showContacts(View v)
     {
     	Intent cintent = new Intent(this, ContactsActivity.class);
+    	
+    	if(contacts_serialized != null)
+	    {
+	    	Bundle bundle = new Bundle();
+	    	bundle.putString("contacts", contacts_serialized);
+	    	cintent.putExtras(bundle);
+	    }
+    	
 		Log.i("tantes","iniciando actividad");
-		startActivity(cintent);
+		startActivityForResult(cintent,0);
     }
     
 	public boolean onOptionsItemSelected(MenuItem item)
@@ -157,21 +165,22 @@ public class HomeActivity extends Application {
 				//Mostramos ajax cargando
 				
 				Log.i("tantes","creando actividad");
-
-				
-				//RelativeLayout rl = (RelativeLayout) findViewById(R.id.main_logoimg);
-				//loader = new MYGIFView(this);
-				//rl.addView(loader);
 				
 				Intent intent = new Intent(this, TestActivity.class);
 				Log.i("tantes","iniciando actividad");
 				startActivity(intent);
-				
-
 				break;
 			case R.id.menu_header_social:
 				Intent cintent = new Intent(this, ContactsActivity.class);
 				Log.i("tantes","iniciando actividad");
+				
+				if(contacts_serialized != null)
+			    {
+			    	Bundle bundle = new Bundle();
+			    	bundle.putString("contacts", contacts_serialized);
+			    	cintent.putExtras(bundle);
+			    }
+				
 				startActivityForResult(cintent,0);
 				break;
 			case R.id.menu_settings:
@@ -195,7 +204,14 @@ public class HomeActivity extends Application {
             {  
             	Bundle b = data.getExtras();
             	
-            	Log.i("tantest","ContactsActivity me manda saludos: "+b.getString("saludos"));
+            	if(b.containsKey("contacts"))
+            	{
+            		contacts_serialized = b.getString("contacts");
+            		
+            		//Los guardamos en BD
+            		Log.i("tantest","Tenemos datos serializados");
+            	}
+            	
             	//Guardo estado que viene en data
             }
                
@@ -226,8 +242,8 @@ public class HomeActivity extends Application {
         
 		switch(msg.what) 
         {
-        	case 0: ifError("Tenemos algunos problemillas... pero tu sonrie que Dios te ama");break;
-        	case 1: ifError("Revise su conexión a Internet y sonrie que Dios te ama");break;
+        	case 0: handlerMessage(response);break;//ifError("Tenemos algunos problemillas... pero tu sonrie que Dios te ama");break;
+        	case 1: handlerConfirmation(response);break;//ifError("Revise su conexión a Internet y sonrie que Dios te ama");break;
         	case 2: ifError("Tenemos algunos problemillas... pero tu sonrie que Dios te ama");break;
         	default:break;
         }
@@ -236,6 +252,16 @@ public class HomeActivity extends Application {
 	public void ifError(String txt)
 	{
 		Toast.makeText(HomeActivity.this, txt, Toast.LENGTH_SHORT).show();
+	}
+	
+	public void handlerMessage(JSONObject response)
+	{
+		
+	}
+	
+	public void handlerConfirmation(JSONObject response)
+	{
+		
 	}
 
 }

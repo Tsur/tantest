@@ -143,139 +143,76 @@ public class ClientSocket extends Thread
 		responseController = controller;
     }*/
     
-    public void send(String method, String argument, ClientResponse controller)
+    public void sendMsg(String to, String msg)
     {
 
     	if(clientSocket !=null && clientSocket.isConnected())
     	{
-	    	String id = UUID.randomUUID().toString();
-	
-	    	responseHandlers.put(id, controller);
+	    	String message_id = UUID.randomUUID().toString();
 	
 			out.write("{\"client\":\""+getClient()+
-	    			"\",\"method\":\""+method+
-	    			"\",\"id\":\""+id+
-	    			"\",\"arguments\":[\""+argument+"\"]}");
+	    			"\",\"method\":\"SendMsg\",\"id\":\""+message_id+
+	    			"\",\"arguments\":[\""+to+"\",\""+msg+"\"]}");
 			
 			out.flush();
 			
 			Log.i("tantest", "Mensaje enviado");
     	}
+    	else
+    	{
+    		//Guardamos en BD para posterior envio
+    	}
     	
     }
     
-    public void send(String method, String argument, ClientResponse controller, final long time)
+    public void sendConfirmation(String message_id, String to)
     {
 
     	if(clientSocket !=null && clientSocket.isConnected())
     	{
-	    	final String id = UUID.randomUUID().toString();
-	
-	    	responseHandlers.put(id, controller);
 	
 			out.write("{\"client\":\""+getClient()+
-	    			"\",\"method\":\""+method+
-	    			"\",\"id\":\""+id+
-	    			"\",\"arguments\":[\""+argument+"\"]}");
+	    			"\",\"method\":\"confirmMsg\",\"id\":\"void\",\"arguments\":[\""+message_id+"\",\""+to+"\"]}");
 			
 			out.flush();
 			
 			Log.i("tantest", "Mensaje enviado");
+    	}
+    	else
+    	{
+    		//Guardamos en BD para posterior envio
+    	}
 			
-			setErrorHandlers(id, false);
-			
-			(new Thread() {
-			    
-				public void run() 
+		/*(new Thread() {
+		    
+			public void run() 
+			{
+				try 
 				{
-					try 
+					Thread.sleep(time);
+					
+					if(getErrorHandlers(id) == false)
 					{
-						Thread.sleep(time);
+						ClientResponse response = responseHandlers.get("onTimeoutError");
 						
-						if(getErrorHandlers(id) == false)
-						{
-							ClientResponse response = responseHandlers.get("onTimeoutError");
-							
-							//Compose the message including the JSON object
-							Message msg = new Message();
-							msg.what = response.what;
-							
-							response.handler.sendMessage(msg);
-						}
-					} 
-					catch (InterruptedException e) 
-					{
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						//Compose the message including the JSON object
+						Message msg = new Message();
+						msg.what = response.what;
+						
+						response.handler.sendMessage(msg);
 					}
-			    }
-				
-			}).start();
-    	}
-    	
+				} 
+				catch (InterruptedException e) 
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+		    }
+			
+		}).start();*/
+
     }
-    
-    public void send(String method, Collection<String> arguments, ClientResponse controller)
-    {
-    	
-    	if(clientSocket !=null && clientSocket.isConnected())
-    	{
-    	
-	    	String id = UUID.randomUUID().toString();
-	    	
-	    	String command = "{\"client\":\""+getClient()+
-	    			"\",\"method\":\""+method+
-	    			"\",\"id\":\""+id+
-	    			"\",\"arguments\":";
-	    	
-	    	String args = "[";
-	    	
-	    	Iterator<String> it = arguments.iterator();
-	    	String elem;
-	    	
-	    	while(it.hasNext())
-	    	{
-	    		elem = it.next();
-	    		
-	    		if(elem.startsWith("["))
-	    		{
-	    			args += elem+",";
-	    		}
-	    		else
-	    		{
-	    			if(elem.startsWith("\"") && elem.endsWith("\""))
-	    			{
-	    				args += elem+",";
-	    			}
-	    			else
-	    			{
-	    				args += "\""+elem+"\",";
-	    			}
-	    				
-	    		}
-	    		
-	    	}
-	    	
-	    	if(arguments.size() > 0)
-	    	{
-	    		args = args.substring(0,args.length()-1);
-	    	}
-	
-	    	args += "]}";
-	    	
-	    	command += args;
-	    	
-	    	responseHandlers.put(id, controller);
-	    	
-	    	//commands.add(command);
-	    	Log.i("tantest","Al server: "+command);
-	    	
-	    	out.write(command);
-			out.flush();
-		
-    	}
-    }
-    
+ 
     private void processResponse(String response)
     {
 
@@ -296,13 +233,13 @@ public class ClientSocket extends Thread
 					String id = jres.getString("id");
 					
 					//Error timeout
-					if(getErrorHandlers(id) != null)
+					/*if(getErrorHandlers(id) != null)
 					{
 						setErrorHandlers(id, true);
-					}
+					}*/
 					
 					//Error transmicion datos, db, ...etc
-					if(jres.getBoolean("error"))
+					/*if(jres.getBoolean("error"))
 					{
 						ClientResponse response = responseHandlers.get("onServerError");
 						
@@ -314,7 +251,7 @@ public class ClientSocket extends Thread
 					
 					}
 					else
-					{
+					{*/
 						//Get the handler information
 						ClientResponse response = responseHandlers.get(id);
 					
@@ -325,9 +262,9 @@ public class ClientSocket extends Thread
 						
 						response.handler.sendMessage(msg);
 					
-						responseHandlers.remove(id);
+						//responseHandlers.remove(id);
 							
-					}
+					//}
 					
 					
 					//Send Message to handler
