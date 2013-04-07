@@ -39,35 +39,7 @@ public class HomeActivity extends Application {
 		
 		handler = new HomeActivityHandler(this);
 		
-		ClientSocket.getInstance()
-		.getHandlers().put("onServerError", new ClientResponse(handler,0));
-		
-		ClientSocket.getInstance()
-		.getHandlers().put("onConnectionError", new ClientResponse(handler,1));
-		
-		ClientSocket.getInstance()
-		.getHandlers().put("OnTimeoutError", new ClientResponse(handler,2));
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getSupportMenuInflater().inflate(R.menu.activity_home, menu);
-		return true;
-	}
-	
-
-    @Override
-    public void onResume()
-    {
-    	Log.i("tantest","RESUME HOM ACTIVITY");
-    	
-    	if(loader != null)
-		{
-    		loader.setVisibility(View.GONE);
-		}
-    	
-    	(new Thread() {
+		(new Thread() {
 		    
 			public void run() 
 			{
@@ -94,15 +66,59 @@ public class HomeActivity extends Application {
 					
 				}
 				
-				ClientSocket.getInstance().init(client_id,country_id);
+				/*ClientSocket.getInstance()
+				.getHandlers().put("onServerError", new ClientResponse(handler,10));
+				
+				ClientSocket.getInstance()
+				.getHandlers().put("onConnectionError", new ClientResponse(handler,11));
+				
+				ClientSocket.getInstance()
+				.getHandlers().put("onTimeoutError", new ClientResponse(handler,12));
+				*/
+				ClientSocket.getInstance()
+				.getHandlers().put("sendMsg", new ClientResponse(handler,0));
+				
+				ClientSocket.getInstance()
+				.getHandlers().put("confirmMsg", new ClientResponse(handler,1));
+				
+				ClientSocket.getInstance().clientID = client_id;
+				ClientSocket.getInstance().countryCode = country_id;
+				
+				ClientSocket.getInstance().start();
 				
 		    }
 		}).start();
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getSupportMenuInflater().inflate(R.menu.activity_home, menu);
+		return true;
+	}
+	
+
+    @Override
+    public void onResume()
+    {
+    	Log.i("tantest","RESUME HOM ACTIVITY");
     	
-    	
+    	if(loader != null)
+		{
+    		loader.setVisibility(View.GONE);
+		}
     	
     	super.onResume();
     }
+    
+	@Override
+	protected void onDestroy() 
+	{
+		
+		ClientSocket.getInstance().close();
+		
+		super.onDestroy();
+	}
 	
 	public void changeText(View view)
 	{

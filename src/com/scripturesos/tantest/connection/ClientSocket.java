@@ -22,8 +22,8 @@ public class ClientSocket extends Thread
 {
 	
 	private Socket clientSocket;
-	private String clientID;
-	private String countryCode;
+	public String clientID;
+	public String countryCode;
 	//private List<String> commands;
 	//private String command;
 	private PrintWriter out;
@@ -62,32 +62,17 @@ public class ClientSocket extends Thread
 		}
 	}
 	
-	public ClientSocket init(String client, String country) 
+	private synchronized void init() 
     {
-        //assert clientSocket == null;
-		/*if(clientSocket != null)
-    	{
-        	try 
-        	{
-				clientSocket.close();
-			} 
-        	catch (IOException e) 
-        	{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-    	}*/
-		
+
 		if(clientSocket != null && clientSocket.isConnected())
 		{
-			return this;
+			return;
 		}
         
     	try 
         {
     		//Log.i("tantest", "Conectando");
-    		clientID = client;
-            countryCode = country;
             //commands = new ArrayList<String>();
             //responseHandlers = new HashMap<String,ClientResponse>();
             Log.i("tantest", "Conectando a: "+IP+":"+PORT);
@@ -97,13 +82,14 @@ public class ClientSocket extends Thread
 			out = new PrintWriter(clientSocket.getOutputStream(), true);
 			Log.i("tantest", "Buffers arrancados");
 			
-            start();
-            
-            return this;
+			out.write("{\"client\":\""+getClient()+"\",\"method\":\"identify\",\"id\":\"void\",\"arguments\":[]");
+			
+			out.flush();
+
 		} 
         catch (Exception e) 
         {
-        	Log.i("tantest", "Error conexion");
+        	/*Log.i("tantest", "Error conexion");
         	
         	ClientResponse response = responseHandlers.get("onConnectionError");
 			
@@ -111,14 +97,12 @@ public class ClientSocket extends Thread
 			Message msg = new Message();
 			msg.what = response.what;
 			
-			response.handler.sendMessage(msg);
-			
-			return this;
+			response.handler.sendMessage(msg);*/
         }
     	
     }
     
-	public Socket getSocket()
+	public synchronized Socket getSocket()
     {
     	return clientSocket;
     }
@@ -210,7 +194,7 @@ public class ClientSocket extends Thread
 						
 						if(getErrorHandlers(id) == false)
 						{
-							ClientResponse response = responseHandlers.get("OnTimeoutError");
+							ClientResponse response = responseHandlers.get("onTimeoutError");
 							
 							//Compose the message including the JSON object
 							Message msg = new Message();
@@ -370,16 +354,34 @@ public class ClientSocket extends Thread
 
     		//Log.i("tantest", "ESperando respuesta");
     		
-	 	    while(clientSocket.isConnected())
+	 	    while(true)
 	 	    {
 	 	    	
-	 	    	if(in.ready())
+	 	    	if(clientSocket != null && clientSocket.isConnected())
 	 	    	{
- 				   //System.out.println("obtengo respuesta");
-	 	    		//Log.i("tantest", "Tenemos respuesta!");
- 				   processResponse(in.readLine());
+	 	    		if(in.ready())
+		 	    	{
+	 				   //System.out.println("obtengo respuesta");
+		 	    		//Log.i("tantest", "Tenemos respuesta!");
+	 				   processResponse(in.readLine());
+		 	    	}
+	 	    		
+	 	    		sleep(INTERVAL);
 	 	    	}
- 			   
+	 	    	else
+	 	    	{
+	 	    		init();
+	 	    		
+	 	    		if(clientSocket != null && clientSocket.isConnected())
+		 	    	{
+	 	    			sleep(INTERVAL);
+		 	    	}
+	 	    		else
+	 	    		{
+	 	    			sleep(RECONNECTION_INTERVAL);
+	 	    		}
+	 	    		
+	 	    	}
 	 	    	/*if(commands.size() > 0)
 	 	    	{
  				  for(String command: commands)
@@ -391,7 +393,7 @@ public class ClientSocket extends Thread
  				  commands.clear();
 	 	    	}*/
  			   
-	 	    	sleep(INTERVAL);
+	 	    	
 	 	    }
 		} 
     	catch (InterruptedException e) 
@@ -416,5 +418,6 @@ public class ClientSocket extends Thread
 	//private final String IP = "192.168.1.131";
     private final int PORT = 3000;
     private final int INTERVAL = 1000;
+    private final int RECONNECTION_INTERVAL = 60*1000;//1 minuto
     //private final int CON_INTERVAL = 100;
 }

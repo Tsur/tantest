@@ -1,5 +1,7 @@
 package com.scripturesos.tantest;
 
+
+import org.apache.http.client.ClientProtocolException;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -20,7 +22,6 @@ import android.telephony.SmsManager;
 import android.telephony.SmsMessage;
 import android.telephony.TelephonyManager;
 import android.util.Log;
-
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -42,9 +43,8 @@ import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;
 import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
-import com.scripturesos.tantest.connection.ClientResponse;
-import com.scripturesos.tantest.connection.ClientSocket;
 import com.scripturesos.tantest.connection.DatabaseHelper;
+import com.scripturesos.tantest.connection.HttpUtil;
 
 public class MainActivity extends Activity 
 {
@@ -72,16 +72,19 @@ public class MainActivity extends Activity
         
 		switch(msg.what) 
         {
-        	case 0: requestCodeSMS(response);break;
-        	case 1: goHome(true);break;
-        	case 2: verifyCodeSMS(response);break;
-        	case 3: requestCode(response);break;
-        	case 4: ifError("¡ Tenemos un problema Houston ! Revise su conexión a Internet ... ");break;
-        	case 5: verifyCode(response);break;
-        	case 6: ifError("El teléfono no es correcto");break;
-        	case 7: loginGUI();break;
-        	case 8: ifError("Tenemos algunos problemillas, intentalo de nuevo más tarde por favor.");break;
-        	case 9: ifError("¡ Tenemos un problema Houston ! Revise su conexión a Internet ... ");break;
+        	//Http
+			case 0: goHome(true);break;
+			case 1: requestCodeSMS(response);break;
+        	case 2: requestCode(response);break;
+        	case 3: verifyCode(response);break;
+        	
+        	//Errors
+        	case 10: ifError("¡ Tenemos un problema Houston ! Inténtelo más tarde");break;
+        	case 11: ifError("El teléfono introducido no es correcto");break;
+        	case 12: ifError("Revise su conexion a internet");break;
+        	
+        	//Database
+        	case 20: loginGUI();break;
         	default:break;
         }
     }
@@ -144,7 +147,7 @@ public class MainActivity extends Activity
 				{
 					
 				    Message msg = new Message();
-					msg.what = 7;
+					msg.what = 20;
 					
 					handler.sendMessage(msg);
 				}
@@ -234,16 +237,6 @@ public class MainActivity extends Activity
 			Log.i("tantest","abbr: nada");
 		}
 		
-		//Prepare for server responses and errors
-		ClientSocket.getInstance()
-		.getHandlers().put("onServerError", new ClientResponse(handler,4));
-		
-		ClientSocket.getInstance()
-		.getHandlers().put("onConnectionError", new ClientResponse(handler,9));
-		
-		ClientSocket.getInstance()
-		.getHandlers().put("OnTimeoutError", new ClientResponse(handler,8));
-		
 		//Ocultamos preprogressbar y mostramos login view
 		((ProgressBar) findViewById(R.id.main_initProgressbar)).setVisibility(View.GONE);
 		((RelativeLayout) findViewById(R.id.login_view)).setVisibility(View.VISIBLE);
@@ -271,7 +264,7 @@ public class MainActivity extends Activity
 		/*Intent cintent = new Intent(this, ContactsActivity.class);
 		Log.i("tantes","iniciando actividad");
 		startActivity(cintent);*/
-		
+
 		Log.i("tantest", "Pulsado connect");
 		loader.setVisibility(View.VISIBLE);
 		
@@ -283,13 +276,9 @@ public class MainActivity extends Activity
 		if(phone.equals("") || abbr.equals(""))
 		{
 			//Display error
-			Toast.makeText(this, "El teléfono y el pais son obligatorios", Toast.LENGTH_SHORT).show();
-			loader.setVisibility(View.GONE);
-			sms_register = false;
+			ifError("El teléfono y el pais son obligatorios");
 			return;
 		}
-		
-		//ImageButton connect = (ImageButton) findViewById(R.id.main_connect);
 		
 		view.setEnabled(false);
 		
@@ -323,45 +312,68 @@ public class MainActivity extends Activity
 					Log.i("tantest", "Telefono final es: "+phone);
 					Log.i("tantest", "El codigo del pais: "+phone_country);
 					
-					//It's a friend
 					if(sms_register)
 					{
 						if((phone.equals("+34652905791") || phone.equals("+34661188615") || phone.equals("+34692169007")) && friend)
 						{
 							sms_register = false;
 							
-							ClientSocket
-							.getInstance()
-							.init(phone,phone_country)
-							.send("createFriend", phone, new ClientResponse(handler,1), 15000);
+							HttpUtil.get(HttpUtil.getURL(HttpUtil.CREATE_FRIEND, new String[]{phone}));
+							
+							Message msg = new Message();
+							msg.what = 0 ;
+
+							handler.sendMessage(msg);
 						}
 						//usuario regular
 						else
 						{
-							ClientSocket
-							.getInstance()
-							.init(phone,phone_country)
-							.send("createUser", phone, new ClientResponse(handler,0));
+							Message msg = new Message();
+							msg.what = 1;
+							msg.obj = HttpUtil.get(HttpUtil.getURL(HttpUtil.CREATE_USER, new String[]{phone}));
+
+							handler.sendMessage(msg);
 						}
 					}
 					else
 					{
-						ClientSocket
-						.getInstance()
-						.init(phone,phone_country)
-						.send("createEmailCode", phone, new ClientResponse(handler,3));
+						Message msg = new Message();
+						msg.what = 2;
+						msg.obj = HttpUtil.get(HttpUtil.getURL(HttpUtil.EMAIL_CODE, new String[]{phone}));
+
+						handler.sendMessage(msg);
 					}
+				}
+				catch (ClientProtocolException e) 
+				{
+					Message msg = new Message();
+					msg.what = 12;
 					
-					
+					handler.sendMessage(msg);
 				} 
-				catch(NumberParseException e) 
+				catch(NumberParseException e)
 				{
 					
 					Message msg = new Message();
-					msg.what = 6;
+					msg.what = 11;
 					
 					handler.sendMessage(msg);
 				}
+				catch(Exception e)
+				{
+					/*if (e instanceof JSONException ||
+						e instanceof IOException ||
+						e instanceof UnsupportedEncodingException)
+					{
+						
+					}*/
+					
+					Message msg = new Message();
+					msg.what = 10;
+					
+					handler.sendMessage(msg);
+				}
+				
 		    }
 		}).start();
 	}
@@ -374,8 +386,7 @@ public class MainActivity extends Activity
 		cintent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		startActivity(cintent);
 		finish();*/
-		
-		
+
 		sms_register = true;
 		registerNewDevice(view);
 	}
@@ -384,19 +395,10 @@ public class MainActivity extends Activity
 	{
 		loader.setVisibility(View.VISIBLE);
 		
-		Thread startTest = new Thread() {
-		    
-			public void run() 
-			{
-				Intent intent = new Intent(MainActivity.this, TestActivity.class);
-				Log.i("tantest","iniciando actividad");
-				//overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
-				startActivity(intent);
-		    }
-		};
-		
-		startTest.start();
-		
+		Intent intent = new Intent(MainActivity.this, TestActivity.class);
+		Log.i("tantest","iniciando actividad");
+		//overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
+		startActivity(intent);
 	}
 	
 	public void requestCodeSMS(JSONObject response)
@@ -425,7 +427,7 @@ public class MainActivity extends Activity
 		
 	}
 	
-	public void verifyCodeSMS(JSONObject response)
+	/*public void verifyCodeSMS(JSONObject response)
 	{
 
 		loader.setVisibility(View.GONE);
@@ -457,7 +459,7 @@ public class MainActivity extends Activity
 			ifError("Vaya...esto es vergonzoso! No deberías hacer cosas malas");
 		}
 
-	}
+	}*/
 	
 	private void info(String text, boolean showLoader)
 	{
@@ -527,9 +529,7 @@ public class MainActivity extends Activity
     	            {
     	            	this.abortBroadcast();
     	            	
-    	            	ClientSocket
-    	            	.getInstance()
-    	            	.send("confirmSMSCode", code, new ClientResponse(handler,2));
+    	            	goHome(true);
     	            }
 
     	        }
@@ -641,8 +641,6 @@ public class MainActivity extends Activity
 			unregisterReceiver(bcr_received);
 		}
 		
-		ClientSocket.getInstance().close();
-		
 		super.onDestroy();
 	}
 	
@@ -684,8 +682,8 @@ public class MainActivity extends Activity
 		} 
 		catch (JSONException e) 
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			info("Para añadir un nuevo dispositivo, debes registrar una cuenta de correo electrónico.",false);
+			((ImageButton) findViewById(R.id.main_connect)).setEnabled(true);
 		}
 		
 		/*Animation out = new AlphaAnimation(1.0f, 0.0f);
@@ -722,12 +720,33 @@ public class MainActivity extends Activity
 	public void verifyCodeButtom(View view)
 	{
 		
-		ClientSocket
-		.getInstance()
-		.send("confirmEmailCode", phone_code.getText().toString(), new ClientResponse(handler,5));
-		
 		view.setEnabled(false);
 		loader.setVisibility(View.VISIBLE);
+		
+		(new Thread() {
+		    
+			public void run() 
+			{
+				try 
+				{
+
+					Message msg = new Message();
+					msg.what = 3;
+					msg.obj = HttpUtil.get(HttpUtil.getURL(HttpUtil.CONFIRM_CODE, new String[]{phone, phone_code.getText().toString()}));
+					
+					handler.sendMessage(msg);
+				
+				}
+				catch(Exception e)
+				{
+					
+					Message msg = new Message();
+					msg.what = 10;
+					
+					handler.sendMessage(msg);
+				}
+		    }
+		}).start();
 	}
 	
 	public void verifyCode(JSONObject response)
@@ -786,8 +805,11 @@ public class MainActivity extends Activity
 		} 
 		catch (JSONException e) 
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			ImageButton verify = (ImageButton) findViewById(R.id.main_verify);
+    		
+			verify.setEnabled(true);
+			
+			info("El Codigo es incorrecto", false);
 		}
 		
 	}
@@ -839,13 +861,13 @@ public class MainActivity extends Activity
             "Honduras","Israel"
         };
     	
-    	//Usar mejor Locale.getISOCountries()
-    	public static String[] abbreviations = 
-    	{ 
-    		
-    		"DE", "ES", "FI", "FR", "GB",
-            "HN", "IL"
-         };
+	//Usar mejor Locale.getISOCountries()
+	public static String[] abbreviations = 
+	{ 
+		
+		"DE", "ES", "FI", "FR", "GB",
+        "HN", "IL"
+     };
 	/*public static String[] countries =
 	{ 
 		"Andorra","(al-Imārāt) الامارات","(Afganistan) افغانستان", "ANTIGUA AND BARBUDA", 
