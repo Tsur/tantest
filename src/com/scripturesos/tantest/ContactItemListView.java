@@ -10,13 +10,14 @@ public class ContactItemListView implements Serializable
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	protected long id;
+	protected int id;
+	protected String client;
 	protected String urlImg;
 	protected String name;
 	protected String status;
 	protected String points;
-     
-	public ContactItemListView(long id, String name, String status, String points)
+    
+	public ContactItemListView(int id, String name, String status, String points)
 	{
 	    this.id = id;
 	    this.name = name;
@@ -24,18 +25,14 @@ public class ContactItemListView implements Serializable
 	    this.points = points;
 	}
 	
-	public ContactItemListView(long id, String name, String status, String points, String urlImg)
+	public ContactItemListView(int id, String name, String status, String points, String urlImg, String client)
 	{
 	    this.id = id;
 	    this.name = name;
 	    this.status = status;
 	    this.points = points;
 	    this.urlImg = urlImg;
-	}
-     
-	public long getId()
-	{
-		return id;
+	    this.client = client;
 	}
      
 	public String getImg() 
@@ -47,6 +44,11 @@ public class ContactItemListView implements Serializable
 	public String getName()
 	{
 		return name;
+	}
+	
+	public int getPosition()
+	{
+		return id;
 	}
      
 	public String getStatus()

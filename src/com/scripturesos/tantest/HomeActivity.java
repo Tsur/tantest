@@ -1,5 +1,7 @@
 package com.scripturesos.tantest;
 
+import java.io.IOException;
+
 import org.json.JSONObject;
 
 import android.content.Intent;
@@ -19,6 +21,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.scripturesos.tantest.connection.ClientResponse;
 import com.scripturesos.tantest.connection.ClientSocket;
 import com.scripturesos.tantest.connection.DatabaseHelper;
+import com.scripturesos.tantest.connection.HttpUtil;
 
 public class HomeActivity extends Application {
 
@@ -47,7 +50,8 @@ public class HomeActivity extends Application {
 				{
 					SQLiteDatabase db = DatabaseHelper.getInstance(getApplicationContext()).getReadableDatabase();
 					
-					Cursor cursor = db.rawQuery("SELECT value FROM options WHERE key=0 OR key=1", null);
+					Cursor cursor = db.rawQuery("SELECT value FROM options", null);
+					//Cursor cursor = db.rawQuery("SELECT value FROM options WHERE key=0 OR key=1", null);
 					
 					cursor.moveToFirst();
 					
@@ -56,6 +60,10 @@ public class HomeActivity extends Application {
 					cursor.moveToNext();
 					
 					country_id = cursor.getString(0);
+					
+					cursor.moveToNext();
+					
+					contacts_serialized = cursor.getString(0);
 					
 					cursor.close();
 					
@@ -204,20 +212,67 @@ public class HomeActivity extends Application {
             {  
             	Bundle b = data.getExtras();
             	
+            	//Problema: Como actualizamos cuando cambie foto o estado?
             	if(b.containsKey("contacts"))
             	{
             		contacts_serialized = b.getString("contacts");
             		
             		//Los guardamos en BD
             		Log.i("tantest","Tenemos datos serializados");
+            		
+            		(new Thread() {
+        			    
+        				public void run() 
+        				{
+        					SQLiteDatabase dbw = DatabaseHelper.getInstance(getApplicationContext()).getWritableDatabase();
+        			
+        					dbw.execSQL("INSERT INTO options (key, value) VALUES (2,'"+contacts_serialized+"')");
+            	
+        			    }
+        			}).start();
+            		
+            		return;
             	}
             	
-            	//Guardo estado que viene en data
+            	if(b.containsKey("chat"))
+            	{
+            		String chat = b.getString("chat");
+            		
+            		try 
+            		{
+						createChat((ContactItemListView)HttpUtil.fromString(chat));
+					} 
+            		catch (IOException e) 
+            		{
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} 
+            		catch (ClassNotFoundException e) 
+					{
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+            	}
+
             }
+            break;
                
         }
         
     }
+	
+	public void createChat(ContactItemListView contact)
+	{
+		//Comprobar que no existe ya el chat
+		
+		//Si existe simplemente mostramos vista del chat
+		
+		//Añadir a listView del HomeActivity
+		
+		//Crear nueva vista de chat -> RelativeLayout
+		
+		//Actualizar base de datos
+	}
 	
 	public class HomeActivityHandler extends Handler 
 	{

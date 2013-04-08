@@ -37,10 +37,12 @@ import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.AdapterView.OnItemClickListener;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
@@ -469,6 +471,8 @@ public class ContactsActivity extends Application {
 				 		 String imgUrl = null;
 				 		 ContactItemListView contact;
 				 		 
+				 		 ContactListAdapter.Cache.images.clear();
+				 		 
 				         for(int i = 0; i < contacts.length(); i++)
 						 {
 				        	 Drawable img = null;
@@ -483,13 +487,17 @@ public class ContactsActivity extends Application {
 									if(phonesList.containsKey("\""+id+"\"") == true)
 									{
 										contact = new ContactItemListView(
-											Long.parseLong(id.substring(1)), 
+											HttpUtil.uniqid.incrementAndGet(), 
 											jsonContact.getString("name").equals("") ? phonesList.get("\""+id+"\"") : jsonContact.getString("name"), 
 											jsonContact.getString("status"), 
 											jsonContact.getString("points"), 
-											imgUrl);
+											imgUrl,
+											id);
 									
 										contactItems.add(contact);
+										
+										InputStream is = (InputStream) new URL(imgUrl).getContent();
+										img = Drawable.createFromStream(is, imgUrl);
 									}
 								
 									/*HttpURLConnection connection = (HttpURLConnection)new URL(contact.getImg()).openConnection();
@@ -497,10 +505,7 @@ public class ContactsActivity extends Application {
 	
 								    connection.connect();
 								    InputStream input = connection.getInputStream();*/
-									InputStream is = (InputStream) new URL(imgUrl).getContent();
-									img = Drawable.createFromStream(is, imgUrl);
-									
-									
+
 								} 
 								catch (MalformedURLException e) 
 								{
@@ -559,15 +564,41 @@ public class ContactsActivity extends Application {
 	
 	public void displayContactsList(ArrayList<ContactItemListView> contactItems)
 	{
-		 ContactListAdapter adapter = new ContactListAdapter(ContactsActivity.this, contactItems);
+		ContactListAdapter adapter = new ContactListAdapter(ContactsActivity.this, contactItems);
 		 
-		 contactsListView = (ListView) findViewById(R.id.act_contacts_lv);
+		contactsListView = (ListView) findViewById(R.id.act_contacts_lv);
 		 
-		 contactsListView.setAdapter(adapter);
+		contactsListView.setAdapter(adapter);
 		    
-		 contactsListView.setVisibility(View.VISIBLE);
+		contactsListView.setVisibility(View.VISIBLE);
+		 
+        contactsListView.setOnItemClickListener(new OnItemClickListener()
+		{
+			@Override 
+			public void onItemClick(AdapterView<?> adapter, View view, int position, long arg3)
+		    { 
+				
+				Intent mIntent = new Intent();
+			    
+			    try 
+			    {
+			    	Bundle bundle = new Bundle();
+				    	
+					bundle.putString("chat", HttpUtil.toString(((ContactListAdapter) contactsListView.getAdapter()).getContacts().get(position)));
+					//bundle.putString("chat", HttpUtil.toString(contactItems.get(position));
+						
+					mIntent.putExtras(bundle);
+			    }
+			    catch (IOException e) 
+		    	{
+					
+				}
+			    
+			    setResult(RESULT_OK, mIntent);
+		    }
+		});
 		    
-		 progress.setVisibility(View.GONE);
+		progress.setVisibility(View.GONE);
 	}
 	
     @Override

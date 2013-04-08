@@ -1,17 +1,10 @@
 package com.scripturesos.tantest;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
-import android.util.Log;
 import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -33,6 +26,11 @@ public class ContactListAdapter extends BaseAdapter
 		    this.contacts = contacts;
 	}
 	 
+	public ArrayList<ContactItemListView> getContacts()
+	{
+		return contacts;
+	}
+	
 	@Override
 	public int getCount() 
 	{
@@ -48,7 +46,7 @@ public class ContactListAdapter extends BaseAdapter
 	@Override
 	public long getItemId(int position) 
 	{
-		  return contacts.get(position).getId();
+		  return position;
 	}
 	 
 	@Override
@@ -108,14 +106,14 @@ public class ContactListAdapter extends BaseAdapter
         }
         */
 		
-        if(Cache.images.get(position) == null)
+        if(Cache.images.get(contact.getPosition()) == null)
         {
-            Cache.images.put(position, activity.getResources().getDrawable(R.drawable.profile));
+            Cache.images.put(contact.getPosition(), activity.getResources().getDrawable(R.drawable.profile));
         }
         
 		//int imageResource = activity.getResources().getIdentifier(contact.getImg(), null, activity.getPackageName());
 		//holder.image.setImageDrawable(activity.getResources().getDrawable(imageResource));
-        holder.image.setImageDrawable(Cache.images.get(position));
+        holder.image.setImageDrawable(Cache.images.get(contact.getPosition()));
 		         
 		//TextView name = (TextView) vi.findViewById(R.id.contacts_lv_name);
 		holder.name.setText((contact.getName().length() > 32) ? contact.getName().substring(0, 29)+ "..." : contact.getName());
@@ -139,6 +137,7 @@ public class ContactListAdapter extends BaseAdapter
 	 
 	 static class Cache
 	 {
+	 	//static SparseArray<Drawable> images = new SparseArray<Drawable>();
 	 	static SparseArray<Drawable> images = new SparseArray<Drawable>();
 	 }
 	 

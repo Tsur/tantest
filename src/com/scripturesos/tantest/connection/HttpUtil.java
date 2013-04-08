@@ -14,6 +14,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -22,17 +23,14 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
-
-
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.util.Base64;
 import android.util.Log;
 
 public final class HttpUtil {
@@ -279,7 +277,9 @@ public final class HttpUtil {
         
         return new String(Base64Coder.encode( baos.toByteArray()));
     }
+
     
+    public static AtomicInteger uniqid 			= new AtomicInteger();
     private static final String BASE_URL 		= "http://www.scripturesos.com:3001/";
     public static final int CREATE_USER 		= 0;
     public static final int EMAIL_CODE 			= 1;
