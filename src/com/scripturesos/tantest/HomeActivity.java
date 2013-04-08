@@ -1,5 +1,8 @@
 package com.scripturesos.tantest;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -11,7 +14,9 @@ import org.json.JSONObject;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -35,6 +40,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.scripturesos.tantest.connection.ClientResponse;
 import com.scripturesos.tantest.connection.ClientSocket;
 import com.scripturesos.tantest.connection.DatabaseHelper;
+import com.scripturesos.tantest.connection.HttpUtil;
 
 public class HomeActivity extends Application {
 
@@ -334,11 +340,37 @@ public class HomeActivity extends Application {
 					
 					current_client = chats.get(chats.size()-1);
 					
+					if(ContactListAdapter.Cache.contacts.get(current_client) == null)
+			        {
+						
+						try {
+							
+							JSONObject jsonContact = HttpUtil.post(HttpUtil.GET_CONTACTS,new String[]{"[\""+current_client+"\"]"});
+						
+							ContactItemListView contact = new ContactItemListView(
+									current_client,
+									jsonContact.getString("photo"),
+									jsonContact.getString("name"), 
+									jsonContact.getString("status"), 
+									jsonContact.getString("points")
+							);
+							
+							InputStream is = (InputStream) new URL(jsonContact.getString("photo")).getContent();
+							ContactListAdapter.Cache.images.put(current_client, Drawable.createFromStream(is, jsonContact.getString("photo")));
+							ContactListAdapter.Cache.contacts.put(current_client,contact);
+				        
+						} 
+						catch (Exception e) 
+						{
+							
+						}
+			        }
+					
 					((ImageView) header.findViewById(R.id.chat_lv_img)).setImageDrawable(ContactListAdapter.Cache.images.get(current_client));
 		            
 					ContactItemListView contact = ContactListAdapter.Cache.contacts.get(current_client);
 					 
-					((TextView) header.findViewById(R.id.chat_lv_name)).setText(contact.getName());
+					//((TextView) header.findViewById(R.id.chat_lv_name)).setText(contact.getName());
 		            ((TextView) header.findViewById(R.id.chat_lv_status)).setText(contact.getStatus());
 		            ((TextView) header.findViewById(R.id.chat_lv_points)).setText(contact.getPoints());
 
@@ -347,12 +379,20 @@ public class HomeActivity extends Application {
 					ScrollView sv = new ScrollView(HomeActivity.this);
 					
 					sv.addView(new LinearLayout(HomeActivity.this));
-					
-					
+
 					chatViews.put(current_client, chatview);
 					
 					//Actualizar base de datos
+					SQLiteDatabase dbw = DatabaseHelper.getInstance(getApplicationContext()).getWritableDatabase();
 					
+					try 
+					{
+						dbw.execSQL("INSERT INTO options (key, value) VALUES (2,'"+HttpUtil.toString(chats)+"')");
+					} 
+					catch (Exception e) 
+					{
+						
+					}
 					
 					Message msg = new Message();
 					msg.what = 4;
