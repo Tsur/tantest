@@ -83,7 +83,7 @@ public class ContactsActivity extends Application {
 			{
 				Log.i("tantest","no pasamos por todo el proceso!");
 				
-				displayContactsList((ArrayList<ContactItemListView>) HttpUtil.fromString(extras.getString("contacts")));
+				displayContactsList((ArrayList<String>) HttpUtil.fromString(extras.getString("contacts")));
 			} 
 			catch (Exception e) 
 			{
@@ -459,45 +459,55 @@ public class ContactsActivity extends Application {
 			}
 			else
 			{
-				
+
 				(new Thread() {
 				    
 					public void run() 
 					{
 						
-						 ArrayList<ContactItemListView> contactItems = new ArrayList<ContactItemListView>();
+						 ArrayList<String> contactItems = new ArrayList<String>();
 				 		 JSONObject jsonContact;
 				 		 String id = null;
 				 		 String imgUrl = null;
 				 		 ContactItemListView contact;
 				 		 
-				 		 ContactListAdapter.Cache.images.clear();
-				 		 
 				         for(int i = 0; i < contacts.length(); i++)
 						 {
+				        	
 				        	 Drawable img = null;
+				        	 contact = null;
 				        	 
 				        	 try 
 								{
 									
 									jsonContact = contacts.getJSONObject(i);
 									id = jsonContact.getString("client");
-									imgUrl = jsonContact.getString("photo");
-									
 									if(phonesList.containsKey("\""+id+"\"") == true)
 									{
+										 
 										contact = new ContactItemListView(
-											HttpUtil.uniqid.incrementAndGet(), 
-											jsonContact.getString("name").equals("") ? phonesList.get("\""+id+"\"") : jsonContact.getString("name"), 
-											jsonContact.getString("status"), 
-											jsonContact.getString("points"), 
-											imgUrl,
-											id);
+												id,
+												jsonContact.getString("photo"),
+												jsonContact.getString("name").equals("") ? phonesList.get("\""+id+"\"") : jsonContact.getString("name"), 
+												jsonContact.getString("status"), 
+												jsonContact.getString("points")
+											);
 									
-										contactItems.add(contact);
+										contactItems.add(id);
 										
-										InputStream is = (InputStream) new URL(imgUrl).getContent();
+										InputStream is = (InputStream) new URL(contact.getImg()).getContent();
 										img = Drawable.createFromStream(is, imgUrl);
+										
+										if(ContactListAdapter.Cache.images.get(id) == null)
+										{
+											ContactListAdapter.Cache.images.put(id, img);
+										}
+										
+										if(ContactListAdapter.Cache.contacts.get(id) == null)
+										{
+											ContactListAdapter.Cache.contacts.put(id, contact);
+										}
+										
 									}
 								
 									/*HttpURLConnection connection = (HttpURLConnection)new URL(contact.getImg()).openConnection();
@@ -507,47 +517,16 @@ public class ContactsActivity extends Application {
 								    InputStream input = connection.getInputStream();*/
 
 								} 
-								catch (MalformedURLException e) 
-								{
-									
-								} 
-								catch (IOException e) 
-								{
-									
-								} 
-								catch (JSONException e) 
+								catch (Exception e) 
 								{
 									
 								}	
-								
-								ContactListAdapter.Cache.images.put(i, img);
 						}
 
-				 	    try 
-				 	    {
-				 	    	Intent mIntent = new Intent();
-				 	    	
-				 	    	if(contactItems != null)
-				 		    {
-				 		    	Bundle bundle = new Bundle();
-				 		    	
-				 				bundle.putString("contacts", HttpUtil.toString(contactItems));
-				 				
-				 				mIntent.putExtras(bundle);
-				 			} 
-				 	    	
-				 	    	setResult(RESULT_OK, mIntent);
-				 	    
-							Message msg = new Message();
-							msg.what = 3;
-							msg.obj = contactItems;
-							handler.sendMessage(msg);	
-
-				 	    }
-				 	    catch (IOException e) 
-				     	{
-				 			
-				 		}
+						Message msg = new Message();
+						msg.what = 3;
+						msg.obj = contactItems;
+						handler.sendMessage(msg);	
 
 				    }
 				}).start();
@@ -562,15 +541,14 @@ public class ContactsActivity extends Application {
 	
 	}
 	
-	public void displayContactsList(ArrayList<ContactItemListView> contactItems)
+	public void displayContactsList(ArrayList<String> contactItems)
 	{
+		Log.i("tantest", "Elementos en adapter"+ contactItems.size());
 		ContactListAdapter adapter = new ContactListAdapter(ContactsActivity.this, contactItems);
 		 
 		contactsListView = (ListView) findViewById(R.id.act_contacts_lv);
 		 
 		contactsListView.setAdapter(adapter);
-		    
-		contactsListView.setVisibility(View.VISIBLE);
 		 
         contactsListView.setOnItemClickListener(new OnItemClickListener()
 		{
@@ -580,23 +558,34 @@ public class ContactsActivity extends Application {
 				
 				Intent mIntent = new Intent();
 			    
-			    try 
-			    {
-			    	Bundle bundle = new Bundle();
-				    	
-					bundle.putString("chat", HttpUtil.toString(((ContactListAdapter) contactsListView.getAdapter()).getContacts().get(position)));
-					//bundle.putString("chat", HttpUtil.toString(contactItems.get(position));
-						
-					mIntent.putExtras(bundle);
-			    }
-			    catch (IOException e) 
-		    	{
-					
+			    Bundle bundle = new Bundle();
+				
+				ContactItemListView contact = ContactListAdapter.Cache.contacts.get(((ContactListAdapter) contactsListView.getAdapter()).getContacts().get(position));
+				//bundle.putString("chat", HttpUtil.toString(contact));
+				Log.i("tantest", "ID en listView"+  contact.getID());
+				
+				bundle.putString("chat", contact.getID());
+				
+				try 
+				{
+					bundle.putString("contacts", HttpUtil.toString(((ContactListAdapter) contactsListView.getAdapter()).getContacts()));
+				} 
+				catch (IOException e) 
+				{
+
 				}
+				//bundle.putString("chat", HttpUtil.toString(contactItems.get(position));
+					
+				mIntent.putExtras(bundle);
 			    
 			    setResult(RESULT_OK, mIntent);
+			    
+			    finish();
 		    }
 		});
+        
+	    
+        contactsListView.setVisibility(View.VISIBLE);
 		    
 		progress.setVisibility(View.GONE);
 	}
@@ -634,7 +623,7 @@ public class ContactsActivity extends Application {
         	case 10: displayNoAgenda("El fichero importado no contiene información suficiente. Por favor, utilize otro");break;
         	case 11: displayNoAgenda(getString(R.string.contacts_no_agenda_import));break;
         	case 12: ifError("Inténtalo de nuevo más tarde por favor");
-        	case 3: displayContactsList((ArrayList<ContactItemListView>)msg.obj);break;
+        	case 3: displayContactsList((ArrayList<String>)msg.obj);break;
             default:break;
         }
     }
@@ -646,4 +635,32 @@ public class ContactsActivity extends Application {
 	
 	public ContactsActivityHandler handler;
 
+    @Override
+    public void onBackPressed() 
+    {
+    	if(contactsListView != null)
+    	{
+    		Intent mIntent = new Intent();
+		    
+		    Bundle bundle = new Bundle();
+			
+			try 
+			{
+				bundle.putString("contacts", HttpUtil.toString(((ContactListAdapter) contactsListView.getAdapter()).getContacts()));
+			} 
+			catch (IOException e) 
+			{
+
+			}
+			//bundle.putString("chat", HttpUtil.toString(contactItems.get(position));
+				
+			mIntent.putExtras(bundle);
+		    
+		    setResult(RESULT_OK, mIntent);
+		    
+		    finish();
+    	}
+    	
+    	super.onBackPressed();
+    }
 }

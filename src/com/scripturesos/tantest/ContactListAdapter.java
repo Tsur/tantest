@@ -1,11 +1,15 @@
 package com.scripturesos.tantest;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.util.SparseArray;
+import android.util.Log;
+//import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,29 +22,35 @@ public class ContactListAdapter extends BaseAdapter
 {
 	
 	protected Activity activity;
-	protected ArrayList<ContactItemListView> contacts;
+	protected ArrayList<String> clients;
 	         
-	public ContactListAdapter(Activity activity, ArrayList<ContactItemListView> contacts) 
+	public ContactListAdapter(Activity activity, ArrayList<String> chats) 
 	{
 		    this.activity = activity;
-		    this.contacts = contacts;
+		    this.clients = chats;
 	}
 	 
-	public ArrayList<ContactItemListView> getContacts()
+	public ArrayList<String> getContacts()
 	{
-		return contacts;
+		return clients;
+	}
+	
+	public void add(String client)
+	{
+		clients.add(client);
+		//notifyDataSetChanged();
 	}
 	
 	@Override
 	public int getCount() 
 	{
-		  return contacts.size();
+		  return clients.size();
 	}
 	 
 	@Override
 	public Object getItem(int position) 
 	{
-		  return contacts.get(position);
+		  return clients.get(position);
 	}
 	 
 	@Override
@@ -74,46 +84,18 @@ public class ContactListAdapter extends BaseAdapter
 			holder = (ViewHolder) vi.getTag();
 		}
 		             
-		ContactItemListView contact = contacts.get(position);
-		         
-		//ImageView image = (ImageView) vi.findViewById(R.id.contacts_lv_img);
-
-		//Save image to cache
-        /*if(Cache.images.get(position) == null)
-        {
-            InputStream is;
-            Drawable img = null;
-			try 
-			{
-				Log.i("tantes",contact.getImg());
-				
-				
-				is = (InputStream) new URL(contact.getImg()).getContent();
-				img = Drawable.createFromStream(is, "lo que sea");
-			} 
-			catch (MalformedURLException e) 
-			{
-				// TODO Auto-generated catch block
-				img = activity.getResources().getDrawable(R.drawable.profile);
-			} 
-			catch (IOException e) 
-			{
-				// TODO Auto-generated catch block
-				img = activity.getResources().getDrawable(R.drawable.profile);
-			}
-            
-            Cache.images.put(position, img);
-        }
-        */
+		ContactItemListView contact = ContactListAdapter.Cache.contacts.get(clients.get(position));
+		      
+		Log.i("tantest","name: "+contact.getName());
 		
-        if(Cache.images.get(contact.getPosition()) == null)
+        if( ContactListAdapter.Cache.images.get(contact.getID()) == null)
         {
-            Cache.images.put(contact.getPosition(), activity.getResources().getDrawable(R.drawable.profile));
+        	 ContactListAdapter.Cache.images.put(contact.getID(), activity.getResources().getDrawable(R.drawable.profile));
         }
         
 		//int imageResource = activity.getResources().getIdentifier(contact.getImg(), null, activity.getPackageName());
 		//holder.image.setImageDrawable(activity.getResources().getDrawable(imageResource));
-        holder.image.setImageDrawable(Cache.images.get(contact.getPosition()));
+        holder.image.setImageDrawable( ContactListAdapter.Cache.images.get(contact.getID()));
 		         
 		//TextView name = (TextView) vi.findViewById(R.id.contacts_lv_name);
 		holder.name.setText((contact.getName().length() > 32) ? contact.getName().substring(0, 29)+ "..." : contact.getName());
@@ -138,7 +120,8 @@ public class ContactListAdapter extends BaseAdapter
 	 static class Cache
 	 {
 	 	//static SparseArray<Drawable> images = new SparseArray<Drawable>();
-	 	static SparseArray<Drawable> images = new SparseArray<Drawable>();
+	 	static Map<String, ContactItemListView> contacts = new HashMap<String, ContactItemListView>();
+	 	static Map<String, Drawable> images = new HashMap<String, Drawable>();
 	 }
 	 
 
