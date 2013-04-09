@@ -20,7 +20,8 @@
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:layout_alignParentBottom="true"
-        android:background="@drawable/basic_input" >
+        android:background="@drawable/basic_input"
+        android:visibility="gone" >
     
         <EditText
             android:id="@+id/act_home_chat_input"

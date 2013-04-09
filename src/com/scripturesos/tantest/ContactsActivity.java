@@ -206,6 +206,12 @@ public class ContactsActivity extends Application {
 		//Tenemos en phoneList un diccionario/ mapa de numeros -> nombre
 		cursor.close();
 		
+		if(phonesList.containsKey("\""+ClientSocket.getInstance().clientID+"\""))
+		{
+			phonesList.remove("\""+ClientSocket.getInstance().clientID+"\"");
+		}
+		
+		
 		//Conectamos con el servidor y mandamos telefonos
 		if(phonesList.size() > 0)
 		{
@@ -468,7 +474,6 @@ public class ContactsActivity extends Application {
 						 ArrayList<String> contactItems = new ArrayList<String>();
 				 		 JSONObject jsonContact;
 				 		 String id = null;
-				 		 String imgUrl = null;
 				 		 ContactItemListView contact;
 				 		 
 				         for(int i = 0; i < contacts.length(); i++)
@@ -495,19 +500,19 @@ public class ContactsActivity extends Application {
 									
 										contactItems.add(id);
 										
-										InputStream is = (InputStream) new URL(contact.getImg()).getContent();
-										img = Drawable.createFromStream(is, imgUrl);
-										
-										if(ContactListAdapter.Cache.images.get(id) == null)
-										{
-											ContactListAdapter.Cache.images.put(id, img);
-										}
-										
 										if(ContactListAdapter.Cache.contacts.get(id) == null)
 										{
 											ContactListAdapter.Cache.contacts.put(id, contact);
 										}
 										
+										InputStream is = (InputStream) new URL(contact.getImg()).getContent();
+										img = Drawable.createFromStream(is, null);
+										
+										if(ContactListAdapter.Cache.images.get(id) == null)
+										{
+											ContactListAdapter.Cache.images.put(id, img);
+										}
+
 									}
 								
 									/*HttpURLConnection connection = (HttpURLConnection)new URL(contact.getImg()).openConnection();

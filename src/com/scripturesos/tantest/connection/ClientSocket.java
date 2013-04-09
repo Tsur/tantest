@@ -82,7 +82,7 @@ public class ClientSocket extends Thread
 			out = new PrintWriter(clientSocket.getOutputStream(), true);
 			Log.i("tantest", "Buffers arrancados");
 			
-			out.write("{\"client\":\""+getClient()+"\",\"method\":\"identify\",\"id\":\"void\",\"arguments\":[]");
+			out.write("{\"client\":\""+getClient()+"\",\"method\":\"identify\",\"id\":\"void\",\"arguments\":[]}");
 			
 			out.flush();
 
@@ -151,12 +151,12 @@ public class ClientSocket extends Thread
 	    	String message_id = UUID.randomUUID().toString();
 	
 			out.write("{\"client\":\""+getClient()+
-	    			"\",\"method\":\"SendMsg\",\"id\":\""+message_id+
+	    			"\",\"method\":\"sendMsg\",\"id\":\""+message_id+
 	    			"\",\"arguments\":[\""+to+"\",\""+msg+"\"]}");
 			
 			out.flush();
 			
-			Log.i("tantest", "Mensaje enviado");
+			Log.i("tantest", "Mensaje enviado to: "+to+", msg: "+msg);
     	}
     	else
     	{
@@ -229,6 +229,8 @@ public class ClientSocket extends Thread
 			{
 				try 
 				{
+					//Log.i("tantest", "respuesta es: "+res);
+					
 					JSONObject jres = new JSONObject(res);
 					String id = jres.getString("id");
 					

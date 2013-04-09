@@ -86,7 +86,7 @@ public class ContactListAdapter extends BaseAdapter
 		             
 		ContactItemListView contact = ContactListAdapter.Cache.contacts.get(clients.get(position));
 		      
-		Log.i("tantest","name: "+contact.getName());
+		//Log.i("tantest","name: "+contact.getName());
 		
         if( ContactListAdapter.Cache.images.get(contact.getID()) == null)
         {

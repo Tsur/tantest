@@ -1,20 +1,18 @@
 package com.scripturesos.tantest;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -23,18 +21,15 @@ import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.AdapterView.OnItemClickListener;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
@@ -52,11 +47,15 @@ public class HomeActivity extends Application {
 	
 	private ArrayList<String> chats = new ArrayList<String>();
 	private ListView chatsListView;
-	private Map<String,LinearLayout> chatViews= new HashMap<String,LinearLayout>();
+	private Map<String,View> chatViews= new HashMap<String,View>();
+	private Map<String, ArrayList<ChatMessage>> chatMessages= new HashMap<String, ArrayList<ChatMessage>>();
 	private String current_client;
 	private RelativeLayout chatContainer;
 	private RelativeLayout chatActions;
 	private EditText sender;
+	
+	
+	private static Drawable default_dr;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -92,6 +91,8 @@ public class HomeActivity extends Application {
 			    }
 		});
 		
+		default_dr = getResources().getDrawable(R.drawable.profile);
+				
 		(new Thread() {
 		    
 			public void run() 
@@ -129,6 +130,9 @@ public class HomeActivity extends Application {
 				ClientSocket.getInstance()
 				.getHandlers().put("onTimeoutError", new ClientResponse(handler,12));
 				*/
+				
+				ClientSocket.getInstance().close();
+				
 				ClientSocket.getInstance()
 				.getHandlers().put("sendMsg", new ClientResponse(handler,0));
 				
@@ -325,28 +329,18 @@ public class HomeActivity extends Application {
 			//Añadir a listView del HomeActivity
 			chats.add(contact);
 			//((ContactListAdapter)chatsListView.getAdapter()).add(contact);
-			((ContactListAdapter)chatsListView.getAdapter()).notifyDataSetChanged();
-			
+
 			(new Thread() {
 			    
 				public void run() 
 				{
-					//Crear nueva vista de chat -> RelativeLayout
-					LinearLayout chatview = new LinearLayout(HomeActivity.this);
-					//LinearLayout.LayoutParams llParams = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.MATCH_PARENT);
-					
-					//llParams.setMargins(0, 0, 0, 40);
-					
-					//chatview.setLayoutParams(llParams);
-					chatview.setOrientation(LinearLayout.VERTICAL);
-					//chatview.setBackgroundResource(R.drawable.chatbg);
-					//chatview.setVisibility(View.GONE);
-					//chatview.setId(id)
 					
 					LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-					View header = inflater.inflate(R.layout.chat_header, null);
+					View chatView = inflater.inflate(R.layout.chat, null);
 					
 					current_client = chats.get(chats.size()-1);
+					
+					ContactItemListView contact = null;
 					
 					if(ContactListAdapter.Cache.contacts.get(current_client) == null)
 			        {
@@ -355,7 +349,9 @@ public class HomeActivity extends Application {
 							
 							JSONObject jsonContact = HttpUtil.post(HttpUtil.GET_CONTACTS,new String[]{"[\""+current_client+"\"]"});
 						
-							ContactItemListView contact = new ContactItemListView(
+							jsonContact = jsonContact.getJSONArray("response").getJSONObject(0);
+									
+							contact = new ContactItemListView(
 									current_client,
 									jsonContact.getString("photo"),
 									jsonContact.getString("name"), 
@@ -363,34 +359,38 @@ public class HomeActivity extends Application {
 									jsonContact.getString("points")
 							);
 							
-							InputStream is = (InputStream) new URL(jsonContact.getString("photo")).getContent();
-							ContactListAdapter.Cache.images.put(current_client, Drawable.createFromStream(is, jsonContact.getString("photo")));
 							ContactListAdapter.Cache.contacts.put(current_client,contact);
-				        
+							InputStream ins = (InputStream) new URL(contact.getImg()).getContent();
+							Log.i("tantest","Contacto es "+ jsonContact.getString("photo"));
+							ContactListAdapter.Cache.images.put(current_client, Drawable.createFromStream(ins, null));
 						} 
 						catch (Exception e) 
 						{
+							Log.i("tantest","error es "+ e.getMessage());
 							
+							ContactListAdapter.Cache.images.put(current_client, HomeActivity.default_dr);
 						}
+
 			        }
-					
-					((ImageView) header.findViewById(R.id.chat_lv_img)).setImageDrawable(ContactListAdapter.Cache.images.get(current_client));
-		            
-					ContactItemListView contact = ContactListAdapter.Cache.contacts.get(current_client);
+					else
+					{
+						contact = ContactListAdapter.Cache.contacts.get(current_client);
+					}
 					 
+					((ImageView) chatView.findViewById(R.id.chat_img)).setImageDrawable(ContactListAdapter.Cache.images.get(current_client));
+		            
 					//((TextView) header.findViewById(R.id.chat_lv_name)).setText(contact.getName());
-		            ((TextView) header.findViewById(R.id.chat_lv_status)).setText(contact.getStatus());
-		            ((TextView) header.findViewById(R.id.chat_lv_points)).setText(contact.getPoints());
+		            ((TextView) chatView.findViewById(R.id.chat_status)).setText(contact.getStatus());
+		            ((TextView) chatView.findViewById(R.id.chat_points)).setText(contact.getPoints());
 
-		            chatview.addView(header);
-					
-					ScrollView sv = new ScrollView(HomeActivity.this);
-					
-					sv.addView(new LinearLayout(HomeActivity.this));
-
-					chatview.addView(sv);
-					
-					chatViews.put(current_client, chatview);
+		            ListView lv = (ListView) chatView.findViewById(R.id.chat_lv);
+		            
+		            ArrayList<ChatMessage> lcm = new ArrayList<ChatMessage>();
+		            
+		            lv.setAdapter(new MessageListAdapter(HomeActivity.this,lcm));
+		            
+					chatViews.put(current_client, chatView);
+					chatMessages.put(current_client,lcm);
 					
 					//Actualizar base de datos
 					SQLiteDatabase dbw = DatabaseHelper.getInstance(getApplicationContext()).getWritableDatabase();
@@ -460,10 +460,13 @@ public class HomeActivity extends Application {
         	case 4:
         		//RelativeLayout r = (RelativeLayout) findViewById(R.id.act_home_container);
         		//r.addView((LinearLayout) msg.obj);
+        		((ContactListAdapter)chatsListView.getAdapter()).notifyDataSetChanged();
         		makeChatVisible();
+        		break;
         	case 5:
         		//RelativeLayout r = (RelativeLayout) findViewById(R.id.act_home_container);
         		//r.addView((LinearLayout) msg.obj);
+        		((ContactListAdapter)chatsListView.getAdapter()).notifyDataSetChanged();
         		makeChatVisible();
         		String[] options = (String[])msg.obj;
         		composeReceivedMessage(options[0],options[1]);
@@ -485,12 +488,14 @@ public class HomeActivity extends Application {
 			String message = response.getString("message");
 			String message_id = response.getString("message_id");
 			
-			if(current_client.equals(from))
+			if(current_client != null && current_client.equals(from))
 			{
 				composeReceivedMessage(message,message_id);
 			}
 			else
 			{
+				//Notificar de nuevo mensaje
+				
 				createChat(from, new String[]{message,message_id});
 				//composeReceivedMessage(message, message_id);
 			}
@@ -519,58 +524,68 @@ public class HomeActivity extends Application {
 		chatActions.setVisibility(View.VISIBLE);
 	}
 	
-	public void composeReceivedMessage(final String message, final String message_id)
+	public void composeReceivedMessage(String message, final String message_id)
 	{
+
+		ListView lv = (ListView) chatViews.get(current_client).findViewById(R.id.chat_lv);
 		
-		(new Thread(){
+		chatMessages.get(current_client).add(new ChatMessage(true, message));
+
+		((MessageListAdapter)lv.getAdapter()).notifyDataSetChanged();
+		
+		/*(new Thread(){
 		    
 			public void run() 
 			{
+				//Guarda en base de datos
 				
-				LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-				View chat_message = inflater.inflate(R.layout.chat_message_received, null);
-				
-				TextView messageView = (TextView) chat_message.findViewById(R.id.chat_lv_name);
-		
-				messageView.setText(message);
-				
-				LinearLayout container = chatViews.get(current_client);
-				
-				container = (LinearLayout) ((ScrollView)container.getChildAt(1)).getChildAt(0);
-				
-				container.addView(messageView);
-				
-				//Send Confirmation
+				//Envia mensaje al otro usuario
 				ClientSocket.getInstance().sendConfirmation(message_id, current_client);
-		    }
-		}).start();
+		   }
+		}).start();*/
+		
 	}
 	
 	public void ComposeSentMessage(View view)
 	{
 		
-		(new Thread(){
-		    
-			public void run() 
-			{
-				
-				LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-				View chat_message = inflater.inflate(R.layout.chat_message_send, null);
-				
-				TextView messageView = (TextView) chat_message.findViewById(R.id.chat_lv_name);
+		final String message = sender.getText().toString();
 		
-				messageView.setText(sender.getText().toString());
+		if(!message.equals(""))
+		{
+
+			ListView lv = (ListView) chatViews.get(current_client).findViewById(R.id.chat_lv);
+	
+			
+			chatMessages.get(current_client).add(new ChatMessage(false, message ));
+			//((ContactListAdapter)chatsListView.getAdapter()).add(contact);
+			((MessageListAdapter)lv.getAdapter()).notifyDataSetChanged();
+			
+			sender.setText("");
+			
+			//message = null;
+			
+			/*
+			myListView.post(new Runnable() {
+		        @Override
+		        public void run() {
+		            // Select the last row so it will scroll into view...
+		            myListView.setSelection(myListAdapter.getCount() - 1);
+		        }
+		    });
+			*/
+			
+			(new Thread(){
+			    
+				public void run() 
+				{
+					//Guarda en base de datos
+					ClientSocket.getInstance().sendMsg(current_client, message);
+				}
 				
-				LinearLayout container = chatViews.get(current_client);
-				
-				container = (LinearLayout) ((ScrollView)container.getChildAt(1)).getChildAt(0);
-				
-				container.addView(messageView);
-				
-				//Send Confirmation
-				ClientSocket.getInstance().sendMsg(current_client, sender.getText().toString());
-		    }
-		}).start();
+			}).start();
+		
+		}
 	}
 
 }
