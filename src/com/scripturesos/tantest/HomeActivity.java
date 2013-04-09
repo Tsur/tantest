@@ -25,6 +25,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -55,6 +56,7 @@ public class HomeActivity extends Application {
 	private String current_client;
 	private RelativeLayout chatContainer;
 	private RelativeLayout chatActions;
+	private EditText sender;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -71,6 +73,7 @@ public class HomeActivity extends Application {
 		
 		chatContainer = (RelativeLayout) findViewById(R.id.act_home_container);
 		chatActions = (RelativeLayout) findViewById(R.id.act_home_chat_actions);
+		sender = (EditText) findViewById(R.id.act_home_chat_input);
 		
 		chatsListView = (ListView) findViewById(R.id.act_home_lv);
 		chatsListView.setAdapter(new ContactListAdapter(HomeActivity.this, chats));
@@ -286,7 +289,7 @@ public class HomeActivity extends Application {
             		String chat = b.getString("chat");
             		
             		//createChat((ContactItemListView)HttpUtil.fromString(chat));
-					createChat(chat);
+					createChat(chat,null);
             	}
 
             }
@@ -296,7 +299,7 @@ public class HomeActivity extends Application {
         
     }
 	
-	public void createChat(String contact)
+	public void createChat(String contact, final String[] options)
 	{
 		//Si existe simplemente mostramos vista del chat
 		if(chats.contains(contact))
@@ -304,6 +307,11 @@ public class HomeActivity extends Application {
 			chatsListView.setVisibility(View.GONE);
 			current_client = contact;
 			makeChatVisible();
+			
+			if(options != null)
+			{
+				composeReceivedMessage(options[0],options[1]);
+			}
 		}
 		else
 		{
@@ -380,6 +388,8 @@ public class HomeActivity extends Application {
 					
 					sv.addView(new LinearLayout(HomeActivity.this));
 
+					chatview.addView(sv);
+					
 					chatViews.put(current_client, chatview);
 					
 					//Actualizar base de datos
@@ -395,8 +405,18 @@ public class HomeActivity extends Application {
 					}
 					
 					Message msg = new Message();
-					msg.what = 4;
-					handler.sendMessage(msg);	
+					
+					if(options == null)
+					{
+						msg.what = 4;
+					}
+					else
+					{
+						msg.what = 5;
+						msg.obj = options;
+					}
+					 
+					handler.sendMessage(msg);
 			    }
 			}).start();
 			
@@ -427,7 +447,7 @@ public class HomeActivity extends Application {
 		switch(msg.what) 
         {
         	case 0: 
-        		handlerMessage((JSONObject) msg.obj);break;//ifError("Tenemos algunos problemillas... pero tu sonrie que Dios te ama");break;
+        		handlerReceivedMessage((JSONObject) msg.obj);break;//ifError("Tenemos algunos problemillas... pero tu sonrie que Dios te ama");break;
         	case 1: 
         		handlerConfirmation((JSONObject) msg.obj);break;//ifError("Revise su conexión a Internet y sonrie que Dios te ama");break;
         	case 2: 
@@ -441,6 +461,12 @@ public class HomeActivity extends Application {
         		//RelativeLayout r = (RelativeLayout) findViewById(R.id.act_home_container);
         		//r.addView((LinearLayout) msg.obj);
         		makeChatVisible();
+        	case 5:
+        		//RelativeLayout r = (RelativeLayout) findViewById(R.id.act_home_container);
+        		//r.addView((LinearLayout) msg.obj);
+        		makeChatVisible();
+        		String[] options = (String[])msg.obj;
+        		composeReceivedMessage(options[0],options[1]);
         		break;
         	default:break;
         }
@@ -451,21 +477,22 @@ public class HomeActivity extends Application {
 		Toast.makeText(HomeActivity.this, txt, Toast.LENGTH_SHORT).show();
 	}
 	
-	public void handlerMessage(JSONObject response)
+	public void handlerReceivedMessage(JSONObject response)
 	{
 		try 
 		{
 			String from = response.getString("from");
 			String message = response.getString("message");
-			String message_ig = response.getString("message_id");
+			String message_id = response.getString("message_id");
 			
 			if(current_client.equals(from))
 			{
-				
+				composeReceivedMessage(message,message_id);
 			}
 			else
 			{
-				createChat(from);
+				createChat(from, new String[]{message,message_id});
+				//composeReceivedMessage(message, message_id);
 			}
 		} 
 		catch (JSONException e) 
@@ -490,6 +517,60 @@ public class HomeActivity extends Application {
 		
 		chatContainer.setVisibility(View.VISIBLE);
 		chatActions.setVisibility(View.VISIBLE);
+	}
+	
+	public void composeReceivedMessage(final String message, final String message_id)
+	{
+		
+		(new Thread(){
+		    
+			public void run() 
+			{
+				
+				LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				View chat_message = inflater.inflate(R.layout.chat_message_received, null);
+				
+				TextView messageView = (TextView) chat_message.findViewById(R.id.chat_lv_name);
+		
+				messageView.setText(message);
+				
+				LinearLayout container = chatViews.get(current_client);
+				
+				container = (LinearLayout) ((ScrollView)container.getChildAt(1)).getChildAt(0);
+				
+				container.addView(messageView);
+				
+				//Send Confirmation
+				ClientSocket.getInstance().sendConfirmation(message_id, current_client);
+		    }
+		}).start();
+	}
+	
+	public void ComposeSentMessage(View view)
+	{
+		
+		(new Thread(){
+		    
+			public void run() 
+			{
+				
+				LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+				View chat_message = inflater.inflate(R.layout.chat_message_send, null);
+				
+				TextView messageView = (TextView) chat_message.findViewById(R.id.chat_lv_name);
+		
+				messageView.setText(sender.getText().toString());
+				
+				LinearLayout container = chatViews.get(current_client);
+				
+				container = (LinearLayout) ((ScrollView)container.getChildAt(1)).getChildAt(0);
+				
+				container.addView(messageView);
+				
+				//Send Confirmation
+				ClientSocket.getInstance().sendMsg(current_client, sender.getText().toString());
+		    }
+		}).start();
 	}
 
 }

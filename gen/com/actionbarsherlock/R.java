@@ -156,17 +156,17 @@ public final class R {
 	}
 	public static final class color {
 		public static final int abs__bright_foreground_inverse_holo_light = 0x7f090007;
-		public static final int abs__primary_text_disable_only_holo_light = 0x7f090011;
+		public static final int abs__primary_text_disable_only_holo_light = 0x7f090012;
 		public static final int abs__holo_blue_light = 0x7f090008;
 		public static final int abs__bright_foreground_holo_dark = 0x7f090002;
 		public static final int abs__bright_foreground_holo_light = 0x7f090003;
-		public static final int abs__primary_text_holo_dark = 0x7f090012;
-		public static final int abs__primary_text_disable_only_holo_dark = 0x7f090010;
+		public static final int abs__primary_text_holo_dark = 0x7f090013;
+		public static final int abs__primary_text_disable_only_holo_dark = 0x7f090011;
 		public static final int abs__bright_foreground_disabled_holo_dark = 0x7f090004;
 		public static final int abs__background_holo_light = 0x7f090001;
 		public static final int abs__bright_foreground_disabled_holo_light = 0x7f090005;
 		public static final int abs__bright_foreground_inverse_holo_dark = 0x7f090006;
-		public static final int abs__primary_text_holo_light = 0x7f090013;
+		public static final int abs__primary_text_holo_light = 0x7f090014;
 		public static final int abs__background_holo_dark = 0x7f090000;
 	}
 	public static final class string {
@@ -194,7 +194,7 @@ public final class R {
 		public static final int abs__screen_simple_overlay_action_mode = 0x7f030013;
 		public static final int abs__screen_action_bar = 0x7f030010;
 		public static final int abs__action_menu_layout = 0x7f030005;
-		public static final int sherlock_spinner_dropdown_item = 0x7f030022;
+		public static final int sherlock_spinner_dropdown_item = 0x7f030024;
 		public static final int abs__search_dropdown_item_icons_2line = 0x7f030014;
 		public static final int abs__screen_action_bar_overlay = 0x7f030011;
 		public static final int abs__action_bar_title_item = 0x7f030003;
@@ -203,7 +203,7 @@ public final class R {
 		public static final int abs__list_menu_item_icon = 0x7f03000c;
 		public static final int abs__action_mode_bar = 0x7f030006;
 		public static final int abs__list_menu_item_layout = 0x7f03000d;
-		public static final int sherlock_spinner_item = 0x7f030023;
+		public static final int sherlock_spinner_item = 0x7f030025;
 		public static final int abs__screen_simple = 0x7f030012;
 		public static final int abs__search_view = 0x7f030015;
 		public static final int abs__activity_chooser_view = 0x7f030008;
