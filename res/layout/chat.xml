@@ -46,10 +46,14 @@
    	    android:layout_width="match_parent"
    	    android:layout_height="match_parent"
    	    android:layout_below="@id/chat_header"
+   	    android:background="@android:color/transparent"
+   	    android:cacheColorHint="@android:color/transparent"
    	    android:divider="@null"
    	    android:dividerHeight="0dp"
    	    android:listSelector="@android:color/transparent"
-   	    android:transcriptMode="alwaysScroll"
-   	    android:padding="10dp" />
+   	    android:padding="10dp"
+   	    android:scrollbars="none"
+   	    android:smoothScrollbar="true"
+   	    android:transcriptMode="alwaysScroll" />
 	
 </RelativeLayout>

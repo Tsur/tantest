@@ -47,7 +47,6 @@ import android.widget.AdapterView.OnItemClickListener;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.ipaulpro.afilechooser.utils.FileUtils;
-import com.scripturesos.tantest.connection.ClientSocket;
 import com.scripturesos.tantest.connection.HttpUtil;
 
 public class ContactsActivity extends Application {
@@ -162,7 +161,7 @@ public class ContactsActivity extends Application {
 				Cursor phones = cr.query(Phone.CONTENT_URI, null,
 			            Phone.CONTACT_ID + " = " + contactId, null, null);
 	
-				String country = ClientSocket.getInstance().getCountry();
+				String country = HomeActivity.country_id;
 				
 				while(phones.moveToNext())
 				{
@@ -206,9 +205,9 @@ public class ContactsActivity extends Application {
 		//Tenemos en phoneList un diccionario/ mapa de numeros -> nombre
 		cursor.close();
 		
-		if(phonesList.containsKey("\""+ClientSocket.getInstance().clientID+"\""))
+		if(phonesList.containsKey("\""+HomeActivity.client_id+"\""))
 		{
-			phonesList.remove("\""+ClientSocket.getInstance().clientID+"\"");
+			phonesList.remove("\""+HomeActivity.client_id+"\"");
 		}
 		
 		

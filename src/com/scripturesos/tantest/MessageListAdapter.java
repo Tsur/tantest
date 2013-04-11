@@ -20,9 +20,9 @@ public class MessageListAdapter extends BaseAdapter
 	
 	protected Activity activity;
 	protected ArrayList<ChatMessage> chatsMessages;
-	private RelativeLayout.LayoutParams rlp = new RelativeLayout.LayoutParams(
+	/*private RelativeLayout.LayoutParams rlp = new RelativeLayout.LayoutParams(
 	         RelativeLayout.LayoutParams.WRAP_CONTENT,
-	         RelativeLayout.LayoutParams.WRAP_CONTENT);
+	         RelativeLayout.LayoutParams.WRAP_CONTENT);*/
 	
 	public MessageListAdapter(Activity activity, ArrayList<ChatMessage> chats) 
 	{
@@ -65,13 +65,11 @@ public class MessageListAdapter extends BaseAdapter
 			
 			LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			vi = inflater.inflate(R.layout.chat_message, null);
-			
-			rlp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-			
+
 			//holder
 			holder = new ViewHolder();
             holder.message =(TextView) vi.findViewById(R.id.chat_message);
-            holder.container =(RelativeLayout) vi.findViewById(R.id.chat_wrapper);
+            holder.container =(LinearLayout) vi.findViewById(R.id.chat_wrapper);
             
             //Save holder
             vi.setTag(holder);
@@ -86,15 +84,18 @@ public class MessageListAdapter extends BaseAdapter
 		
 		if(cm.left)
 		{
-			holder.container.setBackgroundResource(R.drawable.recbubbleee);
-			//rlp.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
-			//holder.container.setLayoutParams(rlp);
+			/*rlp.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
+			holder.container.setLayoutParams(rlp);*/
+			holder.container.setGravity(Gravity.LEFT);
+			holder.message.setBackgroundResource(R.drawable.lbubble);
+			holder.message.setPadding(15, 20, 15, 10);
 		}
 		else
 		{
-			holder.container.setBackgroundResource(R.drawable.sendbubble);
-			//rlp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
-			holder.container.setLayoutParams(rlp);
+			/*rlp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
+			holder.container.setLayoutParams(rlp);*/
+			holder.container.setGravity(Gravity.RIGHT);
+			holder.message.setBackgroundResource(R.drawable.rbubble);
 		}
 
 		//TextView name = (TextView) vi.findViewById(R.id.contacts_lv_name);
@@ -106,7 +107,7 @@ public class MessageListAdapter extends BaseAdapter
 	 class ViewHolder
 	 {
 	        TextView message;
-	        RelativeLayout container;
+	        LinearLayout container;
 	 }
 	 
 

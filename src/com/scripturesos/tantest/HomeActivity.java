@@ -5,8 +5,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -33,16 +33,17 @@ import android.widget.Toast;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.scripturesos.tantest.connection.ClientResponse;
-import com.scripturesos.tantest.connection.ClientSocket;
 import com.scripturesos.tantest.connection.DatabaseHelper;
 import com.scripturesos.tantest.connection.HttpUtil;
+import com.scripturesos.tantest.connection.IOMessage;
+import com.scripturesos.tantest.connection.IOSocket;
+import com.scripturesos.tantest.connection.MessageCallback;
 
 public class HomeActivity extends Application {
 
 	private ProgressBar loader;
-	private String client_id;
-	private String country_id;
+	public static String client_id;
+	public static String country_id;
 	private String contacts_serialized;
 	
 	private ArrayList<String> chats = new ArrayList<String>();
@@ -54,6 +55,7 @@ public class HomeActivity extends Application {
 	private RelativeLayout chatActions;
 	private EditText sender;
 	
+	private IOSocket server;
 	
 	private static Drawable default_dr;
 	
@@ -121,28 +123,71 @@ public class HomeActivity extends Application {
 					
 				}
 				
-				/*ClientSocket.getInstance()
-				.getHandlers().put("onServerError", new ClientResponse(handler,10));
+				server = new IOSocket(client_id, new MessageCallback() {
+					  
+					  @Override
+					  public void onConnect() 
+					  {
+					    // Handle events
+						  Log.i("tantest","Conectado");
+						  
+						  //Miramops base de datos para mensjaes que no se hayan enviado
+					  }
+					  
+					  @Override
+					  public void onConnectFailure() 
+					  {
+						  Log.i("tantest","Problema al conectar, no recibe handshake o server no disponible");
+					  }
+					  
+					  @Override
+					  public void onDisconnect() 
+					  {
+					    // Handle JSON messages
+						Log.i("tantest","Nos desconectamos, hemos perdido conexion o el servidor no disponible");
+					  }
+					  
+					  @Override
+					  public void onMessage(IOMessage msg) 
+					  {
+						  Log.i("tantest","Recibimos mensaje del servidor");						  
+						  final IOMessage message = msg;
+						  
+						  (new Thread(){
+							  
+							  public void run() 
+							  {
+									  Message handlerMSG = new Message();
+									  
+									  switch(message.getType())
+									  {
+									  	case IOMessage.CHAT_MESSAGE:
+									  		handlerMSG.what = 0;
+									  		handlerMSG.obj = message.getMessageData();
+									  		handler.sendMessage(handlerMSG);
+									  		break;
+									  	case IOMessage.CHAT_CONFIRMATION:
+									  		handlerMSG.what = 1;
+									  		handlerMSG.obj = message.getMessageData();
+									  		handler.sendMessage(handlerMSG);
+									  		break;
+									  }	
+							   }
+							  
+						  }).start();
+							
+					  }
+
+					  @Override
+					  public void onMessageFailure(IOMessage msg) 
+					  {
+					    
+						  Log.i("tantest","No hemos podido enviar mensaje al servidor");
+					  }
+					}, true);
 				
-				ClientSocket.getInstance()
-				.getHandlers().put("onConnectionError", new ClientResponse(handler,11));
-				
-				ClientSocket.getInstance()
-				.getHandlers().put("onTimeoutError", new ClientResponse(handler,12));
-				*/
-				
-				ClientSocket.getInstance().close();
-				
-				ClientSocket.getInstance()
-				.getHandlers().put("sendMsg", new ClientResponse(handler,0));
-				
-				ClientSocket.getInstance()
-				.getHandlers().put("confirmMsg", new ClientResponse(handler,1));
-				
-				ClientSocket.getInstance().clientID = client_id;
-				ClientSocket.getInstance().countryCode = country_id;
-				
-				ClientSocket.getInstance().start();
+	
+				server.connect();
 				
 				//Segun lo que sea, mostrar mensaje o mostrar listView
 				Message msg = new Message();
@@ -178,7 +223,7 @@ public class HomeActivity extends Application {
 	protected void onDestroy() 
 	{
 		
-		ClientSocket.getInstance().close();
+		server.close();
 		
 		super.onDestroy();
 	}
@@ -367,7 +412,7 @@ public class HomeActivity extends Application {
 						catch (Exception e) 
 						{
 							Log.i("tantest","error es "+ e.getMessage());
-							
+							Log.i("tantest",e.toString());
 							ContactListAdapter.Cache.images.put(current_client, HomeActivity.default_dr);
 						}
 
@@ -579,8 +624,12 @@ public class HomeActivity extends Application {
 			    
 				public void run() 
 				{
-					//Guarda en base de datos
-					ClientSocket.getInstance().sendMsg(current_client, message);
+					//Guarda en base de datos chatMessages
+					
+					String message_id = UUID.randomUUID().toString();
+					
+					//Cuidado!! mirar cuando usuairo envia mensaje que contiene caracteres raros como comillas
+					server.send(IOMessage.CHAT_MESSAGE, current_client, message, message_id);
 				}
 				
 			}).start();
