@@ -1299,6 +1299,7 @@ containing a value of this type.
         public static final int act_home_container=0x7f070036;
         public static final int act_home_lv=0x7f07003a;
         public static final int act_test_chronometer=0x7f070054;
+        public static final int act_test_llqc=0x7f07004b;
         public static final int act_test_loader=0x7f070053;
         public static final int act_test_nav=0x7f07004d;
         public static final int act_test_opt1_b1=0x7f07005f;
@@ -1380,7 +1381,6 @@ containing a value of this type.
         public static final int testButtonFirst=0x7f07004e;
         public static final int testButtonLast=0x7f070052;
         public static final int testButtonNext=0x7f070051;
-        public static final int testQuestionsContainer=0x7f07004b;
         public static final int test_menu_header_grade=0x7f070089;
         public static final int testgrade_imageKO=0x7f07005b;
         public static final int testgrade_imageOK=0x7f07005a;
@@ -1528,6 +1528,7 @@ containing a value of this type.
         public static final int act_test_text2=0x7f0c0044;
         public static final int act_test_text3=0x7f0c0045;
         public static final int act_test_text4=0x7f0c0046;
+        public static final int act_test_text5=0x7f0c0047;
         public static final int app_name=0x7f0c000f;
         public static final int choose_file=0x7f0c0030;
         public static final int contacts_no_agenda=0x7f0c002c;

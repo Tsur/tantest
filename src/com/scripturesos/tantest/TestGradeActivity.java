@@ -1,5 +1,7 @@
 package com.scripturesos.tantest;
 
+import java.io.IOException;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,9 +10,13 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.actionbarsherlock.view.Menu;
+import com.scripturesos.tantest.connection.HttpUtil;
+import com.scripturesos.tantest.test.TestGrade;
 
 public class TestGradeActivity extends Application {
 
+	private TestGrade tg;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -19,14 +25,18 @@ public class TestGradeActivity extends Application {
 		
 		Bundle extras = getIntent().getExtras();
 		
-		if (extras != null)
+		if(extras != null)
 		{
-		    String questionsOK = extras.getString("questionsOK");
-		    String totalQuestions = extras.getString("totalQuestions");
-		    String calification = extras.getString("calification");
-		    String base = extras.getString("base");
-		    
-		    showResults(questionsOK,totalQuestions,calification,base);
+		    try 
+		    {
+				tg = (TestGrade) HttpUtil.fromString(extras.getString("grade"));
+			} 
+		    catch(Exception e) 
+		    {
+			
+			}
+			
+		    showResults();
 		}
 
 	}
@@ -38,34 +48,34 @@ public class TestGradeActivity extends Application {
 		return true;
 	}
 	
-	private void showResults(String questionsOK, String totalQuestions, String calification, String base)
+	private void showResults()
 	{
 		TextView textQuestionsOK = (TextView) findViewById(R.id.testgrade_textquestionsok);
 		
-		if(Integer.parseInt(questionsOK) == 0)
+		if(tg.numQuestionsOK() == 0)
 		{
 			textQuestionsOK.setText("No has acertado ninguna pregunta");
 			
 		}
 		else
 		{
-			textQuestionsOK.setText("Has acertado "+questionsOK+" pregunta"+((Integer.parseInt(questionsOK) > 1) ? "s":""));
+			textQuestionsOK.setText("Has acertado "+tg.numQuestionsOK()+" pregunta"+((tg.numQuestionsOK() > 1) ? "s":""));
 		
 		}
 		
 		
 		TextView textGrade = (TextView) findViewById(R.id.testgrade_textgrade);
-		textGrade.setText("Calificacion: "+calification);
+		textGrade.setText("Calificacion: "+tg.getCalification());
 		
 		TextView textTotalQuestions = (TextView) findViewById(R.id.testgrade_texttotalquestions);
-		textTotalQuestions.setText("(Total preguntas: "+totalQuestions+")");
+		textTotalQuestions.setText("(Total preguntas: "+tg.getTotalQuestions()+")");
 		
 		TextView textBase = (TextView) findViewById(R.id.testgrade_textbase);
-		textBase.setText("(sobre: "+base+")");
+		textBase.setText("(sobre: "+tg.getBase()+")");
 		
 		ImageView img;
 		
-		if(Double.parseDouble(calification) >= Integer.parseInt(base)/2)
+		if(tg.getCalification() >= tg.getBase()/2)
 		{
 			img = (ImageView) findViewById(R.id.testgrade_imageOK);
 		}

@@ -1,5 +1,6 @@
 package com.scripturesos.tantest;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -54,6 +55,7 @@ import com.scripturesos.tantest.test.TestUtil;
 
 public class TestActivity extends Application {
 	
+	private TestConfiguration tc;
 	private Test test;
 	private ProgressBar progress;
 	private LinearLayout questionsContainer;
@@ -68,6 +70,8 @@ public class TestActivity extends Application {
 	private DateFormat timer_formatter = new SimpleDateFormat("mm:ss", Locale.getDefault());
 	private Animation finishingTimer;
 	private boolean finishingTimerControl = false;
+	private CountDownTimer timeCounter;
+	private boolean testGraded = false;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -82,7 +86,7 @@ public class TestActivity extends Application {
 		progress = (ProgressBar) findViewById(R.id.act_test_loader);
 		seekbar = (SeekBar) findViewById(R.id.act_test_sb);
 		seekbarText = (TextView) findViewById(R.id.act_test_sb_text);
-		questionsContainer = (LinearLayout) findViewById(R.id.testQuestionsContainer);
+		questionsContainer = (LinearLayout) findViewById(R.id.act_test_llqc);
 		
 		fontRadio = Typeface.createFromAsset(getAssets(), "fuentes/cd.ttf");
 		fontText = Typeface.createFromAsset(getAssets(), "fuentes/trat.ttf");
@@ -92,8 +96,6 @@ public class TestActivity extends Application {
 			public void run() 
 			{
 				Bundle extras = getIntent().getExtras();
-				
-				TestConfiguration tc = null;
 				
 				try 
 				{	
@@ -184,27 +186,8 @@ public class TestActivity extends Application {
 		switch(item.getItemId())
 		{
 			case R.id.test_menu_header_grade:
-				
-				Log.i("tantes","Calificando test");
-				//Calificar test
-				TestGrade tg = test.grade(10);
-				Log.i("tantes","Calificado!");
-				//Desactivar radio y checkbuttons
-				
-				
-				//Mostrar pantalla resultados
-				
-				//Bundle bundle = new Bundle();
-				//bundle.putSerializable("result", tg.toString());
-				
-				Intent intent = new Intent(this, TestGradeActivity.class);
-				intent.putExtra("questionsOK", String.valueOf(tg.numQuestionsOK()));
-				intent.putExtra("totalQuestions", String.valueOf(test.getNumQuestions()));
-				intent.putExtra("calification", String.valueOf(tg.getCalification()));
-				intent.putExtra("base", String.valueOf(tg.getBase()));
-				//Log.i("tantes","iniciando actividad");
-				startActivity(intent);
-
+				item.setVisible(false);
+				gradeTest();
 				break;
 			default:
 		}
@@ -445,7 +428,7 @@ public class TestActivity extends Application {
 		int firstQuestion = test.getFirstQuestion();
 		seekbar.setProgress(firstQuestion);
 		//seekbarText.setText("1");
-		Log.i("tantes","First "+firstQuestion);
+		//Log.i("tantes","First "+firstQuestion);
 		gotoQuestion(firstQuestion);
 	}
 	
@@ -455,7 +438,7 @@ public class TestActivity extends Application {
 		int lastQuestion = test.getLastQuestion();
 		seekbar.setProgress(lastQuestion*100);
 		//seekbarText.setText(String.valueOf(numQuestions+1));
-		Log.i("tantes","Last "+lastQuestion);
+		//Log.i("tantes","Last "+lastQuestion);
 		gotoQuestion(lastQuestion);
 	}
 	
@@ -486,7 +469,7 @@ public class TestActivity extends Application {
 			finishingTimer.setRepeatCount(Animation.INFINITE);
 			
 			
-			(new CountDownTimer(time*60*1000,1000){
+			timeCounter = new CountDownTimer(time*60*1000,1000){
 
 				@Override
 				public void onFinish()
@@ -509,11 +492,126 @@ public class TestActivity extends Application {
 				}
 				
 				
-			}).start();
+			};
+			
+			timeCounter.start();
 			
 			
 		}
 	}
+	
+	public void gradeTest()
+	{
+		//Ocultamos para que el usuario no pueda modificar el test mientras se corrige
+		((RelativeLayout) findViewById(R.id.act_test_nav)).setVisibility(View.GONE);
+		questionsContainer.setVisibility(View.GONE);
+		
+		progress.setVisibility(View.VISIBLE);
+
+		(new Thread() {
+		    
+			public void run() 
+			{
+				
+				if(timeCounter != null)
+				{
+					//Parar tiempo
+					timeCounter.cancel();
+				}
+				
+				TestGrade tg = test.grade(10);
+				
+				tg.setPoints(tc.difficulty, tc.time);
+				
+				TestQuestion tq;
+				
+				for(int q=0; q < state.size(); q++ )
+				{
+					tq = test.getQuestions().get(q);
+					
+					/*Creamos answer container*/
+					if(tq instanceof TestQuestionRadio)
+					{
+						
+						RadioGroup rg = (RadioGroup) ((LinearLayout)state.get(q).getChildAt(0)).getChildAt(1);
+						String solution = (String) tq.getSolution().getSolutionADT();
+						RadioButton rb;
+						
+						for(int k=0; k<4; k++)
+						{
+							rb = (RadioButton) rg.getChildAt(k);
+							
+							if(rb.getText().toString().equalsIgnoreCase(solution))
+							{
+								rb.setTextColor(Color.CYAN);
+							}
+							else
+							{
+								rb.setTextColor(Color.RED);
+							}
+							
+							rb.setEnabled(false);
+							
+						}
+						
+						continue;
+					}
+					
+					if(tq instanceof TestQuestionCheckBox)
+					{
+						
+						LinearLayout container = (LinearLayout) ((LinearLayout)state.get(q).getChildAt(0)).getChildAt(1);
+						@SuppressWarnings("unchecked")
+						Set<String> solution = (Set<String>) tq.getSolution().getSolutionADT();
+						CheckBox cb;
+						
+						for(int k=0; k<4; k++)
+						{
+							cb = (CheckBox) container.getChildAt(k);
+							
+							if(solution.contains(cb.getText().toString()))
+							{
+								cb.setTextColor(Color.CYAN);
+							}
+							else
+							{
+								cb.setTextColor(Color.RED);
+							}
+							
+							cb.setEnabled(false);
+							
+						}
+					}
+				}
+				
+				
+				if(tg.getPoints() > 0)
+				{
+					//Actualizar Base de datos con los puntos que ha acumulado
+				}
+				
+				Message msg = new Message();
+				msg.what = 1;
+				msg.obj = tg;
+				handler.sendMessage(msg);
+		    }
+		}).start();
+	}
+	
+    @Override
+    public void onResume()
+    {
+    	super.onResume();
+    	
+    	if(testGraded)
+    	{
+    		progress.setVisibility(View.GONE);
+    		((RelativeLayout) findViewById(R.id.act_test_nav)).setVisibility(View.VISIBLE);
+    		questionsContainer.setVisibility(View.VISIBLE);
+    		firstQuestion(null);
+    	}
+    	
+    }
 	
 	public class TestActivityHandler extends Handler 
 	{
@@ -536,6 +634,31 @@ public class TestActivity extends Application {
         {
         	case 0:
         		startTest((Integer) msg.obj);
+        		break;
+        	case 1:
+        		
+        		TestGrade tg = (TestGrade) msg.obj;
+        		
+        		View v = getSupportActionBar().getCustomView();
+    			TextView calification = (TextView) v.findViewById(R.id.main_actionbar_textTitle);
+    			calification.setTypeface(fontText);
+    			calification.setText(getString(R.string.act_test_text5)+" "+String.valueOf(tg.getCalification()));
+
+        		Intent intent = new Intent(this, TestGradeActivity.class);
+
+				try 
+				{
+					Bundle bundle = new Bundle();
+					bundle.putString("grade", HttpUtil.toString(tg));
+					intent.putExtras(bundle);
+				} 
+				catch (IOException e) 
+				{
+					
+				}
+
+				startActivity(intent);
+				testGraded = true;
         		break;
         	case 10:
         		progress.setVisibility(View.GONE);

@@ -609,6 +609,7 @@ int id act_home_chat_input_send 0x7f070039
 int id act_home_container 0x7f070036
 int id act_home_lv 0x7f07003a
 int id act_test_chronometer 0x7f070054
+int id act_test_llqc 0x7f07004b
 int id act_test_loader 0x7f070053
 int id act_test_nav 0x7f07004d
 int id act_test_opt1_b1 0x7f07005f
@@ -690,7 +691,6 @@ int id testButtonBack 0x7f07004f
 int id testButtonFirst 0x7f07004e
 int id testButtonLast 0x7f070052
 int id testButtonNext 0x7f070051
-int id testQuestionsContainer 0x7f07004b
 int id test_menu_header_grade 0x7f070089
 int id testgrade_imageKO 0x7f07005b
 int id testgrade_imageOK 0x7f07005a
@@ -798,6 +798,7 @@ int string act_test_text1 0x7f0c0043
 int string act_test_text2 0x7f0c0044
 int string act_test_text3 0x7f0c0045
 int string act_test_text4 0x7f0c0046
+int string act_test_text5 0x7f0c0047
 int string app_name 0x7f0c000f
 int string choose_file 0x7f0c0030
 int string contacts_no_agenda 0x7f0c002c

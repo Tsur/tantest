@@ -51,6 +51,7 @@ public class TestBible extends AbstractTest implements Test{
 		grade.setBase(base);
 		grade.setCalification(calification_total, totalQuestions);
 		grade.setQuestionsOK(questionsOK);
+		grade.setTotalQuestions(questions.size());
 		
 		return grade;
 	}
