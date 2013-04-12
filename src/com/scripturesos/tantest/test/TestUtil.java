@@ -13,10 +13,6 @@ import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -35,27 +31,26 @@ public final class TestUtil {
      * @throws IOException if there is a problem reading the found file
      * @throws ClassNotFoundException if the read contents are not found
      * @throws ClassCastException if the read contents are not valid
+     * @throws IllegalAccessException 
+     * @throws InstantiationException 
      * @see PluginUtil#getImplementors(Class)
      */
-    private static Class<?> getImplementor(Class<?> clazz, String prop) throws IOException, ClassNotFoundException, ClassCastException
+    private static Test getImplementor(Class<?> clazz, String prop) throws IOException, ClassNotFoundException, ClassCastException, InstantiationException, IllegalAccessException
     {
         Properties props = getPlugin(clazz);
         
         String name = props.getProperty(prop);
-
-        Class<?> impl = forName(name);
         
-        if (!clazz.isAssignableFrom(impl))
-        {
-            throw new ClassCastException();
-        }
+        Log.i("tantest","class to instantiate: "+ name);
+        
+        Test impl = (Test) forName(name);
 
         return impl;
     }
     
-    public static Class<?> forName(String className) throws ClassNotFoundException
+    public static Object forName(String className) throws ClassNotFoundException, InstantiationException, IllegalAccessException
     {
-      return Thread.currentThread().getContextClassLoader().loadClass(className);
+    	return Class.forName(className).newInstance();
     }
 
     /**
@@ -70,14 +65,14 @@ public final class TestUtil {
      * @throws IllegalAccessException if the new object can not be instantiated
      * @see PluginUtil#getImplementors(Class)
      */
-    public static Object getInstance(Class<?> clazz) throws MalformedURLException, ClassCastException, IOException, ClassNotFoundException, InstantiationException, IllegalAccessException
+    public static Test getInstance(Class<?> clazz) throws MalformedURLException, ClassCastException, IOException, ClassNotFoundException, InstantiationException, IllegalAccessException
     {
-        return getImplementor(clazz,DEFAULT).newInstance();
+        return getImplementor(clazz,DEFAULT);
     }
     
-    public static Object getInstance(Class<?> clazz, String prop) throws MalformedURLException, ClassCastException, IOException, ClassNotFoundException, InstantiationException, IllegalAccessException
+    public static Test getInstance(Class<?> clazz, String prop) throws MalformedURLException, ClassCastException, IOException, ClassNotFoundException, InstantiationException, IllegalAccessException
     {
-    	return getImplementor(clazz,prop).newInstance();
+    	return getImplementor(clazz,prop);
     }
 
 	/**
@@ -89,13 +84,11 @@ public final class TestUtil {
      */
     private static Properties getPlugin(Class<?> clazz) throws IOException
     {
-        String pluginName = clazz.getName() + EXTENSION_PLUGIN;
-
+        String pluginName = clazz.getSimpleName() + EXTENSION_PLUGIN;
+        
         try
-        {
-        	URL url = ClassLoader.getSystemResource(pluginName);
-        	
-        	InputStream in = url.openStream();
+        {	
+        	InputStream in = clazz.getResourceAsStream(pluginName);
 
             Properties prop = new Properties();
             
@@ -154,64 +147,15 @@ public final class TestUtil {
 		return null;
     }
     
-    public static JSONArray getRemoteSource(String url) throws TestRemoteSourceException
-	{
-		/*try
-		{
-			// Create a new HTTP Client
-		    DefaultHttpClient httpClient = new DefaultHttpClient();
-		    // Setup the get request
-		    HttpGet httpGetRequest = new HttpGet(url);
-
-		    // Execute the request in the client
-		    HttpResponse httpResponse = httpClient.execute(httpGetRequest);
-		    
-		    HttpEntity entity = httpResponse.getEntity();
-
-		    if(httpResponse.getStatusLine().getStatusCode() >= 200 || 
-		    		httpResponse.getStatusLine().getStatusCode() <= 202)
-		    {
-		    	InputStream file = entity.getContent();
-		    
-		    	return getSource(file);
-		    }
-		    
-		    throw new TestRemoteSourceException();
-		    
-			
-		}
-		catch (UnsupportedEncodingException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		catch (IOException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		return null;
-		
-		*/
-			
-		try 
-		{
-			
-			return getSource(new URL(url).openStream());
-		} 
-		catch(MalformedURLException e) 
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
-		catch (IOException e) 
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		return null;
+    public static JSONArray getRemoteSource(String url) throws TestRemoteSourceException, MalformedURLException, IOException
+	{    	
+    	/*URL stream = new URL(url);
+    	URLConnection connection = stream.openConnection();
+        connection.setConnectTimeout(5 * 1000);//5s
+        connection.setReadTimeout(40 * 1000);//40s
+        return getSource(connection.getInputStream());*/
+        
+		return getSource((new URL(url)).openStream());
 		
 	}
     
@@ -232,5 +176,5 @@ public final class TestUtil {
 	}
     
     private static final String EXTENSION_PLUGIN = ".plugin";
-    private static final String DEFAULT = "Default";
+    private static final String DEFAULT = "0";
 }

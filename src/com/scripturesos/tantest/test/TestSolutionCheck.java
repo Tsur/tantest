@@ -29,6 +29,7 @@ public class TestSolutionCheck implements TestSolution{
 			return 0;
 		}
 		
+		@SuppressWarnings("unchecked")
 		Iterator<String> itr = ((Set<String>) userSolution.getSolutionADT()).iterator();
 		
 		double points = 0;
@@ -66,6 +67,7 @@ public class TestSolutionCheck implements TestSolution{
 		return checkAnswer;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void setSolutionADT(Object adt) throws JSONException, TestException
 	{

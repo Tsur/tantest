@@ -1,6 +1,5 @@
 package com.scripturesos.tantest.test;
 
-import java.io.IOException;
 
 //import java.io.IOException;
 //import java.net.MalformedURLException;
@@ -72,7 +71,7 @@ public class TestFactory
      * 
      * Create Test
      */
-    public static Test createTest(Class clazz)
+    public static Test createTest(Class<?> clazz)
     {
     	try
     	{
@@ -129,36 +128,10 @@ public class TestFactory
     {
     	try
     	{
-    		return (Test) TestUtil.getInstance(TestFactory.class);
+    		return TestUtil.getInstance(TestFactory.class);
 		}
-    	/*
-    	catch (MalformedURLException e)
-    	{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		*/
-    	catch (ClassCastException e)
-    	{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    	catch (IOException e)
-    	{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    	catch (ClassNotFoundException e)
-    	{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    	catch (InstantiationException e)
-    	{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
-    	catch (IllegalAccessException e)
+
+    	catch (Exception e)
     	{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -171,36 +144,9 @@ public class TestFactory
     {
     	try
     	{
-    		return (Test) TestUtil.getInstance(TestFactory.class, prop);
+    		return TestUtil.getInstance(TestFactory.class, prop);
 		}
-    	/*
-    	catch (MalformedURLException e)
-    	{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		*/
-    	catch (ClassCastException e)
-    	{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    	catch (IOException e)
-    	{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    	catch (ClassNotFoundException e)
-    	{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-    	catch (InstantiationException e)
-    	{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
-    	catch (IllegalAccessException e)
+    	catch (Exception e)
     	{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -208,5 +154,42 @@ public class TestFactory
     	
 		return null;
     }
+    
+    /*public static Test createTest(int category)
+    {
+    	try
+    	{
+    		String cat = null;
+    		
+    		switch(category)
+    		{
+    		case 0:
+    			cat = "general";
+    			break;
+    		case 1:
+    			cat = "history";
+    			break;
+    		case 2:
+    			cat = "geography";
+    			break;
+    		case 3:
+    			cat = "laws";
+    			break;
+    		case 4:
+    			cat = "numbers";
+    			break;
+    		}
+    		
+    		return TestFactory.createTest(cat);
+		}
+
+    	catch (Exception e)
+    	{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+		return null;
+    }*/
 
 }

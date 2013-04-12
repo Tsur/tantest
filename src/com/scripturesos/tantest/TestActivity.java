@@ -1,48 +1,52 @@
 package com.scripturesos.tantest;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Set;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources.NotFoundException;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
+import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
+import com.scripturesos.tantest.connection.HttpUtil;
 import com.scripturesos.tantest.test.Test;
-import com.scripturesos.tantest.test.TestBible;
+import com.scripturesos.tantest.test.TestConfiguration;
 import com.scripturesos.tantest.test.TestException;
 import com.scripturesos.tantest.test.TestFactory;
 import com.scripturesos.tantest.test.TestGrade;
 import com.scripturesos.tantest.test.TestQuestion;
 import com.scripturesos.tantest.test.TestQuestionCheckBox;
 import com.scripturesos.tantest.test.TestQuestionRadio;
-import com.scripturesos.tantest.test.TestRemoteSourceException;
 import com.scripturesos.tantest.test.TestSolution;
 import com.scripturesos.tantest.test.TestSolutionCheck;
 import com.scripturesos.tantest.test.TestSolutionRadio;
@@ -51,121 +55,120 @@ import com.scripturesos.tantest.test.TestUtil;
 public class TestActivity extends Application {
 	
 	private Test test;
-	
+	private ProgressBar progress;
 	private LinearLayout questionsContainer;
 	private SeekBar seekbar;
 	private TextView seekbarText;
-	private Map<Integer,ScrollView> state = new HashMap<Integer,ScrollView>();
+	private SparseArray<ScrollView> state = new SparseArray<ScrollView>();
+	
+	private Typeface fontRadio;
+	private Typeface fontText;
+	
+	private TextView timer;
+	private DateFormat timer_formatter = new SimpleDateFormat("mm:ss", Locale.getDefault());
+	private Animation finishingTimer;
+	private boolean finishingTimerControl = false;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
+		setTitle(R.string.act_test_text1);
+		
 		super.onCreate(savedInstanceState);
 		
+		setContentView(R.layout.activity_test);
 		//overridePendingTransition(R.anim.fadein, R.anim.fadeout);
+		handler = new TestActivityHandler(TestActivity.this);
+		progress = (ProgressBar) findViewById(R.id.act_test_loader);
+		seekbar = (SeekBar) findViewById(R.id.act_test_sb);
+		seekbarText = (TextView) findViewById(R.id.act_test_sb_text);
+		questionsContainer = (LinearLayout) findViewById(R.id.testQuestionsContainer);
 		
-		//Creamos Test
-		try
-		{
-			test = TestFactory.createTest(TestBible.class);
-			Log.i("tantes","Iniciando");
-			
-			if(isNetworkAvailable())
+		fontRadio = Typeface.createFromAsset(getAssets(), "fuentes/cd.ttf");
+		fontText = Typeface.createFromAsset(getAssets(), "fuentes/trat.ttf");
+		
+		(new Thread() {
+		    
+			public void run() 
 			{
-				//JSONArray test_data = TestUtil.getRemoteSource("https://dl.dropbox.com/s/uiwybzpsxcy04je/bible.json?token_hash=AAEHX2RaffWtjJbXQMdSAefawUyquGBYgwI3tW2BFe5tAg&dl=1");
-				//test.initTest(5, test_data);
-				test.initTest(5, TestUtil.getSource(getResources().openRawResource(R.raw.bible)));
+				Bundle extras = getIntent().getExtras();
 				
-			}
-			else
-			{
-				test.initTest(5, TestUtil.getSource(getResources().openRawResource(R.raw.bible)));
-			}
-			
-			Log.i("tantes","Creando Test");
-			
-			//Si no activamos activity_test, no podemos usar nada de lo que tiene
-			setContentView(R.layout.activity_scroll_test);
-			
-			createTestLayout();
-			Log.i("tantes","LayoutCreando");
-			
-			gotoQuestion(test.getFirstQuestion());
-			Log.i("tantes","Test creado");
-			
-			Log.i("tantes","Todo fue correcto!");
+				TestConfiguration tc = null;
+				
+				try 
+				{	
+					if(extras != null && extras.containsKey("configuration"))
+					{
+						tc = (TestConfiguration) HttpUtil.fromString(extras.getString("configuration"));
+					}
+					else
+					{
+						tc = new TestConfiguration();
+					} 
+				}
+				catch(Exception e) 
+				{
+					tc = new TestConfiguration();
+				}
 
-		}
-		catch (JSONException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
-		catch (NotFoundException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		catch (TestRemoteSourceException e)
-		{
-			try
-			{
-				test.initTest(5, TestUtil.getSource(getResources().openRawResource(R.raw.bible)));
-				Log.i("tantes","Creando Test");
+				test = TestFactory.createTest(String.valueOf(tc.category));
+
+				Message msg = new Message();
 				
-				//Si no activamos activity_test, no podemos usar nada de lo que tiene
-				setContentView(R.layout.activity_scroll_test);
-				
-				createTestLayout();
-				Log.i("tantes","LayoutCreando");
-				
-				gotoQuestion(test.getFirstQuestion());
-				Log.i("tantes","Test creado");
-				
-				Log.i("tantes","Todo fue correcto!");
-			}
-			catch (NotFoundException e1)
-			{
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			catch (TestException e1)
-			{
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			catch (JSONException e1)
-			{
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
-			
-			
-		}
-		catch (TestException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
+				if(test != null)
+				{
+					try 
+					{
+						test.initTest(tc.questions, tc.difficulty);
+					}
+					catch (Exception e) 
+					{
+						try 
+						{
+							//Dependiendo de la dificultad usamos uno u otro
+							Log.i("tantest","Creando Test General, no URL: "+test.getSource());
+							
+							test.initTest(tc.questions, TestUtil.getSource(getResources().openRawResource(R.raw.bible)));
+						} 
+						catch (Exception e1) 
+						{
+							msg.what = 11;
+							handler.sendMessage(msg);
+						}
+					}
+
+					createTestLayout();
+					
+					msg.what = 0;
+					msg.obj = tc.time;
+					handler.sendMessage(msg);
+					
+				}
+				else
+				{
+					msg.what = 10;
+					handler.sendMessage(msg);
+				}
+		    }
+		}).start();
 		
 	}
 	
-	private boolean isNetworkAvailable()
+	/*private boolean isNetworkAvailable()
 	{
 	    ConnectivityManager connectivityManager 
 	          = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 	    NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
 	    return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-	}
+	}*/
 
-	protected void onPause()
+	/*protected void onPause()
 	{
 		
 		super.onPause();
 		
 		//overridePendingTransition(R.anim.fadein, R.anim.fadeout);
-	}
+	}*/
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -212,12 +215,9 @@ public class TestActivity extends Application {
 	public void createTestLayout()
 	{
 
-		seekbar = (SeekBar) findViewById(R.id.testSeekBar);
-		seekbarText = (TextView) findViewById(R.id.testSeekBarText);
 		seekbar.setMax((test.getNumQuestions()-1)*100);
 		seekbar.incrementProgressBy(10);
 		seekbar.setProgress(0);
-		
 		seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
 
 		    @Override
@@ -241,15 +241,9 @@ public class TestActivity extends Application {
 		    	gotoQuestion(seekBar.getProgress()/100);
 		    }
 		});
-		Log.i("tantes","seekBar Configurado");
 		
-		questionsContainer = (LinearLayout) findViewById(R.id.testQuestionsContainer);
-		Log.i("tantes","Obtenida referencia a contenedor principal");
 		
 		int textColor = Color.rgb(23, 26, 30);
-		Typeface fontRadio = Typeface.createFromAsset(getAssets(), "fuentes/cd.ttf");
-		Typeface fontText = Typeface.createFromAsset(getAssets(), "fuentes/trat.ttf");
-		Log.i("tantes","Variables tipografia");
 		
 		int numQuestionLabel = 1;
 		OnCheckedChangeListener occl = new OnCheckedChangeListener()
@@ -466,11 +460,103 @@ public class TestActivity extends Application {
 	}
 	
 	private void gotoQuestion(int question)
-	{
-		ScrollView questionView = state.get(question);
-		
+	{	
 		questionsContainer.removeAllViews();
-		questionsContainer.addView(questionView);
+		questionsContainer.addView(state.get(question));
 	}
+	
+	private void startTest(Integer time)
+	{
+		progress.setVisibility(View.GONE);
+		gotoQuestion(test.getFirstQuestion());
+		((RelativeLayout) findViewById(R.id.act_test_nav)).setVisibility(View.VISIBLE);
+		
+		if(time != null && time > 0)
+		{
+			View v = getSupportActionBar().getCustomView();
+			
+			timer = (TextView) v.findViewById(R.id.main_actionbar_textTitle);//findViewById(R.id.act_test_chronometer);
+			timer.setTypeface(fontText);
+			timer.setText((time >= 10 ? time : "0"+time)+":00");
+			//timer.setVisibility(View.VISIBLE);
+			finishingTimer = new AlphaAnimation(0.0f, 1.0f);
+			finishingTimer.setDuration(400); //You can manage the time of the blink with this parameter
+			//finishingTimer.setStartOffset(20);
+			finishingTimer.setRepeatMode(Animation.REVERSE);
+			finishingTimer.setRepeatCount(Animation.INFINITE);
+			
+			
+			(new CountDownTimer(time*60*1000,1000){
+
+				@Override
+				public void onFinish()
+				{
+					Log.i("tantest","Se acabó el tiempo");
+					timer.setText(R.string.act_test_text4);
+					timer.clearAnimation();
+				}
+
+				@Override
+				public void onTick(long millisUntilFinished) 
+				{
+					if(millisUntilFinished <= 11000 && finishingTimerControl == false)
+					{
+						timer.startAnimation(finishingTimer);
+						finishingTimerControl = true;
+					}
+					
+					timer.setText(timer_formatter.format(new Date(millisUntilFinished)));
+				}
+				
+				
+			}).start();
+			
+			
+		}
+	}
+	
+	public class TestActivityHandler extends Handler 
+	{
+        private TestActivity parent;
+
+        public TestActivityHandler(TestActivity parent) 
+        {
+            this.parent = parent;
+        }
+
+        public void handleMessage(Message msg) 
+        {
+            parent.handleMessage(msg);
+        }
+    }
+	
+	public void handleMessage(Message msg) 
+	{
+        switch(msg.what) 
+        {
+        	case 0:
+        		startTest((Integer) msg.obj);
+        		break;
+        	case 10:
+        		progress.setVisibility(View.GONE);
+        		ifError(getString(R.string.act_test_text2));
+        		finish();
+        		break;
+        	case 11:
+        		progress.setVisibility(View.GONE);
+        		ifError(getString(R.string.act_test_text3));
+        		finish();
+        		break;
+            default:
+            	break;
+        }
+    }
+	
+	public void ifError(String txt)
+	{
+		Toast.makeText(TestActivity.this, txt, Toast.LENGTH_SHORT).show();
+	}
+	
+	public TestActivityHandler handler;
 
 }

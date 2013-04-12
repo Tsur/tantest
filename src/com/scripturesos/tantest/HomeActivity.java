@@ -123,7 +123,7 @@ public class HomeActivity extends Application {
 					
 				}
 				
-				server = new IOSocket(client_id, new MessageCallback() {
+				/*server = new IOSocket(client_id, new MessageCallback() {
 					  
 					  @Override
 					  public void onConnect() 
@@ -187,7 +187,7 @@ public class HomeActivity extends Application {
 					}, true);
 				
 	
-				server.connect();
+				server.connect();*/
 				
 				//Segun lo que sea, mostrar mensaje o mostrar listView
 				Message msg = new Message();
@@ -285,11 +285,10 @@ public class HomeActivity extends Application {
 				//Mostramos ajax cargando
 				
 				Log.i("tantes","creando actividad");
-				
-				Intent intent = new Intent(this, TestActivity.class);
-				Log.i("tantes","iniciando actividad");
-				startActivity(intent);
+				Intent tintent = new Intent(this, TestOptionsActivity.class);
+				startActivityForResult(tintent,1);
 				break;
+				
 			case R.id.menu_header_social:
 				Intent cintent = new Intent(this, ContactsActivity.class);
 				Log.i("tantes","iniciando actividad");
@@ -343,6 +342,21 @@ public class HomeActivity extends Application {
 
             }
             break;
+            case 1:
+            	if (resultCode == RESULT_OK) 
+                {  
+                	Bundle b = data.getExtras();
+                	
+                	//Problema: Como actualizamos cuando cambie foto o estado?
+                	if(b.containsKey("configuration"))
+                	{
+                		Intent tintent = new Intent(this, TestActivity.class);
+        				tintent.putExtras(b);
+        				startActivity(tintent);
+                	}
+
+                }
+            	break;
                
         }
         

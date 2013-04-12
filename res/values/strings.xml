@@ -38,4 +38,27 @@
 	<string name="choose_file">Select a file</string>
 	<string name="error_selecting_file">Error selecting File</string>
 	
+	
+	<string name="act_test_opt_text1">Número de Preguntas</string>
+	<string name="act_test_opt_text2">Límite de Tiempo</string>
+	<string name="act_test_opt_text3">Nivel Dificultad</string>
+	<string name="act_test_opt_text4">Categoría</string>
+	<string name="act_test_opt_text5">Neófito</string>
+	<string name="act_test_opt_text6">Vianda Sólida</string>
+	<string name="act_test_opt_text7">Ministro</string>
+	<string name="act_test_opt_text8">Fariseo</string>
+	<string name="act_test_opt_text9">General</string>
+	<string name="act_test_opt_text10">Historia</string>
+	<string name="act_test_opt_text11">Geografía</string>
+	<string name="act_test_opt_text12">Leyes</string>
+	<string name="act_test_opt_text13">Números</string>
+	<string name="act_test_opt_text14">Configuración del Test</string>
+	<string name="act_test_opt_text15">Otras opciones</string>
+	<string name="act_test_opt_text16">Aceptar configuración</string>
+	<string name="act_test_opt_text17">Sin Tiempo</string>
+	
+	<string name="act_test_text1">Resuelve el Test</string>
+	<string name="act_test_text2">¡ Tenemos un problema, intentalo mas tarde!</string>
+	<string name="act_test_text3">¡Aún no tenemos tests con esa configuración, inténtalo mas tarde!</string>
+	<string name="act_test_text4">Tiempo acabado</string>
 </resources>

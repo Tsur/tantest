@@ -1,0 +1,15 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/act_test_opt_i1"
+        android:orderInCategory="100"
+        android:showAsAction="never"
+        android:icon="@drawable/ic_settings"
+        android:title="@string/act_test_opt_text15"/>
+    
+     <item android:id="@+id/act_test_opt_i2"
+          android:icon="@drawable/ic_menu_header_result"
+          android:title="@string/act_test_opt_text16"
+          android:showAsAction="ifRoom" />
+
+</menu>
