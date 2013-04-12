@@ -89,7 +89,11 @@ public class TestGrade implements Serializable{
 			points += questionsOK;
 			
 			//+plus (tiempo)
-			points += time;
+			if(time > 0)
+			{
+				points += (61-(time % 61));
+			}
+			
 		}
 		//Si no aprueba, 0 puntos
 		else

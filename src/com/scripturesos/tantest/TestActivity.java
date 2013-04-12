@@ -477,6 +477,7 @@ public class TestActivity extends Application {
 					Log.i("tantest","Se acabó el tiempo");
 					timer.setText(R.string.act_test_text4);
 					timer.clearAnimation();
+					gradeTest();
 				}
 
 				@Override
