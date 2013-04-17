@@ -17,6 +17,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -548,16 +549,16 @@ public class TestActivity extends Application {
 			//finishingTimer.setStartOffset(20);
 			finishingTimer.setRepeatMode(Animation.REVERSE);
 			finishingTimer.setRepeatCount(Animation.INFINITE);
-			
-			
+
 			timeCounter = new CountDownTimer(time*60*1000,1000){
 
 				@Override
 				public void onFinish()
 				{
-					Log.i("tantest","Se acabó el tiempo");
+					//Log.i("tantest","Se acabó el tiempo");
 					timer.setText(R.string.act_test_text4);
 					timer.clearAnimation();
+					finishingTimerControl = false;
 					gradeTest();
 				}
 
@@ -606,15 +607,26 @@ public class TestActivity extends Application {
 				{
 					//Parar tiempo
 					timeCounter.cancel();
-					timer.clearAnimation();
+					
+					if(finishingTimerControl == true)
+					{
+						timer.clearAnimation();
+					}
 					
 					try 
 					{
-						Date realTimemili = timer_formatter.parse(timer.getText().toString());
-						realTime = timer_formatter.format(new Date((tc.time*60*1000) - realTimemili.getTime()));
-				
+						if(timer.getText().toString().equals(getString(R.string.act_test_text4)))
+						{
+							realTime = String.valueOf(tc.time) + (tc.time > 1 ? " minutos" : " minuto");
+						}
+						else
+						{
+							Date realTimemili = timer_formatter.parse(timer.getText().toString());
+							realTime = timer_formatter.format(new Date((tc.time*60*1000) - realTimemili.getTime()));
+						}
+						
 					}
-					catch (ParseException e) 
+					catch (Exception e) 
 					{
 						realTime = null;
 					}
@@ -645,6 +657,7 @@ public class TestActivity extends Application {
 				//HTML END		
 				
 				TestQuestion tq;
+				int wrongQuestColor = Color.rgb(81, 7, 7);
 				
 				for(int q=0; q < state.size(); q++ )
 				{
@@ -668,7 +681,8 @@ public class TestActivity extends Application {
 							}
 							else
 							{
-								rb.setTextColor(Color.RED);
+								rb.setTextColor(wrongQuestColor);
+								rb.setPaintFlags(rb.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
 							}
 							
 							rb.setEnabled(false);
@@ -696,7 +710,9 @@ public class TestActivity extends Application {
 							}
 							else
 							{
-								cb.setTextColor(Color.RED);
+								cb.setTextColor(wrongQuestColor);
+								cb.setPaintFlags(cb.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+								
 							}
 							
 							cb.setEnabled(false);

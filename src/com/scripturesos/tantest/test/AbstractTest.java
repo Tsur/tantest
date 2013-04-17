@@ -184,7 +184,11 @@ public class AbstractTest
 		else
 		{
 			html += "<p id=\"time\">Tiempo máximo: "+tg.getTime()+(tg.getTime() > 1 ? " minutos" : " minuto")+"</p>";
-			html += "<p id=\"time_used\">Tiempo empleado: "+tg.getRealTime()+"</p>";
+			
+			if(tg.getRealTime() != null)
+			{
+				html += "<p id=\"time_used\">Tiempo empleado: "+tg.getRealTime()+"</p>";
+			}
 		}
 		
 		html += "<p id=\"points\">Puntos: "+tg.getPoints()+"</p>";

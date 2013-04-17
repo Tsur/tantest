@@ -289,7 +289,7 @@ public class HomeActivity extends Application {
 					}, true);
 				
 	
-				//server.connect();
+				server.connect();
 				
 				//Segun lo que sea, mostrar mensaje o mostrar listView
 				if(chats.size() > 0)
@@ -652,32 +652,9 @@ public class HomeActivity extends Application {
 					if(ContactUtil.Cache.contacts.get(current_client) == null)
 			        {
 						
-						/*try {
-							
-							JSONObject jsonContact = HttpUtil.post(HttpUtil.GET_CONTACTS,new String[]{"[\""+current_client+"\"]"});
-						
-							jsonContact = jsonContact.getJSONArray("response").getJSONObject(0);
-									
-							contact = new ContactItemListView(
-									current_client,
-									jsonContact.getString("photo"),
-									jsonContact.getString("name"), 
-									jsonContact.getString("status"), 
-									jsonContact.getString("points")
-							);
-							
-							ContactListAdapter.Cache.contacts.put(current_client,contact);
-							InputStream ins = (InputStream) new URL(contact.getImg()).getContent();
-							Log.i("tantest","Contacto es "+ jsonContact.getString("photo"));
-							ContactListAdapter.Cache.images.put(current_client, Drawable.createFromStream(ins, null));
-						} 
-						catch (Exception e) 
-						{
-							Log.i("tantest","error es "+ e.getMessage());
-							Log.i("tantest",e.toString());
-							ContactListAdapter.Cache.images.put(current_client, HomeActivity.default_dr);
-						}*/
 						ContactUtil.createContacts("[\""+current_client+"\"]");
+						
+						contact = ContactUtil.Cache.contacts.get(current_client);
 
 			        }
 					else
