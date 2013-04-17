@@ -1,21 +1,16 @@
 package com.scripturesos.tantest;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.drawable.Drawable;
-import android.util.Log;
-//import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+//import android.util.SparseArray;
 
 
 public class ContactListAdapter extends BaseAdapter
@@ -84,18 +79,18 @@ public class ContactListAdapter extends BaseAdapter
 			holder = (ViewHolder) vi.getTag();
 		}
 		             
-		ContactItemListView contact = ContactListAdapter.Cache.contacts.get(clients.get(position));
+		ContactItemListView contact = ContactUtil.Cache.contacts.get(clients.get(position));
 		      
 		//Log.i("tantest","name: "+contact.getName());
 		
-        if( ContactListAdapter.Cache.images.get(contact.getID()) == null)
+        if( ContactUtil.Cache.images.get(contact.getID()) == null)
         {
-        	 ContactListAdapter.Cache.images.put(contact.getID(), activity.getResources().getDrawable(R.drawable.profile));
+        	ContactUtil.Cache.images.put(contact.getID(), activity.getResources().getDrawable(R.drawable.profile));
         }
         
 		//int imageResource = activity.getResources().getIdentifier(contact.getImg(), null, activity.getPackageName());
 		//holder.image.setImageDrawable(activity.getResources().getDrawable(imageResource));
-        holder.image.setImageDrawable( ContactListAdapter.Cache.images.get(contact.getID()));
+        holder.image.setImageDrawable( ContactUtil.Cache.images.get(contact.getID()));
 		         
 		//TextView name = (TextView) vi.findViewById(R.id.contacts_lv_name);
 		holder.name.setText((contact.getName().length() > 32) ? contact.getName().substring(0, 29)+ "..." : contact.getName());
@@ -105,7 +100,7 @@ public class ContactListAdapter extends BaseAdapter
 		
 		//TextView points = (TextView) vi.findViewById(R.id.contacts_lv_points);
 		holder.points.setText(contact.getPoints());
-		 
+	    
 		return vi;
 	  }
 	
@@ -116,13 +111,5 @@ public class ContactListAdapter extends BaseAdapter
 	        TextView points;
 	        ImageView image;
 	 }
-	 
-	 static class Cache
-	 {
-	 	//static SparseArray<Drawable> images = new SparseArray<Drawable>();
-	 	static Map<String, ContactItemListView> contacts = new HashMap<String, ContactItemListView>();
-	 	static Map<String, Drawable> images = new HashMap<String, Drawable>();
-	 }
-	 
 
 }

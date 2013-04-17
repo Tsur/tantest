@@ -62,4 +62,36 @@
 	<string name="act_test_text3">¡Aún no tenemos tests con esa configuración, inténtalo mas tarde!</string>
 	<string name="act_test_text4">Tiempo acabado</string>
 	<string name="act_test_text5">Calificación:</string>
+	<string name="act_test_text6">¿Quieres revisar el test antes de compartirlo?</string>
+	<string name="act_test_text7">Si</string>
+	<string name="act_test_text8">No.</string>
+	
+	<string name="act_test_grade_text1">Bueno, esto es bochornoso</string>
+	<string name="act_test_grade_text2">Vaya, esta vez no ha podido ser &#8230;</string>
+	<string name="act_test_grade_text3">Nada mal, ¡sigue así!</string>
+	<string name="act_test_grade_text4">Impresionante, y recuerda: siempre hay alguno nuevo que aprender</string>
+	<string name="act_test_grade_text5">Calificación:</string>
+	<string name="act_test_grade_text6">Total preguntas:</string>
+	<string name="act_test_grade_text7">Preguntas acertadas:</string>
+	<string name="act_test_grade_text8">Preguntas falladas:</string>
+	<string name="act_test_grade_text9">Grado dificultad:</string>
+	<string name="act_test_grade_text10">Tiempo máximo:</string>
+	<string name="act_test_grade_text11">Calificacion:</string>
+	<string name="act_test_grade_text12">Base:</string>
+	<string name="act_test_grade_text13">Puntos ganados:</string>
+	<string name="act_test_grade_text14">Bajo</string>
+	<string name="act_test_grade_text15">Medio</string>
+	<string name="act_test_grade_text16">Alto</string>
+	<string name="act_test_grade_text17">Avanzado</string>
+	<string name="act_test_grade_text18">minutos</string>
+	<string name="act_test_grade_text19">Anuncialo a tus contactos</string>
+	<string name="act_test_grade_text20">Enviar</string>
+	<string name="act_test_grade_text21">Test en Tantest</string>
+	<string name="act_test_grade_text22">He obtenido una calificación de %1$s en Tantest. Aquí el test en detalle: %2$s</string>
+	<string name="act_test_grade_text23">minuto</string>
+	<string name="act_test_grade_text24">¡Acabo de terminar un test!, echa un vistazo a los resultados:\n\nCalificación: %1$s\nTotal preguntas: %2$s; Acertadas: %3$s; Falladas: %4$s\nDificultad: %5$s\nTiempo máximo: %6$s; Tiempo empleado: %7$s</string>
+	<string name="act_test_grade_text25">Tiempo empleado:</string>
+	<string name="act_test_grade_text26">¡Acabo de terminar un test!, echa un vistazo a los resultados:\n\nCalificación: %1$s\nTotal preguntas: %2$s; Acertadas: %3$s; Falladas: %4$s\nDificultad: %5$s\nTiempo máximo: Ilimitado</string>
+	
+	
 </resources>

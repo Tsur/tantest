@@ -131,14 +131,6 @@ public class MainActivity extends Activity
 				
 				Cursor cursor = db.rawQuery("SELECT value FROM options WHERE key=0", null);
 				
-				/*while (cursor.moveToNext()) 
-				{
-					for (int i=0; i<cursor.getColumnCount(); i++) 
-					{
-						  String var1 = cursor.getString(i);
-					}
-				}*/
-				
 				if(cursor.getCount() > 0)
 				{
 					goHome(false);

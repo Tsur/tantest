@@ -1,17 +1,18 @@
 package com.scripturesos.tantest;
 
-import java.io.InputStream;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.Drawable;
@@ -44,21 +45,21 @@ public class HomeActivity extends Application {
 	private ProgressBar loader;
 	public static String client_id;
 	public static String country_id;
-	private String contacts_serialized;
-	
-	private ArrayList<String> chats = new ArrayList<String>();
 	private ListView chatsListView;
 	private Map<String,View> chatViews= new HashMap<String,View>();
-	private Map<String, ArrayList<ChatMessage>> chatMessages= new HashMap<String, ArrayList<ChatMessage>>();
 	private String current_client;
 	private RelativeLayout chatContainer;
 	private RelativeLayout chatActions;
 	private EditText sender;
-	
 	private IOSocket server;
+	public static Drawable default_dr;
 	
-	private static Drawable default_dr;
-	
+	private ArrayList<IOMessage> messages_offine = new ArrayList<IOMessage>();
+	private HashMap<String, ArrayList<ChatMessage>> chatMessages = new HashMap<String, ArrayList<ChatMessage>>();
+	private ArrayList<String> chats = new ArrayList<String>();
+	private String contacts_serialized;
+	private boolean canSave = false;
+		
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -71,30 +72,9 @@ public class HomeActivity extends Application {
 		loader = (ProgressBar) findViewById(R.id.home_progressbar);
 		
 		handler = new HomeActivityHandler(this);
-		
-		chatContainer = (RelativeLayout) findViewById(R.id.act_home_container);
-		chatActions = (RelativeLayout) findViewById(R.id.act_home_chat_actions);
-		sender = (EditText) findViewById(R.id.act_home_chat_input);
-		
-		chatsListView = (ListView) findViewById(R.id.act_home_lv);
-		chatsListView.setAdapter(new ContactListAdapter(HomeActivity.this, chats));
-		chatsListView.setOnItemClickListener(new OnItemClickListener()
-		{
-				@Override 
-				public void onItemClick(AdapterView<?> adapter, View view, int position, long arg3)
-			    { 
-					chatsListView.setVisibility(View.GONE);
-					
-					ContactItemListView contact = ContactListAdapter.Cache.contacts.get(((ContactListAdapter) chatsListView.getAdapter()).getContacts().get(position));
-
-					current_client = contact.getID();
-					
-					makeChatVisible();
-			    }
-		});
-		
+	
 		default_dr = getResources().getDrawable(R.drawable.profile);
-				
+		
 		(new Thread() {
 		    
 			public void run() 
@@ -114,6 +94,62 @@ public class HomeActivity extends Application {
 					
 					country_id = cursor.getString(0);
 					
+					ContactUtil.createAgenda(HomeActivity.this, client_id, country_id);
+
+					/*while(cursor.moveToNext())
+					{
+						
+					}*/
+					try 
+					{
+						if(cursor.moveToNext())
+						{
+							Log.i("tantest","Tenemos chat messages");
+							
+							chatMessages = (HashMap<String, ArrayList<ChatMessage>>) HttpUtil.fromString(cursor.getString(0));
+							
+							if(cursor.moveToNext())
+							{
+								Log.i("tantest","Tenemos chats");
+								chats = (ArrayList<String>) HttpUtil.fromString(cursor.getString(0));
+							}
+
+							if(chats.size() > 0)
+							{
+								Log.i("tantest","tamaño mayor que uno");
+								
+								String scontacts = "[";
+								
+								for(String contact: chats)
+								{
+									scontacts += "\""+contact+"\",";
+									Log.i("tantest","Contacto en chats: "+contact);
+								}
+								
+								scontacts = scontacts.substring(0, scontacts.length()-1);
+								
+								scontacts += "]";
+								
+								Log.i("tantest","Contacto server: "+scontacts);
+								
+								ContactUtil.createContacts(scontacts);
+								
+								initChatViews();
+							}
+
+							if(cursor.moveToNext())
+							{
+								Log.i("tantest","Tenemos messages offine");
+								messages_offine = (ArrayList<IOMessage>) HttpUtil.fromString(cursor.getString(0));
+							}
+						}
+						
+					}
+					catch (Exception e) 
+					{
+						
+					}
+					
 					cursor.close();
 					
 					db.close();
@@ -122,16 +158,81 @@ public class HomeActivity extends Application {
 					Log.i("tantest","country: "+country_id);
 					
 				}
-				
-				/*server = new IOSocket(client_id, new MessageCallback() {
+
+				server = new IOSocket(client_id, new MessageCallback() {
 					  
 					  @Override
 					  public void onConnect() 
 					  {
-					    // Handle events
+						  // Handle events
 						  Log.i("tantest","Conectado");
 						  
-						  //Miramops base de datos para mensjaes que no se hayan enviado
+						  //Crear lista temporal primero y luego borrar para tener
+						  //mensajes que aun fallen
+						  (new Thread(){
+							  
+							  public void run() 
+							  {
+								  if(!messages_offine.isEmpty())
+								  {
+									  ArrayList<IOMessage> messages_offine_temp = new ArrayList<IOMessage>();
+								  
+									  for(IOMessage message: messages_offine)
+									  {
+										  messages_offine_temp.add(message);
+									  }
+									  
+									  messages_offine.clear();
+									  
+									  for(IOMessage message: messages_offine_temp)
+									  {
+										  server.send(message);  
+									  }
+									  
+									  messages_offine_temp.clear();
+									  messages_offine_temp = null;
+								  }
+								  
+								  //Miramops base de datos para mensjaes que no se hayan enviado
+								  JSONObject response;
+								  
+								  try 
+								  {
+									  response = HttpUtil.post(HttpUtil.GET_UNCHEKED_MSG,new String[]{client_id});
+									
+									  JSONArray unconfirmed = response.getJSONArray("response");
+									  
+									  for(int c=0; c<unconfirmed.length(); c++)
+									  {
+										  handlerConfirmation(unconfirmed.getJSONObject(c));
+									  }
+									
+								  } 
+								  catch(Exception e) 
+								  {
+									
+								  }
+								  
+								  try 
+								  {
+									  response = HttpUtil.post(HttpUtil.GET_UNREAD_MSG,new String[]{client_id});
+									
+									  JSONArray unread = response.getJSONArray("response");
+									  
+									  for(int r=0; r<unread.length(); r++)
+									  {
+										  handlerReceivedMessage(unread.getJSONObject(r));
+									  }
+									
+								  } 
+								  catch(Exception e) 
+								  {
+									
+								  }
+
+							  }
+							  
+						  }).start();
 					  }
 					  
 					  @Override
@@ -149,8 +250,7 @@ public class HomeActivity extends Application {
 					  
 					  @Override
 					  public void onMessage(IOMessage msg) 
-					  {
-						  Log.i("tantest","Recibimos mensaje del servidor");						  
+					  {						  
 						  final IOMessage message = msg;
 						  
 						  (new Thread(){
@@ -161,16 +261,18 @@ public class HomeActivity extends Application {
 									  
 									  switch(message.getType())
 									  {
-									  	case IOMessage.CHAT_MESSAGE:
-									  		handlerMSG.what = 0;
-									  		handlerMSG.obj = message.getMessageData();
-									  		handler.sendMessage(handlerMSG);
-									  		break;
-									  	case IOMessage.CHAT_CONFIRMATION:
-									  		handlerMSG.what = 1;
-									  		handlerMSG.obj = message.getMessageData();
-									  		handler.sendMessage(handlerMSG);
-									  		break;
+										  	case MessageCallback.CHAT_MESSAGE:
+										  		Log.i("tantest","Recibimos mensaje del servidor");
+										  		handlerMSG.what = 0;
+										  		handlerMSG.obj = message.getMessageData();
+										  		handler.sendMessage(handlerMSG);
+										  		break;
+										  	case MessageCallback.CHAT_CONFIRMATION:
+										  		Log.i("tantest","Recibimos CONfirmacion del servidor");
+										  		handlerMSG.what = 1;
+										  		handlerMSG.obj = message.getMessageData();
+										  		handler.sendMessage(handlerMSG);
+										  		break;
 									  }	
 							   }
 							  
@@ -181,19 +283,28 @@ public class HomeActivity extends Application {
 					  @Override
 					  public void onMessageFailure(IOMessage msg) 
 					  {
-					    
 						  Log.i("tantest","No hemos podido enviar mensaje al servidor");
+						  messages_offine.add(msg);
 					  }
 					}, true);
 				
 	
-				server.connect();*/
+				//server.connect();
 				
 				//Segun lo que sea, mostrar mensaje o mostrar listView
-				Message msg = new Message();
-				msg.what = 3;
-				handler.sendMessage(msg);	
-				
+				if(chats.size() > 0)
+				{
+					Message msg = new Message();
+					msg.what = 6;
+					handler.sendMessage(msg);
+				}
+				else
+				{
+					Message msg = new Message();
+					msg.what = 3;
+					handler.sendMessage(msg);	
+				}
+
 		    }
 		}).start();
 	}
@@ -211,29 +322,69 @@ public class HomeActivity extends Application {
     {
     	Log.i("tantest","RESUME HOM ACTIVITY");
     	
-    	if(loader != null)
+    	/*if(loader != null)
 		{
     		loader.setVisibility(View.GONE);
-		}
+		}*/
     	
     	super.onResume();
     }
     
 	@Override
-	protected void onDestroy() 
+	protected void onPause() 
 	{
+		//server.close();
+		super.onPause();
 		
-		server.close();
-		
-		super.onDestroy();
-	}
-	
-	public void changeText(View view)
-	{
-		TextView text = (TextView) findViewById(R.id.home_text);
-		
-		text.setText("BOTON HA SIDO PULSADO");
-		
+		Log.i("tantest", "On Pause");
+		if(canSave)
+		{
+			Log.i("tantest", "Saving");
+			
+			//Actualizar base de datos
+			(new Thread(){
+				
+				public void run()
+				{
+					canSave = false;
+					
+					try 
+					{
+						SQLiteDatabase dbw = DatabaseHelper.getInstance(getApplicationContext()).getWritableDatabase();
+					
+						synchronized(chatMessages)
+						{
+							if(chatMessages.size() > 0)
+							{
+								dbw.execSQL("INSERT INTO options (key, value) VALUES (2,\""+HttpUtil.toString(chatMessages)+"\")");
+								
+								synchronized(chats)
+								{
+									dbw.execSQL("INSERT INTO options (key, value) VALUES (3,\""+HttpUtil.toString(chats)+"\")");
+								
+									synchronized(messages_offine)
+									{
+										if(messages_offine.size() > 0)
+										{
+											dbw.execSQL("INSERT INTO options (key, value) VALUES (4,\""+HttpUtil.toString(messages_offine)+"\")");
+										}
+									}
+									
+								}
+							}
+						}
+					
+						dbw.close();
+					
+					} 
+					catch (Exception e) 
+					{
+						canSave = true;
+					}
+				}
+				
+			}).start();
+		}
 	}
 	
     // Alternative variant for API 5 and higher
@@ -254,9 +405,84 @@ public class HomeActivity extends Application {
     		moveTaskToBack(true);
     		//super.onBackPressed();
     	}
-    	
     }
 	
+    public void init()
+    {
+    	chatContainer = (RelativeLayout) findViewById(R.id.act_home_container);
+		chatActions = (RelativeLayout) findViewById(R.id.act_home_chat_actions);
+		sender = (EditText) findViewById(R.id.act_home_chat_input);
+		
+		chatsListView = (ListView) findViewById(R.id.act_home_lv);
+		chatsListView.setAdapter(new ContactListAdapter(HomeActivity.this, chats));
+		chatsListView.setOnItemClickListener(new OnItemClickListener()
+		{
+				@Override 
+				public void onItemClick(AdapterView<?> adapter, View view, int position, long arg3)
+			    { 
+					chatsListView.setVisibility(View.GONE);
+					
+					ContactItemListView contact = ContactUtil.Cache.contacts.get(((ContactListAdapter) chatsListView.getAdapter()).getContacts().get(position));
+
+					current_client = contact.getID();
+					
+					makeChatVisible();
+			    }
+		});
+
+    }
+    
+    public void initChatViews()
+    {
+    	LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		View chatView;
+		ContactItemListView contactlv;
+		ListView lv;
+		ArrayList<ChatMessage> lcm;
+		ArrayList<String> chats_temp = new ArrayList<String>();
+		
+		for(String contact: chats)
+		{
+			chatView = inflater.inflate(R.layout.chat, null);
+			
+			if(ContactUtil.Cache.contacts.get(contact) == null)
+	        {
+				continue;
+	        }
+			else
+			{
+				contactlv = ContactUtil.Cache.contacts.get(contact);
+			}
+			
+			((ImageView) chatView.findViewById(R.id.chat_img)).setImageDrawable(ContactUtil.Cache.images.get(contact));
+            
+			//((TextView) header.findViewById(R.id.chat_lv_name)).setText(contact.getName());
+            ((TextView) chatView.findViewById(R.id.chat_status)).setText(contactlv.getStatus());
+            ((TextView) chatView.findViewById(R.id.chat_points)).setText(contactlv.getPoints());
+
+            lv = (ListView) chatView.findViewById(R.id.chat_lv);
+            
+            lcm = chatMessages.get(contact);
+            
+            if(lcm == null)
+            {
+            	lcm = new ArrayList<ChatMessage>();			
+            	chatMessages.put(contact,lcm);
+            }
+            
+            lv.setAdapter(new MessageListAdapter(HomeActivity.this,lcm));
+            
+			chatViews.put(contact, chatView);
+			chats_temp.add(contact);
+		}
+		
+		if(chats.size() != chats_temp.size())
+		{
+			chats = chats_temp;
+		}
+		
+    }
+    
     public void showContacts(View v)
     {
     	Intent cintent = new Intent(this, ContactsActivity.class);
@@ -275,15 +501,11 @@ public class HomeActivity extends Application {
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
 		
-		loader.setVisibility(View.VISIBLE);
-		loader.setIndeterminate(true);
-		
 		switch(item.getItemId())
 		{
 			case R.id.menu_header_test:
 				
 				//Mostramos ajax cargando
-				
 				Log.i("tantes","creando actividad");
 				Intent tintent = new Intent(this, TestOptionsActivity.class);
 				startActivityForResult(tintent,1);
@@ -352,9 +574,27 @@ public class HomeActivity extends Application {
                 	{
                 		Intent tintent = new Intent(this, TestActivity.class);
         				tintent.putExtras(b);
-        				startActivity(tintent);
+        				startActivityForResult(tintent,2);
                 	}
-
+                }
+            	break;
+            	
+            case 2:
+            	if (resultCode == RESULT_OK) 
+                {  
+                	Bundle b = data.getExtras();
+                	Log.i("tantest","recibimos datos de TestActiviy");
+                	try 
+                	{
+						createChat(b.getString("chat"), null);
+						ComposeSentCustomMessage(b.getString("test"), true);
+						
+                		//shareTest((TestGrade)HttpUtil.fromString(b.getString("test")));
+					} 
+                	catch (Exception e) 
+                	{
+                		Log.i("tantest","ShareTest Exception");
+					}    	
                 }
             	break;
                
@@ -362,12 +602,20 @@ public class HomeActivity extends Application {
         
     }
 	
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) 
+    {
+        super.onConfigurationChanged(newConfig);
+    }
+	
 	public void createChat(String contact, final String[] options)
 	{
-		//Si existe simplemente mostramos vista del chat
+		//Ocultamos y luego mostraremos al volver atras
+		chatsListView.setVisibility(View.GONE);
+		
 		if(chats.contains(contact))
 		{
-			chatsListView.setVisibility(View.GONE);
+			//chatsListView.setVisibility(View.GONE);
 			current_client = contact;
 			makeChatVisible();
 			
@@ -378,7 +626,7 @@ public class HomeActivity extends Application {
 		}
 		else
 		{
-			chatsListView.setVisibility(View.GONE);
+			//chatsListView.setVisibility(View.GONE);
 			
 			TextView no_chats = (TextView) findViewById(R.id.home_text);
 			no_chats.setVisibility(View.GONE);
@@ -401,10 +649,10 @@ public class HomeActivity extends Application {
 					
 					ContactItemListView contact = null;
 					
-					if(ContactListAdapter.Cache.contacts.get(current_client) == null)
+					if(ContactUtil.Cache.contacts.get(current_client) == null)
 			        {
 						
-						try {
+						/*try {
 							
 							JSONObject jsonContact = HttpUtil.post(HttpUtil.GET_CONTACTS,new String[]{"[\""+current_client+"\"]"});
 						
@@ -428,15 +676,16 @@ public class HomeActivity extends Application {
 							Log.i("tantest","error es "+ e.getMessage());
 							Log.i("tantest",e.toString());
 							ContactListAdapter.Cache.images.put(current_client, HomeActivity.default_dr);
-						}
+						}*/
+						ContactUtil.createContacts("[\""+current_client+"\"]");
 
 			        }
 					else
 					{
-						contact = ContactListAdapter.Cache.contacts.get(current_client);
+						contact = ContactUtil.Cache.contacts.get(current_client);
 					}
 					 
-					((ImageView) chatView.findViewById(R.id.chat_img)).setImageDrawable(ContactListAdapter.Cache.images.get(current_client));
+					((ImageView) chatView.findViewById(R.id.chat_img)).setImageDrawable(ContactUtil.Cache.images.get(current_client));
 		            
 					//((TextView) header.findViewById(R.id.chat_lv_name)).setText(contact.getName());
 		            ((TextView) chatView.findViewById(R.id.chat_status)).setText(contact.getStatus());
@@ -450,18 +699,6 @@ public class HomeActivity extends Application {
 		            
 					chatViews.put(current_client, chatView);
 					chatMessages.put(current_client,lcm);
-					
-					//Actualizar base de datos
-					SQLiteDatabase dbw = DatabaseHelper.getInstance(getApplicationContext()).getWritableDatabase();
-					
-					try 
-					{
-						dbw.execSQL("INSERT INTO options (key, value) VALUES (2,'"+HttpUtil.toString(chats)+"')");
-					} 
-					catch (Exception e) 
-					{
-						
-					}
 					
 					Message msg = new Message();
 					
@@ -505,13 +742,15 @@ public class HomeActivity extends Application {
         
 		switch(msg.what) 
         {
-        	case 0: 
+        	case 0:
         		handlerReceivedMessage((JSONObject) msg.obj);break;//ifError("Tenemos algunos problemillas... pero tu sonrie que Dios te ama");break;
-        	case 1: 
+        	case 1:
         		handlerConfirmation((JSONObject) msg.obj);break;//ifError("Revise su conexión a Internet y sonrie que Dios te ama");break;
         	case 2: 
-        		ifError("Tenemos algunos problemillas... pero tu sonrie que Dios te ama");break;
+        		ifError("Tenemos algunos problemillas... pero tu sonrie que Dios te ama");
+        		break;
         	case 3: 
+        		init();
         		TextView no_chats = (TextView) findViewById(R.id.home_text);
         		no_chats.setVisibility(View.VISIBLE);
         		loader.setVisibility(View.GONE);
@@ -519,6 +758,7 @@ public class HomeActivity extends Application {
         	case 4:
         		//RelativeLayout r = (RelativeLayout) findViewById(R.id.act_home_container);
         		//r.addView((LinearLayout) msg.obj);
+        		canSave = true;
         		((ContactListAdapter)chatsListView.getAdapter()).notifyDataSetChanged();
         		makeChatVisible();
         		break;
@@ -530,7 +770,13 @@ public class HomeActivity extends Application {
         		String[] options = (String[])msg.obj;
         		composeReceivedMessage(options[0],options[1]);
         		break;
-        	default:break;
+        	case 6: 
+        		init();
+        		chatsListView.setVisibility(View.VISIBLE);
+        		loader.setVisibility(View.GONE);
+        		break;
+        	default:
+        		break;
         }
     }
 	
@@ -569,7 +815,37 @@ public class HomeActivity extends Application {
 	
 	public void handlerConfirmation(JSONObject response)
 	{
-		
+		try 
+		{
+			String from = response.getString("from");
+			String id = response.getString("message_id");
+			
+			if(chatMessages.containsKey(from))
+			{
+				ArrayList<ChatMessage> lcm = chatMessages.get(from);
+				
+				for(ChatMessage cm : lcm)
+				{
+					if(cm.id.equals(id))
+					{
+						Log.i("tantest","confirmacion identificada");
+						cm.confirmed = true;
+						canSave = true;
+						break;
+					}
+				}
+				
+				Log.i("tantest","actualizando");
+				ListView lv = (ListView) chatViews.get(current_client).findViewById(R.id.chat_lv);
+				((MessageListAdapter)lv.getAdapter()).notifyDataSetChanged();
+			}
+			
+		} 
+		catch (JSONException e) 
+		{
+			
+		}
+
 	}
 	
 	public void makeChatVisible()
@@ -586,69 +862,85 @@ public class HomeActivity extends Application {
 	public void composeReceivedMessage(String message, final String message_id)
 	{
 
+		Log.i("tantest", "mensaje recibido: "+ message);
+		canSave = true;
+		
 		ListView lv = (ListView) chatViews.get(current_client).findViewById(R.id.chat_lv);
 		
-		chatMessages.get(current_client).add(new ChatMessage(true, message));
+		if(message_id.endsWith("_root"))
+		{
+			chatMessages.get(current_client).add(new ChatMessage(true, message, true, message_id));
 
+		}
+		else
+		{
+			chatMessages.get(current_client).add(new ChatMessage(true, message, false, message_id));
+
+		}
+		
 		((MessageListAdapter)lv.getAdapter()).notifyDataSetChanged();
 		
-		/*(new Thread(){
+		(new Thread(){
 		    
 			public void run() 
 			{
 				//Guarda en base de datos
 				
 				//Envia mensaje al otro usuario
-				ClientSocket.getInstance().sendConfirmation(message_id, current_client);
+				Log.i("tantest","Envio confirmacion");
+				server.send(MessageCallback.CHAT_CONFIRMATION, current_client, message_id, client_id);
 		   }
-		}).start();*/
+		}).start();
 		
 	}
 	
 	public void ComposeSentMessage(View view)
 	{
-		
-		final String message = sender.getText().toString();
+		ComposeSentCustomMessage(sender.getText().toString(), false);
+	}
+	
+	public void ComposeSentCustomMessage(String message, boolean root)
+	{
 		
 		if(!message.equals(""))
 		{
-
-			ListView lv = (ListView) chatViews.get(current_client).findViewById(R.id.chat_lv);
-	
+			canSave = true;
 			
-			chatMessages.get(current_client).add(new ChatMessage(false, message ));
+			ListView lv = (ListView) chatViews.get(current_client).findViewById(R.id.chat_lv);
+			
+			String id = UUID.randomUUID().toString();
+			
+			if(root)
+			{
+				 id += "_root";
+			}
+			
+			chatMessages.get(current_client).add(new ChatMessage(false, message, root, id));
 			//((ContactListAdapter)chatsListView.getAdapter()).add(contact);
 			((MessageListAdapter)lv.getAdapter()).notifyDataSetChanged();
 			
 			sender.setText("");
-			
-			//message = null;
-			
-			/*
-			myListView.post(new Runnable() {
-		        @Override
-		        public void run() {
-		            // Select the last row so it will scroll into view...
-		            myListView.setSelection(myListAdapter.getCount() - 1);
-		        }
-		    });
-			*/
 			
 			(new Thread(){
 			    
 				public void run() 
 				{
 					//Guarda en base de datos chatMessages
+					int last = chatMessages.get(current_client).size() -1;
 					
-					String message_id = UUID.randomUUID().toString();
+					//Cuidado si envio mas de uno muy rapido puede haber error con last
+					ChatMessage cm = chatMessages.get(current_client).get(last);
 					
+					//String message_id = UUID.randomUUID().toString();
+					Log.i("tantest", "mensaje enviado: "+ StringEscapeUtils.escapeJava(cm.message));
 					//Cuidado!! mirar cuando usuairo envia mensaje que contiene caracteres raros como comillas
-					server.send(IOMessage.CHAT_MESSAGE, current_client, message, message_id);
+					server.send(MessageCallback.CHAT_MESSAGE, current_client, StringEscapeUtils.escapeJava(cm.message), cm.id);
 				}
 				
 			}).start();
 		
 		}
 	}
+	
 
 }

@@ -13,10 +13,7 @@
 	        android:layout_width="match_parent"
 	        android:layout_height="wrap_content"
 	        android:background="@color/trans_gray"
-	        android:paddingBottom="30dp"
-	        android:paddingLeft="50dp"
-	        android:paddingRight="50dp"
-	        android:paddingTop="30dp" >
+	        android:padding="30dp" >
     	
 	    	<TextView
 	    	    android:id="@+id/act_test_opt1_text"
@@ -95,10 +92,7 @@
 		    android:layout_width="match_parent"
 		    android:layout_height="wrap_content"
 		    android:background="@color/trans_white"
-		    android:paddingBottom="30dp"
-		    android:paddingLeft="50dp"
-		    android:paddingRight="50dp"
-		    android:paddingTop="30dp" >
+		    android:padding="30dp" >
 
 		    <TextView
 		        android:id="@+id/act_test_opt2_text"
@@ -178,10 +172,7 @@
 		    android:layout_width="match_parent"
 		    android:layout_height="wrap_content"
 		    android:background="@color/trans_gray"
-		    android:paddingBottom="30dp"
-		    android:paddingLeft="50dp"
-		    android:paddingRight="50dp"
-		    android:paddingTop="30dp" >
+		    android:padding="30dp" >
 			    
 		    <TextView
 		        android:id="@+id/act_test_opt3_text"
@@ -251,10 +242,7 @@
 		    android:layout_width="match_parent"
 		    android:layout_height="wrap_content"
 		    android:background="@color/trans_white"
-		    android:paddingBottom="30dp"
-		    android:paddingLeft="50dp"
-		    android:paddingRight="50dp"
-		    android:paddingTop="30dp" >
+		    android:padding="30dp" >
 
 		    <TextView
 		        android:id="@+id/act_test_opt4_text"

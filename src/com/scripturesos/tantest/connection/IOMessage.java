@@ -1,24 +1,30 @@
 package com.scripturesos.tantest.connection;
 
+import java.io.Serializable;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class IOMessage {
+public class IOMessage implements Serializable{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	//Special cases
-	public static final int ERROR = 0;
+	/*public static final int ERROR = 0;
 	public static final int DISCONNECT = 1;
 	public static final int HEARTBEAT = 2;
-	public static final int EVENT = 3;
+	public static final int EVENT = 3;*/
 	
 	//Message cases
-	public static final int CHAT_MESSAGE = 10;
+	/*public static final int CHAT_MESSAGE = 10;
 	public static final int CHAT_CONFIRMATION = 11;
-	public static final int CHAT_ROOT = 12;
+	public static final int CHAT_ROOT = 12;*/
 	
 	
 	private int type;
-	private JSONObject messageData;
+	private transient JSONObject messageData;
 	private String packet;
 	
 	public IOMessage(){}
@@ -65,10 +71,10 @@ public class IOMessage {
 		
 		switch(this.getType())
 		{
-			case CHAT_MESSAGE:
+			case MessageCallback.CHAT_MESSAGE:
 				packet ="{\"method\":\"sendMsg\",\"arguments\":[";
 				break;
-			case CHAT_CONFIRMATION:
+			case MessageCallback.CHAT_CONFIRMATION:
 				packet ="{\"method\":\"confirmMsg\",\"arguments\":[";
 				break;
 		}

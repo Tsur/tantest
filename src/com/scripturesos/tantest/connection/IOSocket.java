@@ -21,7 +21,7 @@ public class IOSocket {
 	
 	private int heartTimeout = 5000;//5 s
 	private int connectTimeout = 10000;// 10s
-	private int reconnectTime = 150 * 1000; // 2m y medio
+	private int reconnectTime = 90 * 1000; // 1m y medio ; 2m y medio = 150*1000
 	private int intervalResponse = 800;//close to 1s
 	private Timer timer;
 	
@@ -90,6 +90,32 @@ public class IOSocket {
 		
 		message.setPacket(arg);
 		
+		synchronized(this)
+		{
+			if(connected)
+			{
+				if(message.isSet())
+				{
+					Log.i("tantest"," mensaje: "+message.getPacket());
+					out.write(message.getPacket());
+					out.flush();
+				}
+				else
+				{
+					callback.onMessageFailure(message); 
+				}
+				
+			}
+			else
+			{
+				callback.onMessageFailure(message); 
+			}
+		}
+			
+	}
+	
+	public void send(IOMessage message)
+	{
 		synchronized(this)
 		{
 			if(connected)
@@ -339,24 +365,24 @@ public class IOSocket {
         			
         				switch (message.getType()) 
             			{			
-            				case IOMessage.HEARTBEAT:
+            				case MessageCallback.HEARTBEAT:
             					clearTimer();
             					out.write("{\"method\":\"heartbeat\"}");
             					out.flush();
             					setTimer(new CloseTask(), heartTimeout);
             					break;
             			
-            				case IOMessage.CHAT_MESSAGE:
-            				case IOMessage.CHAT_CONFIRMATION:
+            				case MessageCallback.CHAT_MESSAGE:
+            				case MessageCallback.CHAT_CONFIRMATION:
             					callback.onMessage(message);
             					break;
             			
-            				case IOMessage.EVENT:
+            				case MessageCallback.EVENT:
             			
             					break;
 
-            				case IOMessage.ERROR:
-            				case IOMessage.DISCONNECT:
+            				case MessageCallback.ERROR:
+            				case MessageCallback.DISCONNECT:
             					//TODO
             					break;
             			}

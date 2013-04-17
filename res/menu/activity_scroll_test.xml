@@ -10,6 +10,7 @@
      <item android:id="@+id/test_menu_header_grade"
           android:icon="@drawable/ic_menu_header_result"
           android:title="@string/test_menu_header_grade"
+          android:visible="false"
           android:showAsAction="ifRoom" />
 
 </menu>

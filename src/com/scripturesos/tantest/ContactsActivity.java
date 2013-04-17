@@ -1,48 +1,24 @@
 package com.scripturesos.tantest;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import a_vcard.android.syncml.pim.PropertyNode;
-import a_vcard.android.syncml.pim.VDataBuilder;
-import a_vcard.android.syncml.pim.VNode;
-import a_vcard.android.syncml.pim.vcard.VCardException;
-import a_vcard.android.syncml.pim.vcard.VCardParser;
 import android.content.ActivityNotFoundException;
-import android.content.ContentResolver;
 import android.content.Intent;
-import android.database.Cursor;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.provider.ContactsContract;
-import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.AdapterView.OnItemClickListener;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
@@ -54,7 +30,7 @@ public class ContactsActivity extends Application {
 	//TextView debug;
 	private ListView contactsListView;
 	private ProgressBar progress;
-	private Map<String,String> phonesList;
+	//private Map<String,String> phonesList;
 	//private ArrayList<ContactItemListView> contactItems;
 	
 	@SuppressWarnings("unchecked")
@@ -138,7 +114,8 @@ public class ContactsActivity extends Application {
 	 */
 	private void getContacts()
 	{
-		ContentResolver cr = getContentResolver();
+		ContactUtil.createAgenda(this, HomeActivity.client_id, HomeActivity.country_id);
+		/*ContentResolver cr = getContentResolver();
 		 
 		Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
 		
@@ -180,20 +157,7 @@ public class ContactsActivity extends Application {
 					
 					Log.i("tantest",number);
 					phonesList.put("\""+number+"\"",name);
-	
-					/*int type = phones.getInt(phones.getColumnIndex(Phone.TYPE));
-					
-					switch (type) {
-			                case Phone.TYPE_HOME:
-			                    // do something with the Home number here...
-			                    break;
-			                case Phone.TYPE_MOBILE:
-			                    // do something with the Mobile number here...
-			                    break;
-			                case Phone.TYPE_WORK:
-			                    // do something with the Work number here...
-			                    break;
-			    	}*/
+
 				}
 				
 			    phones.close();
@@ -208,19 +172,24 @@ public class ContactsActivity extends Application {
 		if(phonesList.containsKey("\""+HomeActivity.client_id+"\""))
 		{
 			phonesList.remove("\""+HomeActivity.client_id+"\"");
-		}
+		}*/
 		
 		
 		//Conectamos con el servidor y mandamos telefonos
-		if(phonesList.size() > 0)
+		//if(phonesList.size() > 0)
+		if(ContactUtil.Cache.agenda.size() > 0)
 		{
 			
 			try 
 			{
 				Message msg = new Message();
 				msg.what = 0;
-				msg.obj = HttpUtil.post(HttpUtil.GET_CONTACTS,new String[]{phonesList.keySet().toString()});
+				msg.obj = ContactUtil.createContacts(ContactUtil.Cache.agenda.keySet().toString());
 				handler.sendMessage(msg);
+				/*Message msg = new Message();
+				msg.what = 0;
+				msg.obj = HttpUtil.post(HttpUtil.GET_CONTACTS,new String[]{phonesList.keySet().toString()});
+				handler.sendMessage(msg);*/
 			}
 			catch (Exception e) 
 			{
@@ -229,8 +198,7 @@ public class ContactsActivity extends Application {
 				msg.what = 12;
 				handler.sendMessage(msg);
 			}
-			
-			
+
 		}
 		else
 		{
@@ -273,7 +241,6 @@ public class ContactsActivity extends Application {
 	    {
 	        // The reason for the existence of aFileChooser
 	    }
-        
 
 	}
 	
@@ -309,81 +276,16 @@ public class ContactsActivity extends Application {
         					// Create a File from this Uri
         		            File file = FileUtils.getFile(uri);
         		            
-        					//Read the file
-        					BufferedReader reader = new BufferedReader(new InputStreamReader(
-        			                new FileInputStream(file), "UTF-8"));
+        					ContactUtil.createAgendaFromVCard(file, HomeActivity.client_id, HomeActivity.country_id);
         			        
-        			        String vcardString = "";
-        			        
-        			        String line;
-        			        
-        			        while ((line = reader.readLine()) != null) 
-        			        {
-        			            vcardString += line + "\n";
-        			        }
-        			        
-        			        reader.close();
-        			        
-        			        Log.i("tantest", "File readed");
-        			        
-        			        VCardParser parser = new VCardParser();
-        			        VDataBuilder builder = new VDataBuilder();
-        			        
-        			      //parse the string
-        			        boolean parsed = parser.parse(vcardString, "UTF-8", builder);
-        			        
-        			        if(!parsed) 
-        			        {
-        			        	Log.i("tantest", "Could not parse vCard file: ");
-        			        	return;
-        			        }
-
-        			        Log.i("tantest", "File parsed");
-        			        
-        			        //get all parsed contacts
-        			        List<VNode> contacts = builder.vNodeList;
-
-        			        //do something for all the contacts
-        			        for (VNode contact : contacts) 
-        			        {
-        			            ArrayList<PropertyNode> props = contact.propList;
-
-        			            //contact name - FN property
-        			            String name = null;
-        			            String phone = null;
-        			            
-        			            for(PropertyNode prop : props) 
-        			            {
-        			                if("FN".equals(prop.propName)) 
-        			                {
-        			                    name = prop.propValue;
-        			                    
-        			                }
-        			                
-        			                if ("TEL".equals(prop.propName)) 
-        			                {
-        			                    phone = prop.propValue.replace("-", "");
-        			                    break;
-        			                }
-        			            }
-
-        			            //similarly for other properties (N, ORG, TEL, etc)
-        			            if(name != null && phone != null)
-        			            {
-        			            	phonesList.put(phone,name);
-        			            	Log.i("tantest", "Name: " + name);
-            			            Log.i("tantest", "phone: " + phone);
-        			            }
-        			            
-        			        }
-        			        
-        			        if(phonesList.size() > 0)
+        					if(ContactUtil.Cache.agenda.size() > 0)
         					{
-        			        	Message msg = new Message();
-        						msg.what = 0;
-        						msg.obj = HttpUtil.post(HttpUtil.GET_CONTACTS,new String[]{phonesList.keySet().toString()});
-        						handler.sendMessage(msg);
         						
+        						Message msg = new Message();
+        						msg.what = 0;
+        						msg.obj = ContactUtil.createContacts(ContactUtil.Cache.agenda.keySet().toString());
+        						handler.sendMessage(msg);
+
         					}
         					else
         					{
@@ -392,21 +294,10 @@ public class ContactsActivity extends Application {
         						msg.what = 10;
         						handler.sendMessage(msg);
         					}
+
         				} 
-        				catch (UnsupportedEncodingException e) {
-        					// TODO Auto-generated catch block
-        					e.printStackTrace();
-        				} catch (FileNotFoundException e) {
-        					// TODO Auto-generated catch block
-        					e.printStackTrace();
-        				} catch (IOException e) {
-        					// TODO Auto-generated catch block
-        					e.printStackTrace();
-        				} catch (VCardException e) {
-        					// TODO Auto-generated catch block
-        					e.printStackTrace();
-        				} catch (JSONException e) {
-							// TODO Auto-generated catch block
+        				catch(Exception e) 
+        				{
 							e.printStackTrace();
 						}
         		    }
@@ -444,7 +335,7 @@ public class ContactsActivity extends Application {
 	    super.onBackPressed();
 	}*/
 	
-	public void makeContactsList(JSONObject serverContacts)
+	/*public void makeContactsList(JSONObject serverContacts)
 	{
 
 		//ArrayList<ContactItemListView> contactItems = new ArrayList<ContactItemListView>();
@@ -469,7 +360,7 @@ public class ContactsActivity extends Application {
 				    
 					public void run() 
 					{
-						
+						 
 						 ArrayList<String> contactItems = new ArrayList<String>();
 				 		 JSONObject jsonContact;
 				 		 String id = null;
@@ -513,12 +404,6 @@ public class ContactsActivity extends Application {
 										}
 
 									}
-								
-									/*HttpURLConnection connection = (HttpURLConnection)new URL(contact.getImg()).openConnection();
-								    connection.setRequestProperty("User-agent","Mozilla/4.0");
-	
-								    connection.connect();
-								    InputStream input = connection.getInputStream();*/
 
 								} 
 								catch (Exception e) 
@@ -543,7 +428,7 @@ public class ContactsActivity extends Application {
 			e.printStackTrace();
 		}
 	
-	}
+	}*/
 	
 	public void displayContactsList(ArrayList<String> contactItems)
 	{
@@ -564,7 +449,7 @@ public class ContactsActivity extends Application {
 			    
 			    Bundle bundle = new Bundle();
 				
-				ContactItemListView contact = ContactListAdapter.Cache.contacts.get(((ContactListAdapter) contactsListView.getAdapter()).getContacts().get(position));
+				ContactItemListView contact = ContactUtil.Cache.contacts.get(((ContactListAdapter) contactsListView.getAdapter()).getContacts().get(position));
 				//bundle.putString("chat", HttpUtil.toString(contact));
 				Log.i("tantest", "ID en listView"+  contact.getID());
 				
@@ -623,11 +508,22 @@ public class ContactsActivity extends Application {
 	{
         switch(msg.what) 
         {
-        	case 0: makeContactsList((JSONObject)msg.obj);break;
-        	case 10: displayNoAgenda("El fichero importado no contiene información suficiente. Por favor, utilize otro");break;
-        	case 11: displayNoAgenda(getString(R.string.contacts_no_agenda_import));break;
+        	//case 0: makeContactsList((JSONObject)msg.obj);break;
+        	case 0:
+        		ArrayList<String> contacts = (ArrayList<String>)msg.obj;
+        		if(contacts.size() == 0)
+    			{
+    				displayNoAgenda("Ninguno de tus contactos utiliza tantest, qué pena ...");
+    			}
+        		else
+        		{
+        			displayContactsList(contacts);
+        		}
+        		break;
+        	case 10: displayNoAgenda(getString(R.string.contacts_no_agenda_import));break;
+        	case 11: displayNoAgenda(getString(R.string.contacts_no_agenda));break;
         	case 12: ifError("Inténtalo de nuevo más tarde por favor");
-        	case 3: displayContactsList((ArrayList<String>)msg.obj);break;
+        	//case 3: displayContactsList((ArrayList<String>)msg.obj);break;
             default:break;
         }
     }
@@ -662,7 +558,7 @@ public class ContactsActivity extends Application {
 		    
 		    setResult(RESULT_OK, mIntent);
 		    
-		    finish();
+		    //finish();
     	}
     	
     	super.onBackPressed();

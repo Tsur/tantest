@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -70,7 +71,7 @@ public class MessageListAdapter extends BaseAdapter
 			holder = new ViewHolder();
             holder.message =(TextView) vi.findViewById(R.id.chat_message);
             holder.container =(LinearLayout) vi.findViewById(R.id.chat_wrapper);
-            
+            holder.confirmed = (ImageView) vi.findViewById(R.id.chat_message_img);
             //Save holder
             vi.setTag(holder);
 		}
@@ -96,10 +97,30 @@ public class MessageListAdapter extends BaseAdapter
 			holder.container.setLayoutParams(rlp);*/
 			holder.container.setGravity(Gravity.RIGHT);
 			holder.message.setBackgroundResource(R.drawable.rbubble);
-		}
+			holder.message.setPadding(15, 5, 15, 20);
 
-		//TextView name = (TextView) vi.findViewById(R.id.contacts_lv_name);
+		}
+		
+		if(cm.root)
+		{
+			holder.message.setBackgroundResource(R.drawable.rootbubble);
+			holder.message.setPadding(35, 30, 30, 30);
+		}
+		
 		holder.message.setText(cm.message); 
+
+		if(cm.confirmed)
+		{
+			holder.confirmed.setVisibility(View.VISIBLE);
+			holder.confirmed.setBackgroundResource(R.drawable.msg_confirmed);
+			holder.message.setPadding(40, 15, 15, 20);
+		}
+		else
+		{
+			holder.confirmed.setVisibility(View.GONE);
+		}
+		//TextView name = (TextView) vi.findViewById(R.id.contacts_lv_name);
+		
 		
 		return vi;
 	  }
@@ -108,6 +129,7 @@ public class MessageListAdapter extends BaseAdapter
 	 {
 	        TextView message;
 	        LinearLayout container;
+	        ImageView confirmed;
 	 }
 	 
 

@@ -2,14 +2,20 @@ package com.scripturesos.tantest;
 
 import java.io.IOException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.Set;
 
+import org.apache.http.client.ClientProtocolException;
 import org.json.JSONException;
+import org.json.JSONObject;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -72,6 +78,8 @@ public class TestActivity extends Application {
 	private boolean finishingTimerControl = false;
 	private CountDownTimer timeCounter;
 	private boolean testGraded = false;
+	private double calification;
+	private MenuItem item;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -176,17 +184,86 @@ public class TestActivity extends Application {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getSupportMenuInflater().inflate(R.menu.activity_scroll_test, menu);
+		item = menu.findItem(R.id.test_menu_header_grade);
 		return true;
 	}
+	
+	@Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) 
+	{
+        super.onActivityResult(requestCode, resultCode, data);
+        
+        switch(requestCode) 
+        {
+            case 0:      
+            if (resultCode == RESULT_OK) 
+            {  
+            	Bundle b = data.getExtras();
+
+            	if(b.containsKey("chat") && b.containsKey("test"))
+            	{
+            		//Mandamos a HomeActivity que mande mensaje e inicie chat
+            		
+    			    //HomeActivity.this.handler.post();
+        		
+    			    //shareTest((TestGrade)HttpUtil.fromString(b.getString("test")),(ContactItemListView)HttpUtil.fromString(b.getString("chat")));
+            		Intent mIntent = new Intent();
+    			    
+    			    Bundle bundle = new Bundle();
+    				
+    				bundle.putString("chat", b.getString("chat"));
+    				bundle.putString("test", b.getString("test"));
+    				
+    				mIntent.putExtras(bundle);
+    			    
+    			    setResult(RESULT_OK, mIntent);
+    			    
+            		//ifError(getString(R.string.act_test_text6));
+    			    
+    			    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+    			        @Override
+    			        public void onClick(DialogInterface dialog, int which) {
+
+    			        	switch(which)
+    			        	{
+	    			            case DialogInterface.BUTTON_POSITIVE:
+	    			                
+	    			                break;
+	
+	    			            case DialogInterface.BUTTON_NEGATIVE:
+	    			                finish();
+	    			                break;
+    			            }
+    			        }
+    			    };
+
+    			    (new AlertDialog.Builder(this))
+    			    .setMessage(R.string.act_test_text6)
+    			    .setPositiveButton(R.string.act_test_text7, dialogClickListener)
+    			    .setNegativeButton(R.string.act_test_text8, dialogClickListener)
+    			    .setCancelable(false)
+    			    .show();
+            	}
+            }
+            break;
+               
+        }
+        
+    }
+	
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) 
+    {
+        super.onConfigurationChanged(newConfig);
+    }
 
 	public boolean onOptionsItemSelected(MenuItem item)
 	{
 		
-		
 		switch(item.getItemId())
 		{
 			case R.id.test_menu_header_grade:
-				item.setVisible(false);
+				//item.setVisible(false);
 				gradeTest();
 				break;
 			default:
@@ -206,7 +283,6 @@ public class TestActivity extends Application {
 		    @Override
 		    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 		        
-		    	
 		    	seekbarText.setText(String.valueOf((progress/100)+1));
 		        //seekBarValue.setText(String.valueOf(progress));
 		    }
@@ -454,6 +530,11 @@ public class TestActivity extends Application {
 		gotoQuestion(test.getFirstQuestion());
 		((RelativeLayout) findViewById(R.id.act_test_nav)).setVisibility(View.VISIBLE);
 		
+		if(item != null)
+		{
+			item.setVisible(true);
+		}
+		
 		if(time != null && time > 0)
 		{
 			View v = getSupportActionBar().getCustomView();
@@ -506,23 +587,62 @@ public class TestActivity extends Application {
 		//Ocultamos para que el usuario no pueda modificar el test mientras se corrige
 		((RelativeLayout) findViewById(R.id.act_test_nav)).setVisibility(View.GONE);
 		questionsContainer.setVisibility(View.GONE);
+		questionsContainer.removeAllViews();
 		
 		progress.setVisibility(View.VISIBLE);
-
+		
+		if(item != null)
+		{
+			item.setVisible(false);
+		}
+		
 		(new Thread() {
 		    
 			public void run() 
 			{
+				String realTime = null;
 				
 				if(timeCounter != null)
 				{
 					//Parar tiempo
 					timeCounter.cancel();
+					timer.clearAnimation();
+					
+					try 
+					{
+						Date realTimemili = timer_formatter.parse(timer.getText().toString());
+						realTime = timer_formatter.format(new Date((tc.time*60*1000) - realTimemili.getTime()));
+				
+					}
+					catch (ParseException e) 
+					{
+						realTime = null;
+					}
 				}
 				
 				TestGrade tg = test.grade(10);
 				
-				tg.setPoints(tc.difficulty, tc.time);
+				tg.setPoints(tc.difficulty, tc.time, realTime);
+				
+				//HTML START
+
+				try 
+				{
+					String html = test.toHTML(tg);
+
+					JSONObject response = HttpUtil.post(HttpUtil.REGISTER_TEST, new String[]{html});
+					
+					tg.setUrl(response.getString("response"));
+										
+					Log.i("tantest","URL: "+tg.getUrl()); 
+					
+				}
+				catch(Exception e) 
+				{
+					//Log.i("tantest","e: "+e);
+				}
+
+				//HTML END		
 				
 				TestQuestion tq;
 				
@@ -606,7 +726,13 @@ public class TestActivity extends Application {
     	
     	if(testGraded)
     	{
-    		progress.setVisibility(View.GONE);
+    		
+    		View v = getSupportActionBar().getCustomView();
+			TextView calificationTxt = (TextView) v.findViewById(R.id.main_actionbar_textTitle);
+			calificationTxt.setTypeface(fontText);
+			calificationTxt.setText(getString(R.string.act_test_text5)+" "+String.valueOf(calification));
+    		
+			progress.setVisibility(View.GONE);
     		((RelativeLayout) findViewById(R.id.act_test_nav)).setVisibility(View.VISIBLE);
     		questionsContainer.setVisibility(View.VISIBLE);
     		firstQuestion(null);
@@ -639,11 +765,7 @@ public class TestActivity extends Application {
         	case 1:
         		
         		TestGrade tg = (TestGrade) msg.obj;
-        		
-        		View v = getSupportActionBar().getCustomView();
-    			TextView calification = (TextView) v.findViewById(R.id.main_actionbar_textTitle);
-    			calification.setTypeface(fontText);
-    			calification.setText(getString(R.string.act_test_text5)+" "+String.valueOf(tg.getCalification()));
+        		calification = tg.getCalification();
 
         		Intent intent = new Intent(this, TestGradeActivity.class);
 
@@ -657,9 +779,8 @@ public class TestActivity extends Application {
 				{
 					
 				}
-
-				startActivity(intent);
 				testGraded = true;
+				startActivityForResult(intent,0);
         		break;
         	case 10:
         		progress.setVisibility(View.GONE);

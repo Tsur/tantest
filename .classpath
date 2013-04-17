@@ -8,5 +8,6 @@
 	<classpathentry kind="lib" path="libs/libphonenumber-5.4.jar"/>
 	<classpathentry kind="lib" path="libs/android-vcard.jar"/>
 	<classpathentry kind="lib" path="libs/httpmime-4.0.1.jar"/>
+	<classpathentry kind="lib" path="libs/commons-lang3-3.1.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

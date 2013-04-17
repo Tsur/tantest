@@ -28,5 +28,7 @@ public interface Test
 	public int getPrevQuestion();
 	public int getFirstQuestion();
 	public int getLastQuestion();
+	
+	public String toHTML(TestGrade tg);
 
 }

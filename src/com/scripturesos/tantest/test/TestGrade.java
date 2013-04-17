@@ -3,6 +3,8 @@ package com.scripturesos.tantest.test;
 import java.io.Serializable;
 import java.text.DecimalFormat;
 
+import com.scripturesos.tantest.R;
+
 public class TestGrade implements Serializable{
 
 	/**
@@ -15,6 +17,10 @@ public class TestGrade implements Serializable{
 	private int totalQuestions;
 	private int points;
 	private int total;
+	private int difficulty;
+	private int time;
+	private String realTime;
+	private String url="";
 	
 	public TestGrade(){}
 	
@@ -60,8 +66,30 @@ public class TestGrade implements Serializable{
 		return base;
 	}
 	
-	public void setPoints(int difficulty, int time)
+	public void setPoints(int difficulty, int time, String realTime)
 	{
+		switch(difficulty)
+		{
+			case 0:
+				this.difficulty = R.string.act_test_grade_text14;
+				break;
+			case 1:
+				this.difficulty = R.string.act_test_grade_text15;
+				break;
+			case 2:
+				this.difficulty = R.string.act_test_grade_text16;
+				break;
+			case 3:
+				this.difficulty = R.string.act_test_grade_text17;
+				break;
+			default:break;
+		}
+		
+		//this.difficulty = difficulty;
+		this.time = time;
+		
+		this.realTime = realTime;
+		
 		//Si aprueba ->Suma puntos con respecto a la dificultad
 		if(calification >= 5)
 		{
@@ -107,6 +135,26 @@ public class TestGrade implements Serializable{
 		return points;
 	}
 	
+	public int getDifficulty()
+	{
+		return difficulty;
+	}
+	
+	public int getTime()
+	{
+		return time;
+	}
+	
+	public String getRealTime()
+	{
+		return realTime;
+	}
+	
+	public String getUrl()
+	{
+		return url;
+	}
+	
 	public int getTotalQuestions()
 	{
 		return total;
@@ -121,6 +169,11 @@ public class TestGrade implements Serializable{
 				String.valueOf(calification)+
 				"@"+
 				String.valueOf(totalQuestions);
+	}
+	
+	public void setUrl(String url)
+	{
+		this.url = url;
 	}
 	
 }

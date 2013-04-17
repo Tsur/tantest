@@ -55,5 +55,4 @@ public class TestBible extends AbstractTest implements Test{
 		
 		return grade;
 	}
-
 }

@@ -1,6 +1,7 @@
 package com.scripturesos.tantest.test;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -8,6 +9,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.util.Log;
 import android.util.SparseArray;
 
 public class AbstractTest
@@ -149,6 +151,143 @@ public class AbstractTest
 	{
 		// TODO Auto-generated method stub
 		return URL;
+	}
+	
+	public String toHTML(TestGrade tg)
+	{
+		String html = "<div><p id=\"calification\">Calificación: "+tg.getCalification()+"</p>";
+		
+		html += "<p id=\"total_questions\">Total preguntas: "+tg.getTotalQuestions()+"</p>";
+		html += "<p id=\"questions_right\">Preguntas acertadas: "+tg.numQuestionsOK()+"</p>";
+		html += "<p id=\"questions_wrong\">Preguntas falladas: "+(tg.getTotalQuestions()-tg.numQuestionsOK())+"</p>";
+		
+		switch(tg.getDifficulty())
+		{
+			case 0:
+				html += "<p id=\"difficulty\">Grado dificultad: Bajo</p>";
+				break;
+			case 1:
+				html += "<p id=\"difficulty\">Grado dificultad: Medio</p>";
+				break;
+			case 2:
+				html += "<p id=\"difficulty\">Grado dificultad: Alto</p>";
+				break;
+			case 3:
+				html += "<p id=\"difficulty\">Grado dificultad: Avanzado</p>";
+				break;
+		}
+			
+		if(tg.getTime() == 0)
+		{
+			html += "<p id=\"time\">Tiempo: Sin Tiempo</p>";
+		}
+		else
+		{
+			html += "<p id=\"time\">Tiempo máximo: "+tg.getTime()+(tg.getTime() > 1 ? " minutos" : " minuto")+"</p>";
+			html += "<p id=\"time_used\">Tiempo empleado: "+tg.getRealTime()+"</p>";
+		}
+		
+		html += "<p id=\"points\">Puntos: "+tg.getPoints()+"</p>";
+		
+		html += "</div>";
+		
+		int pos = 0;
+		String user_sol;
+		Set<String> user_sol_set = new HashSet<String>();
+		
+		for(TestQuestion question: questions)
+		{
+			TestSolution ts = userSolutions.get(pos);
+			pos++;
+			user_sol = "";
+			user_sol_set.clear();
+			
+			html += "<div class=\"questions\">";
+			html += "<p class=\"title\">"+question.getTitle()+"</p>";
+			html += "<p class=\"description\">"+question.getDescription()+"</p>";
+			html += "<div class=\"answers\">";
+			
+			if(question instanceof TestQuestionRadio)
+			{
+				String solution = (String)question.getSolution().getSolutionADT();
+				
+				if(ts != null)
+				{
+					user_sol = (String) ts.getSolutionADT();
+				}
+				
+				for(String answer: question.getAnswers())
+				{
+					if(answer.equals(solution))
+					{
+						if(answer.equals(user_sol))
+						{
+							html += "<p class=\"solution selected\">"+answer+"</p>";
+						}
+						else
+						{
+							html += "<p class=\"solution\">"+answer+"</p>";
+						}
+					}
+					else
+					{
+						if(answer.equals(user_sol))
+						{
+							html += "<p class=\"selected\">"+answer+"</p>";
+						}
+						else
+						{
+							html += "<p>"+answer+"</p>";
+						}
+					}
+				}
+				
+				html += "</div>";
+			}
+			else
+			{
+				@SuppressWarnings("unchecked")
+				Set<String> solution = (Set<String>)question.getSolution().getSolutionADT();
+				
+				if(ts != null)
+				{
+					user_sol_set = (Set<String>)ts.getSolutionADT();
+				}
+				
+				for(String answer: question.getAnswers())
+				{
+					if(solution.contains(answer))
+					{
+						if(user_sol_set.contains(answer))
+						{
+							html += "<p class=\"solution selected\">"+answer+"</p>";
+						}
+						else
+						{
+							html += "<p class=\"solution\">"+answer+"</p>";
+						}
+					}
+					else
+					{
+						if(user_sol_set.contains(answer))
+						{
+							html += "<p class=\"selected\">"+answer+"</p>";
+						}
+						else
+						{
+							html += "<p>"+answer+"</p>";
+						}
+					}
+					
+				}
+				
+				html += "</div>";
+			}
+			
+			html += "</div>";
+		}
+
+		return html;
 	}
 
 }

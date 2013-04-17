@@ -11,6 +11,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,12 +26,18 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.*;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.scripturesos.tantest.ContactItemListView;
+import com.scripturesos.tantest.ContactListAdapter;
+import com.scripturesos.tantest.HomeActivity;
+
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 
 public final class HttpUtil {
@@ -130,23 +137,36 @@ public final class HttpUtil {
     	// Create a new HTTP Client
     	String url="";
    	    HttpPost httppost = null;
+   	    List<NameValuePair> params;
    	    
    	    switch(method)
    	    {
    	    	case GET_CONTACTS:
    	    		
-   			url = "getContacts";
-   			httppost = new HttpPost(BASE_URL+url);
-   			
-   			List<NameValuePair> params = new ArrayList<NameValuePair>();
-   			params.add(new BasicNameValuePair("contacts", data[0]));
-   			
-   			// Request parameters and other properties.
-   	    	httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+	   			url = "getContacts";
+	   			httppost = new HttpPost(BASE_URL+url);
+	   			
+	   			params = new ArrayList<NameValuePair>();
+	   			params.add(new BasicNameValuePair("contacts", data[0]));
+	   			
+	   			// Request parameters and other properties.
+	   	    	httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
    	    	
    			break;
    			
-			
+   	    	case REGISTER_TEST:
+   	    		
+   	   			url = "registerTest";
+   	   			httppost = new HttpPost(BASE_URL+url);
+   	   			
+   	   			params = new ArrayList<NameValuePair>();
+   	   			params.add(new BasicNameValuePair("html", data[0]));
+   	   			
+   	   			// Request parameters and other properties.
+   	   	    	httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+   	   	    	
+   	   			break;
+   	   			
    			default:break;
    	    }
    	    
@@ -290,4 +310,5 @@ public final class HttpUtil {
     public static final int GET_UNCHEKED_MSG 	= 6;
     public static final int CREATE_FRIEND 		= 7;
     public static final int UPLOAD_FILE 		= 8;
+    public static final int REGISTER_TEST 		= 9;
 }
