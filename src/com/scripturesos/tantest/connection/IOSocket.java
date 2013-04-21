@@ -374,6 +374,12 @@ public class IOSocket {
             			
             				case MessageCallback.CHAT_MESSAGE:
             				case MessageCallback.CHAT_CONFIRMATION:
+            				case MessageCallback.CHAT_HAS_GONE:
+            				case MessageCallback.CHAT_HAS_CHANGED:
+            				case MessageCallback.CHAT_IN_TEST:
+            				case MessageCallback.CHAT_IS_WRITING:
+            				case MessageCallback.CHAT_ONLINE:
+            				case MessageCallback.CHAT_ROOT:
             					callback.onMessage(message);
             					break;
             			

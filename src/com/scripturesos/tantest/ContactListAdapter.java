@@ -102,6 +102,7 @@ public class ContactListAdapter extends BaseAdapter
 		holder.points.setText(contact.getPoints());
 	    
 		return vi;
+		
 	  }
 	
 	 class ViewHolder

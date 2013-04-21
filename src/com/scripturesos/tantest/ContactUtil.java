@@ -232,14 +232,29 @@ public class ContactUtil
 	        	
 	        	try 
 				{
-	        		ccontact = new ContactItemListView(
-        				id,
-						jsonContact.getString("photo"),
-						jsonContact.getString("name").equals("") ? name : jsonContact.getString("name"),
-						//name,
-						jsonContact.getString("status"), 
-						jsonContact.getString("points")
-					);
+	        		if(ContactUtil.Cache.contacts.get(id) != null)
+	        		{
+	        			ccontact = new ContactItemListView(
+	            				id,
+	    						jsonContact.getString("photo"),
+	    						jsonContact.getString("name").equals("") ? name : jsonContact.getString("name"),
+	    						//name,
+	    						jsonContact.getString("status"), 
+	    						jsonContact.getString("points"),
+	    						ContactUtil.Cache.contacts.get(id).getLastDate()
+	    					);
+	        		}
+	        		else
+	        		{
+	        			ccontact = new ContactItemListView(
+	            				id,
+	    						jsonContact.getString("photo"),
+	    						jsonContact.getString("name").equals("") ? name : jsonContact.getString("name"),
+	    						//name,
+	    						jsonContact.getString("status"), 
+	    						jsonContact.getString("points")
+	    					);
+	        		}
 	        		
 	        		contactItems.add(id);
 	        		
@@ -261,6 +276,36 @@ public class ContactUtil
     	return contactItems;
     }
 	
+    public static boolean updateContactImg(String contact, String url)
+    {
+
+    	ContactItemListView ccontact = ContactUtil.Cache.contacts.get(contact);
+    	
+    	try 
+		{
+    		if(ccontact != null)
+    		{
+    			ccontact.setImg(url);
+    			
+    		}
+    		else
+    		{
+    			return false;
+    		}
+    		
+    		ContactUtil.Cache.contacts.put(contact,ccontact);
+			InputStream ins = (InputStream) new URL(ccontact.getImg()).getContent();
+			ContactUtil.Cache.images.put(contact, Drawable.createFromStream(ins, null));
+			
+			return true;
+		}
+    	catch(Exception e)
+    	{
+    		return false;
+    	}
+
+    }
+    
 	 static public class Cache
 	 {
 	 	//static SparseArray<Drawable> images = new SparseArray<Drawable>();

@@ -47,6 +47,7 @@ import android.widget.Toast;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.scripturesos.tantest.connection.HttpUtil;
+import com.scripturesos.tantest.connection.MessageCallback;
 import com.scripturesos.tantest.test.Test;
 import com.scripturesos.tantest.test.TestConfiguration;
 import com.scripturesos.tantest.test.TestException;
@@ -122,6 +123,8 @@ public class TestActivity extends Application {
 					tc = new TestConfiguration();
 				}
 
+				HomeActivity.server.send(MessageCallback.CHAT_IN_TEST);
+				
 				test = TestFactory.createTest(String.valueOf(tc.category));
 
 				Message msg = new Message();
@@ -309,6 +312,7 @@ public class TestActivity extends Application {
 		OnCheckedChangeListener occl = new OnCheckedChangeListener()
 		{
 
+			@SuppressWarnings("unchecked")
 			@Override
 			public void onCheckedChanged(CompoundButton checkbox,boolean checked)
 			{
@@ -640,13 +644,15 @@ public class TestActivity extends Application {
 
 				try 
 				{
-					String html = test.toHTML(tg);
+					//String html = test.toHTML(tg);
 
-					JSONObject response = HttpUtil.post(HttpUtil.REGISTER_TEST, new String[]{html});
+					tg.setHTML(test.toHTML(tg));
 					
-					tg.setUrl(response.getString("response"));
+					//JSONObject response = HttpUtil.post(HttpUtil.REGISTER_TEST, new String[]{html});
+					
+					//tg.setUrl(response.getString("response"));
 										
-					Log.i("tantest","URL: "+tg.getUrl()); 
+					//Log.i("tantest","URL: "+tg.getUrl()); 
 					
 				}
 				catch(Exception e) 

@@ -9,7 +9,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.util.Log;
 import android.util.SparseArray;
 
 public class AbstractTest
@@ -153,6 +152,7 @@ public class AbstractTest
 		return URL;
 	}
 	
+	@SuppressWarnings("unchecked")
 	public String toHTML(TestGrade tg)
 	{
 		String html = "<div><p id=\"calification\">Calificación: "+tg.getCalification()+"</p>";
@@ -250,7 +250,6 @@ public class AbstractTest
 			}
 			else
 			{
-				@SuppressWarnings("unchecked")
 				Set<String> solution = (Set<String>)question.getSolution().getSolutionADT();
 				
 				if(ts != null)

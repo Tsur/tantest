@@ -1,6 +1,0 @@
-default=com.scripturesos.tantest.test.TestBible
-0=com.scripturesos.tantest.test.TestBible
-1=com.scripturesos.tantest.test.TestHistory
-2=com.scripturesos.tantest.test.TestGeo
-3=com.scripturesos.tantest.test.TestLaw
-4=com.scripturesos.tantest.test.TestMath

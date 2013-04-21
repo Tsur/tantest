@@ -7,6 +7,7 @@ import java.util.Map;
 
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -108,6 +109,12 @@ public class ContactsActivity extends Application {
 		
 		return true;
 	}
+	
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) 
+    {
+        super.onConfigurationChanged(newConfig);
+    }
 	
 	/*
 	 * Obtenemos contactos de la Agenda

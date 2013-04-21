@@ -18,4 +18,10 @@ public interface MessageCallback {
 	public static final int CHAT_MESSAGE = 10;
 	public static final int CHAT_CONFIRMATION = 11;
 	public static final int CHAT_ROOT = 12;
+	public static final int CHAT_HAS_GONE = 13;
+	public static final int CHAT_HAS_CHANGED = 14;
+	public static final int CHAT_IS_WRITING = 15;
+	public static final int CHAT_IN_TEST = 16;
+	public static final int CHAT_ONLINE = 17;
+	public static final int CHAT_CREATE = 18;
 }

@@ -2,28 +2,38 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/chat_wrapper"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content" >
+    android:layout_height="wrap_content"
+    android:paddingBottom="5dp"
+    android:paddingTop="5dp" >
  
-   	   	<RelativeLayout
-   	    	android:layout_width="wrap_content"
-   	    	android:layout_height="wrap_content"
-   	    	android:layout_margin="10dp" >
+   	   	<LinearLayout
+   	   	    android:id="@+id/chat_view"
+   	   	    android:layout_width="wrap_content"
+   	   	    android:layout_height="wrap_content"
+   	   	    android:layout_marginLeft="5dp"
+   	   	    android:layout_marginRight="5dp"
+   	   	    android:orientation="vertical" >
    	    
 	   	    <TextView
 	   	        android:id="@+id/chat_message"
 	   	        android:layout_width="wrap_content"
 	   	        android:layout_height="wrap_content"
+	   	        android:layout_gravity="center_vertical"
+	   	        android:layout_marginRight="20dp"
 	   	        android:gravity="center_vertical"
 	   	        android:textColor="@color/black"
-	   	        android:textSize="15sp"
-	   	        android:textStyle="bold" />
+	   	        android:textIsSelectable="false"
+	   	        android:textSize="15sp" />
 
-	   	    <ImageView
-	   	        android:id="@+id/chat_message_img"
-	   	        android:layout_width="15dp"
-	   	        android:layout_height="15dp"
-	   	        android:layout_margin="5dp" />
+	   	    <TextView
+	   	        android:id="@+id/chat_info"
+	   	        android:layout_width="wrap_content"
+	   	        android:layout_height="wrap_content"
+	   	        android:layout_marginTop="5dp"
+	   	        android:textColor="@color/gray_strong"
+	   	        android:textIsSelectable="false"
+	   	        android:textSize="12sp" />
    	    
-   		</RelativeLayout>
+   		</LinearLayout>
    	
 </LinearLayout>

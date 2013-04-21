@@ -1,6 +1,10 @@
 package com.scripturesos.tantest;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 import android.app.Activity;
 import android.content.Context;
@@ -9,21 +13,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
-//import android.util.SparseArray;
-
 
 public class MessageListAdapter extends BaseAdapter
 {
 	
 	protected Activity activity;
 	protected ArrayList<ChatMessage> chatsMessages;
-	/*private RelativeLayout.LayoutParams rlp = new RelativeLayout.LayoutParams(
-	         RelativeLayout.LayoutParams.WRAP_CONTENT,
-	         RelativeLayout.LayoutParams.WRAP_CONTENT);*/
+	private DateFormat date = new SimpleDateFormat("HH:mm", Locale.getDefault());
 	
 	public MessageListAdapter(Activity activity, ArrayList<ChatMessage> chats) 
 	{
@@ -71,7 +69,8 @@ public class MessageListAdapter extends BaseAdapter
 			holder = new ViewHolder();
             holder.message =(TextView) vi.findViewById(R.id.chat_message);
             holder.container =(LinearLayout) vi.findViewById(R.id.chat_wrapper);
-            holder.confirmed = (ImageView) vi.findViewById(R.id.chat_message_img);
+            holder.chat =(LinearLayout) vi.findViewById(R.id.chat_view);
+            holder.info = (TextView) vi.findViewById(R.id.chat_info);
             //Save holder
             vi.setTag(holder);
 		}
@@ -88,39 +87,39 @@ public class MessageListAdapter extends BaseAdapter
 			/*rlp.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
 			holder.container.setLayoutParams(rlp);*/
 			holder.container.setGravity(Gravity.LEFT);
-			holder.message.setBackgroundResource(R.drawable.lbubble);
-			holder.message.setPadding(15, 20, 15, 10);
+			holder.chat.setBackgroundResource(R.drawable.leftbub);
 		}
 		else
 		{
 			/*rlp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
 			holder.container.setLayoutParams(rlp);*/
 			holder.container.setGravity(Gravity.RIGHT);
-			holder.message.setBackgroundResource(R.drawable.rbubble);
-			holder.message.setPadding(15, 5, 15, 20);
-
+			holder.chat.setBackgroundResource(R.drawable.rightbub);
+			
 		}
+		
+		holder.info.setText(date.format(new Date()));
 		
 		if(cm.root)
 		{
-			holder.message.setBackgroundResource(R.drawable.rootbubble);
-			holder.message.setPadding(35, 30, 30, 30);
+			holder.chat.setBackgroundResource(R.drawable.rootbub);
+			//holder.message.setPadding(35, 30, 30, 30);
 		}
 		
 		holder.message.setText(cm.message); 
 
 		if(cm.confirmed)
 		{
-			holder.confirmed.setVisibility(View.VISIBLE);
-			holder.confirmed.setBackgroundResource(R.drawable.msg_confirmed);
-			holder.message.setPadding(40, 15, 15, 20);
+			//&#x2713;
+			holder.info.setText(holder.info.getText() + " " + "✓");
+			//holder.confirmed.setBackgroundResource(R.drawable.msg_confirmed);
+			//holder.message.setPadding(40, 15, 15, 20);
 		}
-		else
+		/*else
 		{
-			holder.confirmed.setVisibility(View.GONE);
-		}
+			holder.info.setText("Enviado: " +date.format(new Date()));
+		}*/
 		//TextView name = (TextView) vi.findViewById(R.id.contacts_lv_name);
-		
 		
 		return vi;
 	  }
@@ -129,7 +128,8 @@ public class MessageListAdapter extends BaseAdapter
 	 {
 	        TextView message;
 	        LinearLayout container;
-	        ImageView confirmed;
+	        LinearLayout chat;
+	        TextView info;
 	 }
 	 
 

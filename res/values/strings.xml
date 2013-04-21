@@ -93,5 +93,8 @@
 	<string name="act_test_grade_text25">Tiempo empleado:</string>
 	<string name="act_test_grade_text26">¡Acabo de terminar un test!, echa un vistazo a los resultados:\n\nCalificación: %1$s\nTotal preguntas: %2$s; Acertadas: %3$s; Falladas: %4$s\nDificultad: %5$s\nTiempo máximo: Ilimitado</string>
 	
-	
+	<string name="act_home_notification">Nuevo Mensaje de</string>
+	<string name="chat_online">Conectado</string>
+	<string name="chat_writing">Escribiendo &#8230;</string>
+	<string name="chat_intest">Haciendo un Test &#8230;</string>
 </resources>

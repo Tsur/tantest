@@ -22,11 +22,24 @@ public class TestGrade implements Serializable{
 	private String realTime;
 	private String url="";
 	
+	
+	private String html="";
+	
 	public TestGrade(){}
 	
 	public void setBase(int base)
 	{
 		this.base = base;
+	}
+	
+	public void setHTML(String html)
+	{
+		this.html = html;
+	}
+	
+	public String getHTML()
+	{
+		return this.html;
 	}
 	
 	public void setCalification(double calification, int totalQuestions)

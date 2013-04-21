@@ -77,6 +77,24 @@ public class IOMessage implements Serializable{
 			case MessageCallback.CHAT_CONFIRMATION:
 				packet ="{\"method\":\"confirmMsg\",\"arguments\":[";
 				break;
+			case MessageCallback.CHAT_HAS_GONE:
+				packet ="{\"method\":\"hasGone\",\"arguments\":[";
+				break;
+			case MessageCallback.CHAT_ONLINE:
+				packet ="{\"method\":\"online\",\"arguments\":[";
+				break;
+			case MessageCallback.CHAT_HAS_CHANGED:
+				packet ="{\"method\":\"hasChanged\",\"arguments\":[";
+				break;
+			case MessageCallback.CHAT_IS_WRITING:
+				packet ="{\"method\":\"writing\",\"arguments\":[";
+				break;
+			case MessageCallback.CHAT_IN_TEST:
+				packet ="{\"method\":\"inTest\",\"arguments\":[";
+				break;
+			case MessageCallback.CHAT_CREATE:
+				packet ="{\"method\":\"initChat\",\"arguments\":[";
+				break;
 		}
 		
 		if(packet == null)

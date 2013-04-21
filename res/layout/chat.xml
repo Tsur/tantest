@@ -7,25 +7,39 @@
         android:id="@+id/chat_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/trans_white" >
+        android:background="@color/trans_white"
+        android:paddingBottom="3dp"
+        android:paddingTop="3dp" >
     	
 	  	<ImageView
 	  	    android:id="@+id/chat_img"
-	  	    android:layout_width="36dp"
-	  	    android:layout_height="36dp"
+	  	    android:layout_width="42dp"
+	  	    android:layout_height="42dp"
 	  	    android:layout_alignParentLeft="true"
 	  	    android:layout_alignParentTop="false"
-	  	    android:layout_centerVertical="true" />
+	  	    android:layout_centerVertical="true"
+	  	    android:layout_marginLeft="5dp" />
 	
+	  	<TextView
+	  	    android:id="@+id/chat_name"
+	  	    android:layout_width="wrap_content"
+	  	    android:layout_height="wrap_content"
+	  	    android:layout_centerVertical="false"
+	  	    android:layout_marginLeft="5dp"
+	  	    android:layout_marginTop="3dp"
+	  	    android:layout_toRightOf="@+id/chat_img"
+	  	    android:textSize="15sp"
+	  	    android:textStyle="bold" />
+	  	
 		<TextView
 		    android:id="@+id/chat_status"
 		    android:layout_width="wrap_content"
 		    android:layout_height="wrap_content"
+		    android:layout_below="@id/chat_name"
 		    android:layout_marginLeft="5dp"
 		    android:layout_toRightOf="@+id/chat_img"
-		    android:layout_centerVertical="true"
-		    android:textSize="15sp"
-		    android:textStyle="bold" />
+		    android:text="@string/chat_online"
+		    android:textSize="13sp" />
 	
 		<TextView
 		    android:id="@+id/chat_points"
@@ -51,7 +65,7 @@
    	    android:divider="@null"
    	    android:dividerHeight="0dp"
    	    android:listSelector="@android:color/transparent"
-   	    android:padding="10dp"
+   	    android:padding="5dp"
    	    android:scrollbars="none"
    	    android:smoothScrollbar="true"
    	    android:transcriptMode="alwaysScroll" />

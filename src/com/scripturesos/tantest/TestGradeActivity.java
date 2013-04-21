@@ -1,6 +1,6 @@
 package com.scripturesos.tantest;
 
-import java.io.IOException;
+import org.json.JSONObject;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.scripturesos.tantest.connection.HttpUtil;
+import com.scripturesos.tantest.connection.MessageCallback;
 import com.scripturesos.tantest.test.TestGrade;
 
 public class TestGradeActivity extends Application {
@@ -38,8 +39,17 @@ public class TestGradeActivity extends Application {
 			}
 			
 		    showResults();
+		    
+		    (new Thread(){
+			    
+				public void run() 
+				{
+					HomeActivity.server.send(MessageCallback.CHAT_HAS_CHANGED, "2", String.valueOf(tg.getPoints()));
+					
+			    }
+				
+			}).start();
 		}
-
 	}
 
 	@Override
@@ -63,11 +73,32 @@ public class TestGradeActivity extends Application {
 
 			case R.id.act_test_grade_menu_share:
 				
-				Intent i=new Intent(android.content.Intent.ACTION_SEND);
-				i.setType("text/plain");
-				i.putExtra(Intent.EXTRA_SUBJECT, R.string.act_test_grade_text21);
-				i.putExtra(Intent.EXTRA_TEXT, String.format(getString(R.string.act_test_grade_text22),tg.getCalification(),tg.getUrl()));
-				startActivity(i);
+				(new Thread(){
+				    
+					public void run() 
+					{
+						try 
+						{
+							JSONObject response = HttpUtil.post(HttpUtil.REGISTER_TEST, new String[]{tg.getHTML()});
+						
+							tg.setUrl(response.getString("response"));
+							
+							//tg.setUrl(response.getString("response"));
+							Intent i=new Intent(android.content.Intent.ACTION_SEND);
+							i.setType("text/plain");
+							i.putExtra(Intent.EXTRA_SUBJECT, R.string.act_test_grade_text21);
+							i.putExtra(Intent.EXTRA_TEXT, String.format(getString(R.string.act_test_grade_text22),tg.getCalification(),tg.getUrl()));
+							startActivity(i);
+						} 
+						catch (Exception e) 
+						{
+							Log.i("tantest","error generando test");
+						}
+					}
+					
+				}).start();
+				
+				
 				break;
 				
 			default:break;

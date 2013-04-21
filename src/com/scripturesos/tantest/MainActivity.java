@@ -1,6 +1,8 @@
 package com.scripturesos.tantest;
 
 
+import java.util.Locale;
+
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -213,7 +215,7 @@ public class MainActivity extends Activity
 		
 		try
 		{
-			abbr = tm.getSimCountryIso();
+			abbr = tm.getSimCountryIso().toUpperCase(Locale.getDefault());
 			Log.i("tantest","abbr: "+abbr);
 			
 			if(!abbr.equals(""))
@@ -542,29 +544,24 @@ public class MainActivity extends Activity
         	@Override
         	public void onReceive(Context arg0, Intent intent) 
         	{
-        		
-        		
+
         		switch (getResultCode())
         		{
                 	case Activity.RESULT_OK:
                 	
                 	info(getString(R.string.act_main_sms_validating),true);
                     break;
-                	/*case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-                    Toast.makeText(getBaseContext(), "Generic failure", 
-                            Toast.LENGTH_SHORT).show();
+                	case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
+                		 ifError("Fallo en la Red");
                     break;
                 	case SmsManager.RESULT_ERROR_NO_SERVICE:
-                    Toast.makeText(getBaseContext(), "No service", 
-                            Toast.LENGTH_SHORT).show();
+                		ifError("Red no disponible");
                     break;
-                	case SmsManager.RESULT_ERROR_NULL_PDU:
-                    Toast.makeText(getBaseContext(), "Null PDU", 
-                            Toast.LENGTH_SHORT).show();
+                	/*case SmsManager.RESULT_ERROR_NULL_PDU:
+                		ifError("Error PDU");
                     break;
                 	case SmsManager.RESULT_ERROR_RADIO_OFF:
-                    Toast.makeText(getBaseContext(), "Radio off", 
-                            Toast.LENGTH_SHORT).show();
+                		ifError("Radio esta apagado");
                     break;*/
                     default: ifError("Tu dispositivo no es compatible");break;
         		}

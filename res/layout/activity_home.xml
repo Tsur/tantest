@@ -6,60 +6,65 @@
     android:background="@drawable/wall3">
     
     <RelativeLayout
-        android:id="@+id/act_home_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginBottom="40dp"
-        android:background="@drawable/chatbg"
-        android:visibility="gone" >
-    
-    </RelativeLayout>
-    
-    <RelativeLayout
-        android:id="@+id/act_home_chat_actions"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_alignParentBottom="true"
-        android:background="@drawable/basic_input"
-        android:visibility="gone" >
-    
-        <EditText
-            android:id="@+id/act_home_chat_input"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginBottom="1dp"
-            android:layout_marginLeft="1dp"
-            android:layout_marginRight="40dp"
-            android:inputType="textMultiLine"
-            android:padding="5dp"
-            android:textColor="@color/black" />
-
-        <ImageButton
-            android:id="@+id/act_home_chat_input_send"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_alignParentRight="true"
-            android:layout_alignRight="@+id/act_home_chat_input"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="5dp"
-            android:background="@drawable/send_chat"
-            android:onClick="ComposeSentMessage" 
-            android:contentDescription="@string/act_home_chat_send"/>
-            
+         android:id="@+id/act_home_container"
+	     android:layout_width="match_parent"
+	     android:layout_height="match_parent"
+	     android:background="@drawable/chatbg"
+	     android:visibility="gone">
+	     
+	    <RelativeLayout
+	        android:id="@+id/act_home_chat_container"
+	        android:layout_width="match_parent"
+	        android:layout_height="match_parent"
+	        android:layout_marginBottom="40dp" >
+	    
+	    </RelativeLayout>
+	    
+	    <RelativeLayout
+	        android:id="@+id/act_home_chat_actions"
+	        android:layout_width="match_parent"
+	        android:layout_height="40dp"
+	        android:layout_alignParentBottom="true"
+	        android:background="@color/chat_gray" >
+	    
+	        <EditText
+	            android:id="@+id/act_home_chat_input"
+	            android:layout_width="match_parent"
+	            android:layout_height="40dp"
+	            android:layout_alignParentRight="true"
+	            android:layout_centerVertical="true"
+	            android:layout_marginBottom="1dp"
+	            android:layout_marginLeft="1dp"
+	            android:layout_marginRight="40dp"
+	            android:inputType="textMultiLine"
+	            android:padding="5dp"
+	            android:textColor="@color/black"
+	            android:textStyle="bold" />
+	
+	        <ImageButton
+	            android:id="@+id/act_home_chat_input_send"
+	            android:layout_width="30dp"
+	            android:layout_height="30dp"
+	            android:layout_alignParentRight="true"
+	            android:layout_alignRight="@+id/act_home_chat_input"
+	            android:layout_centerVertical="true"
+	            android:layout_marginRight="5dp"
+	            android:background="@drawable/test_options_right"
+	            android:onClick="ComposeSentMessage" 
+	            android:contentDescription="@string/act_home_chat_send"/>
+	            
+	    </RelativeLayout>
     </RelativeLayout>
     
 	<ListView
-         android:id="@+id/act_home_lv"
-         android:layout_width="match_parent"
-         android:layout_height="wrap_content"
-         android:background="@color/trans_white"
-         android:divider="@drawable/horizontal_line"
-         android:dividerHeight="2dp"
-         android:paddingLeft="5dp"
-         android:visibility="gone" />
-	
+	    android:id="@+id/act_home_lv"
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:background="@color/trans_white"
+	    android:divider="@drawable/horizontal_line"
+	    android:dividerHeight="2dp"
+	    android:paddingLeft="5dp"
+	    android:visibility="gone" />
 	
 	 <TextView
 	     android:id="@+id/home_text"

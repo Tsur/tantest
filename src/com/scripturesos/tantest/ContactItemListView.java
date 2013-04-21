@@ -1,6 +1,7 @@
 package com.scripturesos.tantest;
 
 import java.io.Serializable;
+import java.util.Date;
 
 
 public class ContactItemListView implements Serializable
@@ -15,7 +16,8 @@ public class ContactItemListView implements Serializable
 	protected String name;
 	protected String status;
 	protected String points;
-    
+	protected Date date;
+	
 	public ContactItemListView(String id, String image, String name, String status, String points)
 	{
 	    this.id = id;
@@ -24,13 +26,27 @@ public class ContactItemListView implements Serializable
 	    this.status = status;
 	    this.points = points;
 	}
+	
+	public ContactItemListView(String id, String image, String name, String status, String points, Date date)
+	{
+	    this.id = id;
+	    this.image = image;
+	    this.name = name;
+	    this.status = status;
+	    this.points = points;
+	    this.date= date;
+	}
      
 	public String getImg() 
 	{
 		return image;
 	}
+	
+	public void setImg(String image) 
+	{
+		this.image = image;
+	}
 
-     
 	public String getName()
 	{
 		return name;
@@ -46,9 +62,29 @@ public class ContactItemListView implements Serializable
 		return status;
 	}
 	
+	public void setStatus(String status)
+	{
+		this.status = status;
+	}
+	
 	public String getPoints()
 	{
 		return points;
+	}
+	
+	public void setPoints(String points)
+	{
+		this.points = points;
+	}
+	
+	public Date getLastDate()
+	{
+		return date;
+	}
+	
+	public void setLastDate(Date date)
+	{
+		this.date = date;
 	}
 
 }
