@@ -2,8 +2,6 @@
 Android Tantest Application
 ===========================
 
-[![Build Status](https://travis-ci.org/madhums/nodejs-express-mongoose-demo.png)](https://)
-
 (Note : Basically, the build status makes clear that this work has passed the build tests that are required in order for it to work as expected)
 
 ## What is Tantest?
@@ -31,6 +29,8 @@ devices as tablets, by registering an email.
 Then, once you have an account/phone registered, you can start a 1)new test or you can start a 2)new conversation. This can be achieved
 by touching the two small icons on the top-right corner of the device's screen respectively. Let's see each of them in detail.
 
+Building ...
+
 ![Title Image](http://)
 
 ## Instrucctions to generate the apk from sources
@@ -38,7 +38,6 @@ by touching the two small icons on the top-right corner of the device's screen r
 
 1) Make sure Apache Maven is installed on your machine
 	http://www.sonatype.com/books/mvnref-book/reference/installation.html
-	Windows OS: http://www.mkyong.com/maven/how-to-install-maven-in-windows/
 	(Make sure JAVA_HOME and MAVEN_HOME environments variables are set with PATH updated)
 2) Make sure android-maven-plugin is properly configured
 	(Note 1: Install Eclipse marketplace if using eclipse:  Help/Install new Software -> http://download.eclipse.org/releases/juno -> Marketplace Client)
