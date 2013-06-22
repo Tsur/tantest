@@ -1,0 +1,310 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:scrollbars="none" >
+
+	<LinearLayout
+	    android:layout_width="match_parent"
+	    android:layout_height="wrap_content"
+	    android:background="@drawable/wall3"
+	    android:orientation="vertical" >
+   
+	    <RelativeLayout
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:background="@color/trans_gray"
+	        android:padding="30dp" >
+    	
+	    	<TextView
+	    	    android:id="@+id/act_test_opt1_text"
+	    	    android:layout_width="wrap_content"
+	    	    android:layout_height="wrap_content"
+	    	    android:layout_centerHorizontal="true"
+	    	    android:layout_marginBottom="2dp"
+	    	    android:layout_marginTop="15dp"
+	    	    android:gravity="center_vertical|center_horizontal|center"
+	    	    android:text="@string/act_test_opt_text1"
+	    	    android:textColor="@color/black"
+	    	    android:textSize="20sp"
+	    	    android:textStyle="bold" />
+		    
+		    <TextView
+		        android:id="@+id/act_test_opt1_value"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_below="@id/act_test_opt1_text"
+		        android:layout_centerHorizontal="true"
+		        android:gravity="center_vertical|center_horizontal|center"
+		        android:paddingLeft="10dp"
+		        android:paddingRight="10dp"
+		        android:textColor="@color/black"
+		        android:textSize="35sp"
+		        android:textStyle="bold" />
+	    
+		    <RelativeLayout
+		        android:id="@+id/act_test_opt1_rl"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_below="@id/act_test_opt1_text"
+		        android:layout_marginLeft="5dp"
+		        android:layout_marginRight="5dp"
+		        android:layout_marginTop="40dp"
+		        android:orientation="horizontal" >
+	
+			    <com.scripturesos.tantest.LongPressRecursiveButtton
+			        android:id="@+id/act_test_opt1_b1"
+			        android:layout_width="32dp"
+			        android:layout_height="32dp"
+			        android:layout_alignParentLeft="true"
+			        android:layout_centerVertical="true"
+			        android:background="@drawable/test_options_less_buttom"
+			        android:maxHeight="32dp"
+			        android:maxWidth="32dp"
+			        android:onClick="minorNumQuestions"
+			        android:longClickable="true"/>
+						
+			    <SeekBar
+			        android:id="@+id/act_test_opt1_b2"
+			        android:layout_width="match_parent"
+			        android:layout_height="wrap_content"
+			        android:layout_toRightOf="@+id/act_test_opt1_b1"
+			        android:layout_toLeftOf="@+id/act_test_opt1_b3"
+			        android:paddingLeft="25dp"
+			        android:paddingRight="25dp"
+			        android:paddingTop="3dp" />
+		    	
+			    <com.scripturesos.tantest.LongPressRecursiveButtton
+			        android:id="@+id/act_test_opt1_b3"
+			        android:layout_width="32dp"
+			        android:layout_height="32dp"
+			        android:layout_alignParentRight="true"
+			        android:layout_centerVertical="true"
+			        android:background="@drawable/test_options_plus_buttom"
+			        android:maxHeight="32dp"
+			        android:maxWidth="32dp"
+			        android:onClick="plusNumQuestions"
+			        android:longClickable="true"/>
+		    
+			</RelativeLayout>
+		</RelativeLayout>
+
+		<RelativeLayout
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:background="@color/trans_white"
+		    android:padding="30dp" >
+
+		    <TextView
+		        android:id="@+id/act_test_opt2_text"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_below="@id/act_test_opt1_rl"
+		        android:layout_centerHorizontal="true"
+		        android:layout_marginBottom="5dp"
+		        android:layout_marginTop="10dp"
+		        android:gravity="center_vertical|center_horizontal|center"
+		        android:text="@string/act_test_opt_text2"
+		        android:textColor="@color/black"
+		        android:textSize="20sp"
+		        android:textStyle="bold" />
+		    
+		    <TextView
+		        android:id="@+id/act_test_opt2_value"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_below="@id/act_test_opt2_text"
+		        android:layout_centerHorizontal="true"
+		        android:gravity="center_vertical|center_horizontal|center"
+		        android:paddingLeft="10dp"
+		        android:paddingRight="10dp"
+		        android:textColor="@color/black"
+		        android:textSize="35sp"
+		        android:textStyle="bold" />
+	    
+		    <RelativeLayout
+		        android:id="@+id/act_test_opt2_rl"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_below="@id/act_test_opt2_text"
+		        android:layout_marginLeft="5dp"
+		        android:layout_marginRight="5dp"
+		        android:layout_marginTop="40dp"
+		        android:orientation="horizontal" >
+	
+			    <com.scripturesos.tantest.LongPressRecursiveButtton
+			        android:id="@+id/act_test_opt2_b1"
+			        android:layout_width="32dp"
+			        android:layout_height="32dp"
+			        android:layout_alignParentLeft="true"
+			        android:layout_centerVertical="true"
+			        android:background="@drawable/test_options_less_buttom"
+			        android:maxHeight="32dp"
+			        android:maxWidth="32dp"
+			        android:onClick="minorTime"
+			        android:longClickable="true" />
+						
+			    <SeekBar
+			        android:id="@+id/act_test_opt2_b2"
+			        android:layout_width="match_parent"
+			        android:layout_height="wrap_content"
+			        android:layout_toRightOf="@+id/act_test_opt2_b1"
+			        android:layout_toLeftOf="@+id/act_test_opt2_b3"
+			        android:paddingLeft="25dp"
+			        android:paddingRight="25dp"
+			        android:paddingTop="3dp" />
+		    	
+			    <com.scripturesos.tantest.LongPressRecursiveButtton
+			        android:id="@+id/act_test_opt2_b3"
+			        android:layout_width="32dp"
+			        android:layout_height="32dp"
+			        android:layout_alignParentRight="true"
+			        android:layout_centerVertical="true"
+			        android:background="@drawable/test_options_plus_buttom"
+			        android:maxHeight="32dp"
+			        android:maxWidth="32dp"
+			        android:onClick="plusTime"
+			        android:longClickable="true" />
+	   
+			</RelativeLayout>
+		</RelativeLayout>
+
+		<RelativeLayout
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:background="@color/trans_gray"
+		    android:padding="30dp" >
+			    
+		    <TextView
+		        android:id="@+id/act_test_opt3_text"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_below="@id/act_test_opt2_rl"
+		        android:layout_centerHorizontal="true"
+		        android:layout_marginBottom="5dp"
+		        android:layout_marginTop="15dp"
+		        android:gravity="center_vertical|center_horizontal|center"
+		        android:text="@string/act_test_opt_text3"
+		        android:textColor="@color/black"
+		        android:textSize="20sp"
+		        android:textStyle="bold" />
+		    
+		    <RelativeLayout
+		        android:id="@+id/act_test_opt3_rl"
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_below="@id/act_test_opt3_text"
+		        android:layout_marginBottom="5dp"
+		        android:layout_marginLeft="5dp"
+		        android:layout_marginRight="5dp"
+		        android:layout_marginTop="5dp"
+		        android:orientation="horizontal" >
+	
+			    <ImageButton
+			        android:id="@+id/act_test_opt3_b1"
+			        android:layout_width="32dp"
+			        android:layout_height="32dp"
+			        android:layout_alignParentLeft="true"
+			        android:layout_centerVertical="true"
+			        android:background="@drawable/test_options_less_buttom"
+			        android:maxHeight="32dp"
+			        android:maxWidth="32dp"
+			        android:onClick="changeDifficultyDown" />
+		    	
+			    <ImageButton
+			        android:id="@+id/act_test_opt3_b3"
+			        android:layout_width="32dp"
+			        android:layout_height="32dp"
+			        android:layout_alignParentRight="true"
+			        android:layout_centerVertical="true"
+			        android:background="@drawable/test_options_plus_buttom"
+			        android:maxHeight="32dp"
+			        android:maxWidth="32dp"
+			        android:onClick="changeDifficultyUp" />
+		
+			    <TextView
+			        android:id="@+id/act_test_opt3_value"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:layout_centerHorizontal="true"
+			        android:layout_centerInParent="true"
+			        android:layout_centerVertical="true"
+			        android:gravity="center_vertical|center_horizontal|center"
+			        android:paddingLeft="10dp"
+			        android:paddingRight="10dp"
+			        android:textColor="@color/black"
+			        android:textSize="35sp"
+			        android:textStyle="bold" />
+		    
+			</RelativeLayout>
+		</RelativeLayout>
+
+		<RelativeLayout
+		    android:layout_width="match_parent"
+		    android:layout_height="wrap_content"
+		    android:background="@color/trans_white"
+		    android:padding="30dp" >
+
+		    <TextView
+		        android:id="@+id/act_test_opt4_text"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:layout_below="@id/act_test_opt3_rl"
+		        android:layout_centerHorizontal="true"
+		        android:layout_marginBottom="5dp"
+		        android:layout_marginTop="15dp"
+		        android:gravity="center_vertical|center_horizontal|center"
+		        android:text="@string/act_test_opt_text4"
+		        android:textColor="@color/black"
+		        android:textSize="20sp"
+		        android:textStyle="bold" />
+	
+		    <RelativeLayout
+		        android:layout_width="match_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_below="@id/act_test_opt4_text"
+		        android:layout_marginBottom="5dp"
+		        android:layout_marginLeft="5dp"
+		        android:layout_marginRight="5dp"
+		        android:layout_marginTop="5dp"
+		        android:orientation="horizontal" >
+	
+			    <ImageButton
+			        android:id="@+id/act_test_opt4_b1"
+			        android:layout_width="32dp"
+			        android:layout_height="32dp"
+			        android:layout_alignParentLeft="true"
+			        android:layout_centerVertical="true"
+			        android:background="@drawable/test_options_left"
+			        android:maxHeight="32dp"
+			        android:maxWidth="32dp"
+			        android:onClick="changeCategoryDown" />
+						
+			    <TextView
+			        android:id="@+id/act_test_opt4_value"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:layout_centerHorizontal="true"
+			        android:layout_centerInParent="true"
+			        android:layout_centerVertical="true"
+			        android:gravity="center_vertical|center_horizontal|center"
+			        android:paddingLeft="10dp"
+			        android:paddingRight="10dp"
+			        android:textColor="@color/black"
+			        android:textSize="35sp"
+			        android:textStyle="bold" />
+		    	
+			    <ImageButton
+			        android:id="@+id/act_test_opt4_b3"
+			        android:layout_width="32dp"
+			        android:layout_height="32dp"
+			        android:layout_alignParentRight="true"
+			        android:layout_centerVertical="true"
+			        android:background="@drawable/test_options_right"
+			        android:maxHeight="32dp"
+			        android:maxWidth="32dp"
+			        android:onClick="changeCategoryUp" />
+	   
+			</RelativeLayout>
+		</RelativeLayout>
+    </LinearLayout>
+</ScrollView>
