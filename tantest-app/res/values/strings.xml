@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<string name="hello">Hello tantest-app!</string>
+
+    <string name="app_name">Tantest</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Opciones</string>
+	<string name="menu_header_test">Nuevo Examen</string>
+	<string name="menu_header_social">Contactos</string>
+	<string name="menu_contacts_import">Importar Contactos</string>
+	<string name="test_next_button">Siguiente</string>
+	<string name="test_back_button">Anterior</string>
+	<string name="test_text_question">Pregunta</string>
+	<string name="test_menu_header_grade">¡Nota final!</string>
+	<string name="menu_header_search">Buscar</string>
+	<string name="menu_help">Ayuda</string>
+	<string name="menu_main_code">Añadir Dispositivo</string>
+	<string name="act_contacts_title">Selecciona Contacto</string>
+	<string name="act_main_phone">Teléfono</string>
+	<string name="act_main_code">Código Validación</string>
+	<string name="act_main_connect">Acceder</string>
+	<string name="act_main_country">Selecciona país de origen</string>
+	<string name="act_main_offine">Desconectado</string>
+	<string name="act_main_verify">Verificar</string>
+	<string name="act_home_chat_send">Enviar</string>
+	
+	<string name="act_main_verify_text">Hemos enviado un código de verificación a su telefono, introduzcalo y pulse verificar para validar su cuenta.</string>
+	<string name="act_main_sms_validating">Estamos validando su número de telefono, espere por favor ...</string>
+	<string name="act_main_verify_nosms">Introduzca eL código de verificación de su telefono y pulse verificar para validar su cuenta.</string>
+	<string name="act_main_sms_body">Su código de verificación es</string>
+	<string name="act_main_sms_sign">El Señor te bendiga. Tantest.</string>
+	<string name="act_main_wrong_code">El código introducido no es correcto brother, ¡ revisalo bien !</string>
+	<string name="act_main_right_code">El código introducido es correctísimo brother, ¡ pasa adelante !</string>
+	<string name="home_no_chats">No has iniciado ninguna conversación. ¡ Pulsa aquí o en el botón contactos de la esquinita de arriba para iniciar una conversación nueva !</string>
+	<string name="contacts_no_agenda">Su agenda no dispone de ningún contacto. Necesitas añadir los contactos a la agenda de su teléfono antes de poder iniciar una conversación. Si estás usando una tableta, entonces importe sus contactos desde el menú de opciones.</string>
+	<string name="contacts_no_agenda_import">El archivo importado no contiene la información necesaria, ¡ prueba con otro !</string>
+	
+	<string name="empty_directory">Empty Directory</string>
+	<string name="storage_removed">Storage was removed or unmounted.</string>
+	<string name="choose_file">Select a file</string>
+	<string name="error_selecting_file">Error selecting File</string>
+	
+	
+	<string name="act_test_opt_text1">Número de Preguntas</string>
+	<string name="act_test_opt_text2">Límite de Tiempo</string>
+	<string name="act_test_opt_text3">Nivel Dificultad</string>
+	<string name="act_test_opt_text4">Categoría</string>
+	<string name="act_test_opt_text5">Neófito</string>
+	<string name="act_test_opt_text6">Vianda Sólida</string>
+	<string name="act_test_opt_text7">Ministro</string>
+	<string name="act_test_opt_text8">Fariseo</string>
+	<string name="act_test_opt_text9">General</string>
+	<string name="act_test_opt_text10">Historia</string>
+	<string name="act_test_opt_text11">Geografía</string>
+	<string name="act_test_opt_text12">Leyes</string>
+	<string name="act_test_opt_text13">Números</string>
+	<string name="act_test_opt_text14">Configuración del Test</string>
+	<string name="act_test_opt_text15">Otras opciones</string>
+	<string name="act_test_opt_text16">Aceptar configuración</string>
+	<string name="act_test_opt_text17">Sin Tiempo</string>
+	
+	<string name="act_test_text1">Resuelve el Test</string>
+	<string name="act_test_text2">¡ Tenemos un problema, intentalo mas tarde!</string>
+	<string name="act_test_text3">¡Aún no tenemos tests con esa configuración, inténtalo mas tarde!</string>
+	<string name="act_test_text4">Tiempo acabado</string>
+	<string name="act_test_text5">Calificación:</string>
+	<string name="act_test_text6">¿Quieres revisar el test antes de compartirlo?</string>
+	<string name="act_test_text7">Si</string>
+	<string name="act_test_text8">No.</string>
+	
+	<string name="act_test_grade_text1">Bueno, esto es bochornoso</string>
+	<string name="act_test_grade_text2">Vaya, esta vez no ha podido ser &#8230;</string>
+	<string name="act_test_grade_text3">Nada mal, ¡sigue así!</string>
+	<string name="act_test_grade_text4">Impresionante, y recuerda: siempre hay alguno nuevo que aprender</string>
+	<string name="act_test_grade_text5">Calificación:</string>
+	<string name="act_test_grade_text6">Total preguntas:</string>
+	<string name="act_test_grade_text7">Preguntas acertadas:</string>
+	<string name="act_test_grade_text8">Preguntas falladas:</string>
+	<string name="act_test_grade_text9">Grado dificultad:</string>
+	<string name="act_test_grade_text10">Tiempo máximo:</string>
+	<string name="act_test_grade_text11">Calificacion:</string>
+	<string name="act_test_grade_text12">Base:</string>
+	<string name="act_test_grade_text13">Puntos ganados:</string>
+	<string name="act_test_grade_text14">Bajo</string>
+	<string name="act_test_grade_text15">Medio</string>
+	<string name="act_test_grade_text16">Alto</string>
+	<string name="act_test_grade_text17">Avanzado</string>
+	<string name="act_test_grade_text18">minutos</string>
+	<string name="act_test_grade_text19">Anuncialo a tus contactos</string>
+	<string name="act_test_grade_text20">Enviar</string>
+	<string name="act_test_grade_text21">Test en Tantest</string>
+	<string name="act_test_grade_text22">He obtenido una calificación de %1$s en Tantest. Aquí el test en detalle: %2$s</string>
+	<string name="act_test_grade_text23">minuto</string>
+	<string name="act_test_grade_text24">¡Acabo de terminar un test!, echa un vistazo a los resultados:\n\nCalificación: %1$s\nTotal preguntas: %2$s; Acertadas: %3$s; Falladas: %4$s\nDificultad: %5$s\nTiempo máximo: %6$s; Tiempo empleado: %7$s</string>
+	<string name="act_test_grade_text25">Tiempo empleado:</string>
+	<string name="act_test_grade_text26">¡Acabo de terminar un test!, echa un vistazo a los resultados:\n\nCalificación: %1$s\nTotal preguntas: %2$s; Acertadas: %3$s; Falladas: %4$s\nDificultad: %5$s\nTiempo máximo: Ilimitado</string>
+	
+	<string name="act_home_notification">Nuevo Mensaje de</string>
+	<string name="chat_online">Conectado</string>
+	<string name="chat_writing">Escribiendo &#8230;</string>
+	<string name="chat_intest">Haciendo un Test &#8230;</string>
+</resources>
