@@ -3,9 +3,9 @@
         
         <item
         android:state_pressed="true"
-        android:drawable="@drawable/main_boton_connect_pressed" />
+        android:drawable="@drawable/main_next" />
         
         <item
-        android:drawable="@drawable/main_boton_connect" />
+        android:drawable="@drawable/main_next" />
 
 </selector>

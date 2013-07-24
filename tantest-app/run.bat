@@ -1,0 +1,1 @@
+adb shell am start -a android.intent.action.MAIN -n com.scripturesos.main/.MainActivity

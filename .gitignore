@@ -1,1 +1,7 @@
 tantest-app/target/
+tantest-app/bin/
+tantest-app/gen/
+tantest-app/.settings/
+tantest-app/pdf/
+tantest-server/target/
+actionbarsherlock/

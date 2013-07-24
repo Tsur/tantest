@@ -88,7 +88,7 @@ public class HomeActivity extends Application {
 	{
 		super.onCreate(savedInstanceState);
 		/* INIT CONTENT VIEW */
-		//Log.i("tantest","CREATE HOME ACTIVITY");
+		Log.i("tantest","CREATE HOME ACTIVITY");
 		
 		setContentView(R.layout.activity_home);
 		
@@ -102,7 +102,7 @@ public class HomeActivity extends Application {
 		    
 			public void run() 
 			{
-				if(client_id == null || country_id == null)
+				/*if(client_id == null || country_id == null)
 				{
 					SQLiteDatabase db = DatabaseHelper.getInstance(getApplicationContext()).getReadableDatabase();
 					
@@ -119,10 +119,6 @@ public class HomeActivity extends Application {
 					
 					ContactUtil.createAgenda(HomeActivity.this, client_id, country_id);
 
-					/*while(cursor.moveToNext())
-					{
-						
-					}*/
 					try 
 					{
 						if(cursor.moveToNext())
@@ -184,8 +180,8 @@ public class HomeActivity extends Application {
 					//Log.i("tantest","country: "+country_id);
 					
 				}
-
-				server = new IOSocket(client_id, new MessageCallback() {
+				*/
+				/*server = new IOSocket(client_id, new MessageCallback() {
 					  
 					  @Override
 					  public void onConnect() 
@@ -337,17 +333,7 @@ public class HomeActivity extends Application {
 	
 				server.connect();
 				
-				sound = MediaPlayer.create(HomeActivity.this, R.raw.alert);
-				/*sound.setOnCompletionListener(new OnCompletionListener() {
-
-		            @Override
-		            public void onCompletion(MediaPlayer mp) {
-		                // TODO Auto-generated method stub
-		                Log.i("tantest","Sonido!");
-		            	//mp.release();
-		            }
-
-		        });*/   
+				sound = MediaPlayer.create(HomeActivity.this, R.raw.alert); 
 				
 				//Segun lo que sea, mostrar mensaje o mostrar listView 
 				if(chats.size() > 0)
@@ -370,7 +356,7 @@ public class HomeActivity extends Application {
 					msg.what = 3;
 					handler.sendMessage(msg);	
 				}
-
+				*/
 		    }
 		}).start();
 	}
@@ -664,8 +650,9 @@ public class HomeActivity extends Application {
 				break;
 				
 			case R.id.menu_header_social:
-				Intent cintent = new Intent(this, ContactsActivity.class);
-				//Log.i("tantes","iniciando actividad");
+				
+				Intent cintent = new Intent(this, UsersActivity.class);
+				Log.i("tantets","iniciando actividad ContactsActivity");
 				
 				if(contacts_serialized != null)
 			    {

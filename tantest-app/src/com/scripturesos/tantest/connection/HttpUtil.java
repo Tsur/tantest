@@ -3,7 +3,9 @@ package com.scripturesos.tantest.connection;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -11,11 +13,15 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -29,7 +35,6 @@ import org.apache.http.client.methods.HttpPost;
 //import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -51,33 +56,37 @@ public final class HttpUtil {
 
 		switch(method)
 		{
-			case CREATE_USER:
-				url += "createUser/"+URLEncoder.encode(params[0],"UTF-8");
+			case ACCESS:
+				url += "access?email="+URLEncoder.encode(params[0],"UTF-8")+"&password="+URLEncoder.encode(params[1],"UTF-8");
 				break;
-			case EMAIL_CODE:
-				url += "createEmailCode/"+URLEncoder.encode(params[0],"UTF-8");
+			case VALIDATE_CODE:
+				url += "validate?email="+URLEncoder.encode(params[0],"UTF-8")+"&code="+URLEncoder.encode(params[1],"UTF-8");
 				break;
-			case CONFIRM_CODE:
-				url += "confirmEmailCode/"+URLEncoder.encode(params[0],"UTF-8")+"/code/"+URLEncoder.encode(params[1],"UTF-8");
+			case FORGOT:
+				url += "forgot?email="+URLEncoder.encode(params[0],"UTF-8");
 				break;
-			case REGISTER_EMAIL:
-				url += "registerEmail/"+URLEncoder.encode(params[0],"UTF-8")+"/email/"+URLEncoder.encode(params[1],"UTF-8");
+			case RESTORE:
+				url += "restore?email="+URLEncoder.encode(params[0],"UTF-8")+"&code="+URLEncoder.encode(params[1],"UTF-8")+"&password="+URLEncoder.encode(params[2],"UTF-8");
+				break;
+			case RANDOM:
+				url += "random?";
+				for(int k=0;k<params.length;k+=2)
+				{
+					url += params[k]+"="+URLEncoder.encode(params[k+1],"UTF-8")+"&";
+				}
+				break;
+			case ID:
+				url += "id?"+params[0]+"="+URLEncoder.encode(params[1],"UTF-8");
 				break;
 			/*case GET_CONTACTS:
 				url += "getContacts/";
 				break;*/
-			case GET_UNREAD_MSG:
+			/*case GET_UNREAD_MSG:
 				url += "getUnreadMsgs/"+URLEncoder.encode(params[0],"UTF-8");
 				break;
 			case GET_UNCHEKED_MSG:
 				url += "getUnconfirmedMsgs/"+URLEncoder.encode(params[0],"UTF-8");
-				break;
-			/*case UPLOAD_FILE:
-				url += "uploadFile/";
 				break;*/
-			case CREATE_FRIEND:
-				url += "createFriend/"+URLEncoder.encode(params[0],"UTF-8");
-				break;
 			default:break;
 		}
 		Log.i("tantest","URL: " + url);
@@ -143,13 +152,21 @@ public final class HttpUtil {
    	    
    	    switch(method)
    	    {
-   	    	case GET_CONTACTS:
+   	    	case INFO:
    	    		
-	   			url = "getContacts";
+	   			url = "info";
 	   			httppost = new HttpPost(BASE_URL+url);
 	   			
 	   			params = new ArrayList<NameValuePair>();
-	   			params.add(new BasicNameValuePair("contacts", data[0]));
+	   			params.add(new BasicNameValuePair("key", User.key));
+	   			params.add(new BasicNameValuePair("email", User.get("email")));
+	   			params.add(new BasicNameValuePair("id", User.get("_id")));
+	   			params.add(new BasicNameValuePair("token", User.get("token")));
+	   			
+	   			for(int k=0;k<data.length;k+=2)
+				{
+	   				params.add(new BasicNameValuePair(data[k], data[k+1]));
+				}
 	   			
 	   			// Request parameters and other properties.
 	   	    	httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
@@ -219,15 +236,15 @@ public final class HttpUtil {
 		
 	}
 
-    /*public static String uploadFile(File file) throws JSONException, ClientProtocolException, IOException
+    public static String uploadFile(File file) throws JSONException, ClientProtocolException, IOException
 	{
     	
     	// Create a new HTTP Client
-   	    HttpPost httppost = new HttpPost(BASE_URL+"uploadFile");
+   	    /*HttpPost httppost = new HttpPost(BASE_URL+"upload");
 
 		MultipartEntity mentity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
 		FileBody fileBody = new FileBody(file);
-		mentity.addPart("file", fileBody);
+		mentity.addPart("multimedia", fileBody);
 		
 		httppost.setEntity(mentity);
 
@@ -275,9 +292,100 @@ public final class HttpUtil {
     	    }
     	}
     	
-		return null;
-		
-	}*/
+		return null;*/
+
+        HttpURLConnection conn = null;
+        DataOutputStream dos = null;  
+        String lineEnd = "\r\n";
+        String twoHyphens = "--";
+        String boundary = "*****";
+        int bytesRead, bytesAvailable, bufferSize;
+        byte[] buffer;
+        int maxBufferSize = 1 * 1024 * 1024; 
+    
+        try { 
+              
+               // open a URL connection to the Servlet
+             FileInputStream fileInputStream = new FileInputStream(file);
+             URL url = new URL(BASE_URL+"upload");
+              
+             // Open a HTTP  connection to  the URL
+             conn = (HttpURLConnection) url.openConnection(); 
+             conn.setDoInput(true); // Allow Inputs
+             conn.setDoOutput(true); // Allow Outputs
+             conn.setUseCaches(false); // Don't use a Cached Copy
+             conn.setRequestMethod("POST");
+             conn.setRequestProperty("Connection", "Keep-Alive");
+             conn.setRequestProperty("ENCTYPE", "multipart/form-data");
+             conn.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
+             conn.setRequestProperty("key", User.key); 
+             conn.setRequestProperty("id", User.get("_id")); 
+             
+             dos = new DataOutputStream(conn.getOutputStream());
+    
+             dos.writeBytes(twoHyphens + boundary + lineEnd); 
+             dos.writeBytes("Content-Disposition: form-data;"+ lineEnd);
+              
+             dos.writeBytes(lineEnd);
+    
+             // create a buffer of  maximum size
+             bytesAvailable = fileInputStream.available(); 
+    
+             bufferSize = Math.min(bytesAvailable, maxBufferSize);
+             buffer = new byte[bufferSize];
+    
+             // read file and write it into form...
+             bytesRead = fileInputStream.read(buffer, 0, bufferSize);  
+                
+             while (bytesRead > 0) {
+                  
+               dos.write(buffer, 0, bufferSize);
+               bytesAvailable = fileInputStream.available();
+               bufferSize = Math.min(bytesAvailable, maxBufferSize);
+               bytesRead = fileInputStream.read(buffer, 0, bufferSize);   
+                
+              }
+    
+             // send multipart form data necesssary after file data...
+             dos.writeBytes(lineEnd);
+             dos.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
+    
+             // Responses from the server (code and message)
+             int serverResponseCode = conn.getResponseCode();
+             String serverResponseMessage = conn.getResponseMessage();
+               
+             Log.i("uploadFile", "HTTP Response is : "
+                     + serverResponseMessage + ": " + serverResponseCode);
+
+             //close the streams //
+             fileInputStream.close();
+             dos.flush();
+             dos.close();
+             
+             JSONObject response;
+             
+             if(serverResponseCode == 200){
+                  
+                  response = new JSONObject(serverResponseMessage); 
+                  
+                  return response.getString("url");
+             } 
+             
+             return "";
+               
+        } 
+        catch (MalformedURLException ex) 
+        {
+            Log.e("Upload file to server", "error: " + ex.getMessage(), ex);
+            return "";
+        } 
+        catch (Exception e)
+        {
+            Log.e("Upload file to server Exception", "Exception : "
+                                             + e.getMessage(), e);  
+            return "";
+        }
+	}
 
     /** Read the object from Base64 string. */
     public static Object fromString( String s ) throws IOException , ClassNotFoundException{
@@ -299,18 +407,27 @@ public final class HttpUtil {
         
         return new String(Base64Coder.encode( baos.toByteArray()));
     }
+	
+	public static boolean isValidEmail(String email) 
+	{
+		Matcher m = emailPattern.matcher(email); 
+		return m.matches();
+	}
 
-    
+    static Pattern emailPattern = Pattern.compile("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
+	
     public static AtomicInteger uniqid 			= new AtomicInteger();
     private static final String BASE_URL 		= "http://www.scripturesos.com:3001/";
-    public static final int CREATE_USER 		= 0;
-    public static final int EMAIL_CODE 			= 1;
-    public static final int CONFIRM_CODE 		= 2;
-    public static final int REGISTER_EMAIL 		= 3;
-    public static final int GET_CONTACTS 		= 4;
-    public static final int GET_UNREAD_MSG 		= 5;
+    public static final int ACCESS		 		= 0;
+    public static final int VALIDATE_CODE 		= 1;
+    public static final int FORGOT		 		= 2;
+    public static final int RESTORE		 		= 3;
+    public static final int RANDOM		 		= 4;
+    public static final int ID			 		= 5;
     public static final int GET_UNCHEKED_MSG 	= 6;
-    public static final int CREATE_FRIEND 		= 7;
-    public static final int UPLOAD_FILE 		= 8;
-    public static final int REGISTER_TEST 		= 9;
+    public static final int INFO		 		= 7;
+   // public static final int UPLOAD_FILE 		= 8;
+    public static final int REGISTER_TEST 		= 8;
+    public static final int GET_UNREAD_MSG 		= 9;
+    public static final int GET_CONTACTS 		= 10;
 }

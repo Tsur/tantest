@@ -57,13 +57,14 @@
 			<artifactId>httpmime</artifactId>
 			<version>4.0.2</version>
 		</dependency>
-		-->
+		
 		
 		<dependency>
 		  <groupId>com.google</groupId>
 		  <artifactId>libphonenumber</artifactId>
 		  <version>5.4</version>
 		</dependency>
+		-->
 		
 		<dependency>
 		  <groupId>com.googlecode.android-vcard</groupId>
@@ -86,16 +87,43 @@
             <plugin>
                 <groupId>com.jayway.maven.plugins.android.generation2</groupId>
                 <artifactId>android-maven-plugin</artifactId>
-                <version>3.5.3</version>
+                <version>3.6.0</version>
                 <configuration>
-                    
-                    <sdk>
+					<sdk>
                         <platform>14</platform>
                     </sdk>
+                    <emulator>
+                        <avd>11223344</avd>
+                    </emulator>
+                    <deleteConflictingFiles>true</deleteConflictingFiles>
                     <undeployBeforeDeploy>true</undeployBeforeDeploy>
                 </configuration>
                 <extensions>true</extensions>
             </plugin>
+			<plugin>
+				<groupId>org.eclipse.m2e</groupId>
+				<artifactId>lifecycle-mapping</artifactId>
+				<version>1.0.0</version>
+				<configuration>
+					<lifecycleMappingMetadata>
+						<pluginExecutions>
+							<pluginExecution>
+								<pluginExecutionFilter>
+									<groupId>com.jayway.maven.plugins.android.generation2</groupId>
+									<artifactId>android-maven-plugin</artifactId>
+									<versionRange>3.6.0</versionRange>
+									<goals>
+										<goal>manifest-update</goal>
+									</goals>
+								</pluginExecutionFilter>
+								<action>
+									<execute />
+								</action>
+							</pluginExecution>
+						</pluginExecutions>
+					</lifecycleMappingMetadata>
+				</configuration>
+			</plugin>
         </plugins>
     </build>
 	

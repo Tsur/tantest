@@ -38,20 +38,20 @@ public class ContactsActivity extends Application {
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
+		Log.i("tantest","Creating contacts");
+		
 		setTitle(R.string.act_contacts_title);
 		
 		super.onCreate(savedInstanceState);
 		
-		Log.i("tantest","Creating contacts");
+		handler = new ContactsActivityHandler(ContactsActivity.this);
 		
 		/* INIT CONTENT VIEW */
 		setContentView(R.layout.activity_contacts);
-	
-		handler = new ContactsActivityHandler(ContactsActivity.this);
-		
+
 		progress = (ProgressBar) findViewById(R.id.act_contacts_loader);
 		
-		Bundle extras = getIntent().getExtras();
+		/*Bundle extras = getIntent().getExtras();
 		
 		if(extras != null && extras.containsKey("contacts"))
     	{
@@ -86,7 +86,7 @@ public class ContactsActivity extends Application {
 					getContacts();
 			    }
 			}).start();
-		}
+		}*/
 
 	}
 
@@ -122,68 +122,7 @@ public class ContactsActivity extends Application {
 	private void getContacts()
 	{
 		ContactUtil.createAgenda(this, HomeActivity.client_id, HomeActivity.country_id);
-		/*ContentResolver cr = getContentResolver();
-		 
-		Cursor cursor = cr.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
-		
-		phonesList = new HashMap<String,String>();
-		
-		if(cursor.moveToFirst())
-		{
-			
-			while(!cursor.isAfterLast())
-			{
-				
-				String contactId =
-						cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts._ID));
-				
-				String name =
-						cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-		        //
-		        //  Get all phone numbers.
-		        //
-				Cursor phones = cr.query(Phone.CONTENT_URI, null,
-			            Phone.CONTACT_ID + " = " + contactId, null, null);
-	
-				String country = HomeActivity.country_id;
-				
-				while(phones.moveToNext())
-				{
-					
-					String number = phones.getString(phones.getColumnIndex(Phone.NUMBER)).trim();
-					
-					if(!number.startsWith("+"))
-					{
-						number = country+number;
-					}
-					
-					number = number.replace("-","");
-					number = number.replace(")","");
-					number = number.replace("(","");
-					number = number.replace(" ","");
-					
-					Log.i("tantest",number);
-					phonesList.put("\""+number+"\"",name);
 
-				}
-				
-			    phones.close();
-			    cursor.moveToNext();
-			}
-			
-		}
-		
-		//Tenemos en phoneList un diccionario/ mapa de numeros -> nombre
-		cursor.close();
-		
-		if(phonesList.containsKey("\""+HomeActivity.client_id+"\""))
-		{
-			phonesList.remove("\""+HomeActivity.client_id+"\"");
-		}*/
-		
-		
-		//Conectamos con el servidor y mandamos telefonos
-		//if(phonesList.size() > 0)
 		if(ContactUtil.Cache.agenda.size() > 0)
 		{
 			
