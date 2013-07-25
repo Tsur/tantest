@@ -3,7 +3,7 @@
         
         <item
         android:state_pressed="true"
-        android:drawable="@drawable/main_next" />
+        android:drawable="@drawable/main_next_pressed" />
         
         <item
         android:drawable="@drawable/main_next" />

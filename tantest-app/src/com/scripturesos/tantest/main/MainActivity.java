@@ -25,7 +25,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
+//import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -215,8 +215,8 @@ public class MainActivity extends Activity
 		resend_text = (TextView) findViewById(R.id.main_validate_resend);
 		
 		//Hide pre-progress bar and display login view
-		((ProgressBar) findViewById(R.id.main_initProgressbar)).setVisibility(View.GONE);
-		((RelativeLayout) findViewById(R.id.login_view)).setVisibility(View.VISIBLE);
+		//((ProgressBar) findViewById(R.id.main_initProgressbar)).setVisibility(View.GONE);
+		//((RelativeLayout) findViewById(R.id.login_view)).setVisibility(View.VISIBLE);
 		
 	}
 	
@@ -339,6 +339,27 @@ public class MainActivity extends Activity
 		Animation out = new TranslateAnimation(0, 0, -50, 0);
 		out.setFillAfter(true);
 		out.setDuration(1300);
+		
+		out.setAnimationListener(new AnimationListener() {
+
+		    public void onAnimationEnd(Animation animation) {
+
+		    	code_text.clearAnimation();
+		    	//code_text.setVisibility(View.GONE);
+
+		    }
+
+			public void onAnimationRepeat(Animation animation) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			public void onAnimationStart(Animation animation) {
+				// TODO Auto-generated method stub
+				
+			}
+
+		});
 		
 		if(text != null)
 		{
@@ -588,9 +609,10 @@ public class MainActivity extends Activity
 	
 	public void ifError(String txt)
 	{
-		Toast.makeText(MainActivity.this, txt, Toast.LENGTH_SHORT).show();
 		loader.setVisibility(View.GONE);
 		code_text.setVisibility(View.GONE);
+
+		Toast.makeText(MainActivity.this, txt, Toast.LENGTH_SHORT).show();
 		
 		if(validating)
 		{
@@ -614,6 +636,5 @@ public class MainActivity extends Activity
     	
     	super.onResume();
     }
-
 
 }

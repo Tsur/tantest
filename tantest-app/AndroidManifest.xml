@@ -23,10 +23,7 @@
 			android:launchMode="singleInstance" 
 			android:name=".MainActivity" 
 			android:theme="@style/SherlockBaseTheme">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
-            </intent-filter>
+            
         </activity>
         
         <activity 
@@ -50,6 +47,10 @@
 			android:name=".HomeActivity" 
 			android:theme="@style/SherlockBaseTheme" 
 			android:windowSoftInputMode="adjustResize">
+			<intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
  
         </activity>
         

@@ -1,36 +1,23 @@
 package com.scripturesos.tantest.main;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Map;
-
-import android.content.ActivityNotFoundException;
-import android.content.Intent;
-import android.content.res.Configuration;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
+
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.RelativeLayout;
 
 import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuItem;
-import com.ipaulpro.afilechooser.utils.FileUtils;
-import com.scripturesos.tantest.connection.HttpUtil;
+
 
 public class UsersActivity extends Application {
 
 	//TextView debug;
 	private ListView contactsListView;
 	private ProgressBar progress;
+	private UserGameSurface userGameView;
 	//private Map<String,String> phonesList;
 	//private ArrayList<ContactItemListView> contactItems;
 	
@@ -38,16 +25,31 @@ public class UsersActivity extends Application {
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
-		Log.i("tantest","Creating contacts");
+		Log.i("tantest","Creating Activity Users");
 		
 		setTitle(R.string.act_contacts_title);
 		
 		super.onCreate(savedInstanceState);
 
-		/* INIT CONTENT VIEW */
 		setContentView(R.layout.activity_users);
 
-		progress = (ProgressBar) findViewById(R.id.act_contacts_loader);
+		Display display = getWindowManager().getDefaultDisplay();
+		
+		Log.i("tantest","Activity Width:" + display.getWidth());
+		Log.i("tantest","Activity Height:" + display.getHeight());
+		
+		userGameView = new UserGameSurface(this);
+		userGameView.getThread().setSurfaceSize(display.getWidth(), display.getHeight());
+		
+		((RelativeLayout) findViewById(R.id.users_container)).addView(userGameView);
+			
+		((ProgressBar) findViewById(R.id.act_contacts_loader)).setVisibility(View.GONE);
+
+       
+		/* INIT CONTENT VIEW */
+		//setContentView(R.layout.activity_users);
+
+		//progress = (ProgressBar) findViewById(R.id.act_contacts_loader);
 		
 		/*Bundle extras = getIntent().getExtras();
 		
@@ -95,5 +97,4 @@ public class UsersActivity extends Application {
 		getSupportMenuInflater().inflate(R.menu.activity_contacts, menu);
 		return true;
 	}
-  
 }
