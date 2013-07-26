@@ -1,15 +1,20 @@
 package com.scripturesos.tantest.main;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
+import android.view.View.OnTouchListener;
 
-public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callback 
+public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callback, OnTouchListener  
 {
 
 	UserGameThread thread;
@@ -24,6 +29,8 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
         thread = new UserGameThread(holder);
         
 		setFocusable(true);
+		setOnTouchListener((OnTouchListener) this);
+		setFocusableInTouchMode(true);
 	}
 	
 	public UserGameThread getThread() 
@@ -71,6 +78,14 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 		private int canvasWidth;
 		private int canvasHeight;
 		private int offset;
+		private double offsetY;
+		private Bitmap boat;
+		private Bitmap boat_bind;
+		private int boatX;
+		private int boatY;
+		private int boat_bindY;
+		//Matrix matrix = new Matrix();
+		
 		//private static final int SPEED = 2;
 		private boolean run = false;
 
@@ -82,6 +97,8 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 			 paint.setColor(Color.rgb(46, 203, 237));
 			 paint.setStyle(Paint.Style.STROKE);
 			 paint.setStrokeWidth(1);
+			 boat = BitmapFactory.decodeResource(getResources(), R.drawable.users_boat);
+			 boat_bind = BitmapFactory.decodeResource(getResources(), R.drawable.users_boat_bind2);
 		}
 		  
 		public void doStart() 
@@ -89,6 +106,9 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 			synchronized(sh) 
 			{
 				offset = canvasWidth;
+				boatX = (canvasWidth/2)-36;
+				boat_bindY = (canvasHeight/2)-24;
+				offsetY = 0;
 				Canvas c = null;
 				
 				try 
@@ -151,6 +171,25 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 			run = b;
 		}
 		
+		public void moveBoat(int w) 
+		{ 
+			boatX += w;
+		}
+		
+		public void detectTouch(MotionEvent event)
+		{
+			//Log.d("tantest", "TX: " + event.getX()); 
+			//Log.d("tantest", "TX: " + event.getY());
+			int y = (int) event.getY();
+			float c = canvasWidth/2;
+			if(y < boatY+100 || y >= canvasHeight-40 || event.getX() < c-36 || event.getX() > c+36)
+			{
+				return;
+			}
+			
+			boat_bindY = y;
+		}
+       
 		public void setSurfaceSize(int width, int height) 
 		{
 			synchronized (sh) 
@@ -168,20 +207,43 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 			{
 				Path p = new Path();
 		        
-				p.moveTo(0,  (float) (100+(10 *(Math.sin((float)(1+offset)*1/35))))); 
+				p.moveTo(0,  (float) (110+offsetY+(10 *(Math.sin((float)(1+offset)*1/35))))); 
 				
 		        for (int i=1; i<canvasWidth; i++) 
 				{
-					p.lineTo(i, (float) (100+(10 *(Math.sin((float)(i+offset)*1/35))))); 
+					p.lineTo(i, (float) (110+offsetY+(10 *(Math.sin((float)(i+offset)*1/35))))); 
 				}
-
-				canvas.restore();
-				canvas.drawColor(Color.BLACK);
-				//canvas.drawColor(Color.BLACK);
-				canvas.drawPath(p, paint);
 				
+				boatY = ((int) (110+offsetY+(10 *(Math.sin((float)((canvasWidth/2)+offset)*1/35)))))-69;
+				
+				Path p2 = new Path();
+		        
+				p2.moveTo(boatX+36, boatY+50);
+				
+				p2.lineTo(boatX+36, boat_bindY); 
+		        
+		        canvas.restore();
+				canvas.drawColor(Color.BLACK);
+				canvas.drawBitmap(boat, boatX, boatY, paint);
+				canvas.drawBitmap(boat_bind, boatX, boat_bindY, paint);
+				
+				//canvas.drawColor(Color.BLACK);
+				paint.setColor(Color.rgb(46, 203, 237));
+				paint.setStrokeWidth(3);
+				canvas.drawPath(p, paint);
+				paint.setColor(Color.rgb(177, 177, 177));
+				paint.setStrokeWidth(1);
+		        canvas.drawPath(p2, paint);
+
 				offset -= 2;
 				
+				offsetY = Math.random();
+				
+				if(Math.random() <= 0.5)
+				{
+					offsetY = -offsetY;
+				}
+
 				/*if(offset <= 0)
 				{
 					offset += 2;
@@ -198,6 +260,15 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 				
 			}
 		}
+	}
+
+	public boolean onTouch(View v, MotionEvent event) 
+	{
+		Log.d("tantest", "Touch");
+		
+		thread.detectTouch(event);
+	    
+	    return super.onTouchEvent(event);
 	}
 }
 //int halfX = (int) maxX / 2;

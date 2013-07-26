@@ -1,9 +1,15 @@
 package com.scripturesos.tantest.main;
 
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnTouchListener;
 
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -12,7 +18,8 @@ import android.widget.RelativeLayout;
 import com.actionbarsherlock.view.Menu;
 
 
-public class UsersActivity extends Application {
+public class UsersActivity extends Application implements SensorEventListener
+{
 
 	//TextView debug;
 	private ListView contactsListView;
@@ -20,6 +27,7 @@ public class UsersActivity extends Application {
 	private UserGameSurface userGameView;
 	//private Map<String,String> phonesList;
 	//private ArrayList<ContactItemListView> contactItems;
+	private SensorManager sensorManager;
 	
 	@SuppressWarnings("unchecked")
 	@Override
@@ -40,6 +48,7 @@ public class UsersActivity extends Application {
 		
 		userGameView = new UserGameSurface(this);
 		userGameView.getThread().setSurfaceSize(display.getWidth(), display.getHeight());
+		userGameView.requestFocus();
 		
 		((RelativeLayout) findViewById(R.id.users_container)).addView(userGameView);
 			
@@ -97,4 +106,32 @@ public class UsersActivity extends Application {
 		getSupportMenuInflater().inflate(R.menu.activity_contacts, menu);
 		return true;
 	}
+
+	public void onAccuracyChanged(Sensor arg0, int arg1) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void onSensorChanged(SensorEvent event) 
+	{
+		Log.i("tantest","Sensor changed");
+		
+		if(event.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
+		{
+			int x = (int) Math.pow(event.values[1], 2); 
+            int y = (int) Math.pow(event.values[2], 2);
+            Log.i("tantest","Accelerometer X: "+x);
+            Log.i("tantest","Accelerometer Y: "+y);
+		}
+		
+		if(event.sensor.getType() == Sensor.TYPE_ORIENTATION) 
+		{
+			int x = (int) Math.pow(event.values[1], 2); 
+            int y = (int) Math.pow(event.values[2], 2);
+            Log.i("tantest","Orientation X: "+x);
+            Log.i("tantest","Orientation Y: "+y);
+        }
+		
+	}
+	
 }
