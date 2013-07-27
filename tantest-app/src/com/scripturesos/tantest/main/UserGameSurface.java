@@ -1,5 +1,7 @@
 package com.scripturesos.tantest.main;
 
+import java.util.Random;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -302,11 +304,17 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 		int y = 0;
 		int speed = 3;
 		
-		public FishGame(int topLimit,int bottomLimit)
+		public FishGame(int min,int max)
 		{
 			//bottomLimit = canvasHeight-20;
 			//topLimit = 120;
-			y = (int) (Math.random()*(bottomLimit-topLimit)) + topLimit;
+			Random rand = new Random();
+
+			// nextInt is normally exclusive of the top value,
+			// so add 1 to make it inclusive
+			y = rand.nextInt(max - min + 1) + min;
+			
+			//y = (int) (Math.random()*(bottomLimit-topLimit)) + topLimit;
 			
 		}
 		
