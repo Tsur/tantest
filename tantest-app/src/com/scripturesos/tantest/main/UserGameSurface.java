@@ -1,5 +1,7 @@
 package com.scripturesos.tantest.main;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import android.content.Context;
@@ -88,7 +90,7 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 		private Bitmap boat_stone2;
 		private Bitmap boat_stone3;
 		private Bitmap boat_fish;
-		private FishGame fish;
+		private List<FishGame> fish = new ArrayList<FishGame>();
 		private boolean contactFound = false;
 		private int boatX;
 		private int boatY;
@@ -113,7 +115,6 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 			 boat_stone2 = BitmapFactory.decodeResource(getResources(), R.drawable.users_game_stonec);
 			 boat_stone3 = BitmapFactory.decodeResource(getResources(), R.drawable.users_game_stoner);
 			 boat_fish = BitmapFactory.decodeResource(getResources(), R.drawable.users_game_fishr);
-			 fish = new FishGame(120, canvasHeight-20);
 		}
 		  
 		public void doStart() 
@@ -211,6 +212,9 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 			{
 				canvasWidth = width;
 				canvasHeight = height;
+				fish.add(new FishGame(120, canvasHeight-20,canvasWidth));
+				fish.add(new FishGame(120, canvasHeight-20,canvasWidth,10));
+				fish.add(new FishGame(120, canvasHeight-20,canvasWidth,3));
 				doStart();
 			}
 		}
@@ -270,13 +274,18 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 				canvas.drawBitmap(boat_stone2, (canvasWidth/2)-35, canvasHeight-30, paint);
 				canvas.drawBitmap(boat_stone3, canvasWidth-100, canvasHeight-50, paint);
 				
-				if(!fish.update( boatX, boat_bindY))
+				for(FishGame afish:fish)
 				{
-					contactFound = true;
-					return;
+					if(!afish.update( boatX, boat_bindY))
+					{
+						contactFound = true;
+						return;
+					}
+					
+					canvas.drawBitmap(boat_fish, afish.x, afish.y, paint);
 				}
+
 				
-				canvas.drawBitmap(boat_fish, fish.x, fish.y, paint);
 				
 				UserGameThread.sleep(20);
 			} 
@@ -303,8 +312,13 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 		int x = -width;
 		int y = 0;
 		int speed = 3;
+		int starting = 0;
 		
-		public FishGame(int min,int max)
+		int max;
+		int min;
+		int maxWidth;
+		
+		public FishGame(int mi,int ma, int mw)
 		{
 			//bottomLimit = canvasHeight-20;
 			//topLimit = 120;
@@ -312,10 +326,26 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 
 			// nextInt is normally exclusive of the top value,
 			// so add 1 to make it inclusive
-			y = rand.nextInt(max - min + 1) + min;
+			y = rand.nextInt(ma - mi + 1) + mi;
+			
+			max = ma;
+			min = mi;
+			maxWidth = mw;
 			
 			//y = (int) (Math.random()*(bottomLimit-topLimit)) + topLimit;
 			
+		}
+		
+		public FishGame(int mi,int ma, int mw, int s)
+		{
+			
+			Random rand = new Random();
+			y = rand.nextInt(ma - mi + 1) + mi;
+			
+			max = ma;
+			min = mi;
+			maxWidth = mw;
+			speed = s;
 		}
 		
 		public boolean update(int netX, int netY)
@@ -327,6 +357,15 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 			}*/
 			
 			x += speed;
+			
+			if(x >= maxWidth)
+			{
+				x=-width;
+				Random rand = new Random();
+				y = rand.nextInt(max - min + 1) + min;
+				//starting = ;
+			}
+			
 			return true;
 		}
 	}
