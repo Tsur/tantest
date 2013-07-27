@@ -81,6 +81,13 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 		private double offsetY;
 		private Bitmap boat;
 		private Bitmap boat_bind;
+		private Bitmap boat_info;
+		private Bitmap boat_stone1;
+		private Bitmap boat_stone2;
+		private Bitmap boat_stone3;
+		private Bitmap boat_fish;
+		private FishGame fish;
+		private boolean contactFound = false;
 		private int boatX;
 		private int boatY;
 		private int boat_bindY;
@@ -99,6 +106,12 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 			 paint.setStrokeWidth(1);
 			 boat = BitmapFactory.decodeResource(getResources(), R.drawable.users_boat);
 			 boat_bind = BitmapFactory.decodeResource(getResources(), R.drawable.users_boat_bind2);
+			 boat_info = BitmapFactory.decodeResource(getResources(), R.drawable.users_game_bubble);
+			 boat_stone1 = BitmapFactory.decodeResource(getResources(), R.drawable.users_game_stonel);
+			 boat_stone2 = BitmapFactory.decodeResource(getResources(), R.drawable.users_game_stonec);
+			 boat_stone3 = BitmapFactory.decodeResource(getResources(), R.drawable.users_game_stoner);
+			 boat_fish = BitmapFactory.decodeResource(getResources(), R.drawable.users_game_fishr);
+			 fish = new FishGame(120, canvasHeight-20);
 		}
 		  
 		public void doStart() 
@@ -187,7 +200,7 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 				return;
 			}
 			
-			boat_bindY = y;
+			boat_bindY = y-36;
 		}
        
 		public void setSurfaceSize(int width, int height) 
@@ -205,6 +218,11 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 			
 			try 
 			{
+				if(contactFound)
+				{
+					return;
+				}
+				
 				Path p = new Path();
 		        
 				p.moveTo(0,  (float) (110+offsetY+(10 *(Math.sin((float)(1+offset)*1/35))))); 
@@ -214,7 +232,8 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 					p.lineTo(i, (float) (110+offsetY+(10 *(Math.sin((float)(i+offset)*1/35))))); 
 				}
 				
-				boatY = ((int) (110+offsetY+(10 *(Math.sin((float)((canvasWidth/2)+offset)*1/35)))))-69;
+				boatY = ((int) (110+(10 *(Math.sin((float)((canvasWidth/2)+offset)*1/35)))))-69;
+				//boatY = ((int) (110+offsetY+(10 *(Math.sin((float)((canvasWidth/2)+offset)*1/35)))))-70;
 				
 				Path p2 = new Path();
 		        
@@ -243,17 +262,21 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 				{
 					offsetY = -offsetY;
 				}
-
-				/*if(offset <= 0)
-				{
-					offset += 2;
-				}
-				else
-				{
-					
-				}*/
 				
-				UserGameThread.sleep(50);
+				canvas.drawBitmap(boat_info, boatX+72, boatY-25, paint);
+				canvas.drawBitmap(boat_stone1, 0, canvasHeight-50, paint);
+				canvas.drawBitmap(boat_stone2, (canvasWidth/2)-35, canvasHeight-30, paint);
+				canvas.drawBitmap(boat_stone3, canvasWidth-100, canvasHeight-50, paint);
+				
+				if(!fish.update( boatX, boat_bindY))
+				{
+					contactFound = true;
+					return;
+				}
+				
+				canvas.drawBitmap(boat_fish, fish.x, fish.y, paint);
+				
+				UserGameThread.sleep(20);
 			} 
 			catch (InterruptedException e) 
 			{
@@ -269,6 +292,35 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 		thread.detectTouch(event);
 	    
 	    return super.onTouchEvent(event);
+	}
+	
+	class FishGame 
+	{
+		static final int width = 30;
+		static final int height = 20;
+		int x = -width;
+		int y = 0;
+		int speed = 3;
+		
+		public FishGame(int topLimit,int bottomLimit)
+		{
+			//bottomLimit = canvasHeight-20;
+			//topLimit = 120;
+			y = (int) (Math.random()*(bottomLimit-topLimit)) + topLimit;
+			
+		}
+		
+		public boolean update(int netX, int netY)
+		{
+			
+			/*if(((x-netX)^2+(y-netY)^2)<=((15+32)^2))
+			{
+				return false;
+			}*/
+			
+			x += speed;
+			return true;
+		}
 	}
 }
 //int halfX = (int) maxX / 2;
