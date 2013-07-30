@@ -60,7 +60,7 @@ public class UsersActivity extends Application  //implements SensorEventListener
 	public UsersActivityHandler handler;
 	
 	//TextView debug;
-	private RelativeLayout loadingView, contactView;
+	private RelativeLayout gameView, loadingView, contactView;
 	private ListView contactsListView;
 	private ProgressBar progress;
 	private UserGameSurface userGameView;
@@ -129,7 +129,8 @@ public class UsersActivity extends Application  //implements SensorEventListener
 		userGameView.getThread().setSurfaceSize(display.getWidth(), display.getHeight());
 		userGameView.requestFocus();
 		
-		((RelativeLayout) findViewById(R.id.users_container)).addView(userGameView);
+		gameView = (RelativeLayout) findViewById(R.id.act_users_game);
+		gameView.addView(userGameView);
 		
 		loadingView = (RelativeLayout) findViewById(R.id.act_users_loading);
 		contactView = (RelativeLayout) findViewById(R.id.act_users_contact);
@@ -219,7 +220,8 @@ public class UsersActivity extends Application  //implements SensorEventListener
 		//userGameView.clearFocus();
 		((RelativeLayout) findViewById(R.id.users_container)).setBackgroundDrawable(bg);
 		
-		userGameView.setVisibility(View.INVISIBLE);
+		Log.i("tantest","hiding surfaceView");
+		gameView.setVisibility(View.GONE);
 		//userGameView.invalidate();
 		
 		vib.vibrate(vib_pattern,-1);
@@ -288,7 +290,7 @@ public class UsersActivity extends Application  //implements SensorEventListener
 		}
 		
 		//userGameView.requestLayout();
-		userGameView.setVisibility(View.VISIBLE);
+		gameView.setVisibility(View.VISIBLE);
 		userGameView.getThread().restart();
 	}
 	
