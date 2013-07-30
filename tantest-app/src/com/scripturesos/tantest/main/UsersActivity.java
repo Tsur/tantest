@@ -304,7 +304,47 @@ public class UsersActivity extends Application  //implements SensorEventListener
 		{
 			String id = user.getString("email").toString();
 			
-			((TextView) contactView.findViewById(R.id.act_users_contact_name)).setText(id);
+			if(user.has("alias"))
+			{
+				((TextView) contactView.findViewById(R.id.act_users_contact_name)).setText(user.getString("alias").toString());
+			}
+			else
+			{
+				((TextView) contactView.findViewById(R.id.act_users_contact_name)).setText(id.substring(0, id.indexOf("@")));
+			}
+			
+			if(user.has("gender"))
+			{
+				if(user.getString("gender").equals("m"))
+				{
+					((ImageView) contactView.findViewById(R.id.act_users_contact_gender)).setImageDrawable(HomeActivity.gender_m);
+				}
+				else
+				{
+					((ImageView) contactView.findViewById(R.id.act_users_contact_gender)).setImageDrawable(HomeActivity.gender_f);
+				}
+			}
+			
+			if(user.has("age"))
+			{
+				
+			}
+			
+			if(user.has("whereabout"))
+			{
+				
+			}
+			
+			if(user.has("status"))
+			{
+				((TextView) contactView.findViewById(R.id.act_users_contact_status)).setText(user.getString("status").toString());	
+			}
+			
+			if(user.has("deno"))
+			{
+				((TextView) contactView.findViewById(R.id.act_users_contact_deno)).setText(user.getString("deno").toString());	
+			}
+			
 			((ImageView) contactView.findViewById(R.id.act_users_contact_img)).setImageDrawable(UsersUtil.imagesCache.get(id));
 			
 			Animation out = new TranslateAnimation(0, 0, -(getWindowManager().getDefaultDisplay().getHeight()/2),0);
@@ -347,6 +387,10 @@ public class UsersActivity extends Application  //implements SensorEventListener
 		error(null);
 	}
 	
+	public void startChat(View view)
+	{
+		error(null);
+	}
 	/*
 	public void onAccuracyChanged(Sensor sensor, int accuracy) 
 	{

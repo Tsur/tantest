@@ -364,7 +364,7 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 						contactFound = true;
 						fish.clear();
 						//canvas.restoreToCount(saveCount);
-						//canvas.drawColor(Color.BLACK);
+						canvas.drawColor(Color.BLACK);
 						
 						Bitmap bg = Bitmap.createBitmap(canvas.getWidth(), canvas.getHeight(), Bitmap.Config.RGB_565);
 						Canvas tempCanvas = new Canvas(bg);

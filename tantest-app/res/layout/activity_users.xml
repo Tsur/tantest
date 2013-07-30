@@ -16,57 +16,111 @@
    	</RelativeLayout>
     	
     <RelativeLayout
-         android:id="@+id/act_users_contact"
-         android:layout_width="match_parent"
-         android:layout_height="wrap_content"
-         android:layout_centerHorizontal="true"
-         android:layout_centerVertical="true"
-         android:layout_marginRight="40dp"
-         android:background="@drawable/rounded_corners"
-         android:visibility="gone" >
+        android:id="@+id/act_users_contact"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="40dp"
+        android:background="@drawable/rounded_corners"
+        android:visibility="gone" >
     
     	<RelativeLayout
     	    android:id="@+id/act_users_contact_container"
     	    android:layout_width="wrap_content"
     	    android:layout_height="wrap_content"
     	    android:layout_centerHorizontal="true"
-    	    android:layout_centerInParent="true"
-    	    android:layout_centerVertical="true"
+    	    android:layout_centerInParent="false"
+    	    android:layout_marginTop="10dp"
     	    android:focusable="true"
-    	    android:padding="10dp"
+    	    android:paddingLeft="5dp"
+    	    android:paddingRight="5dp"
     	    android:visibility="visible" >
          
 	         <ImageView
 	             android:id="@+id/act_users_contact_img"
-	             android:layout_width="32dp"
-	             android:layout_height="32dp"
-	             android:maxHeight="32dp"
-	             android:maxWidth="32dp"
+	             android:layout_width="36dp"
+	             android:layout_height="36dp"
+	             android:maxHeight="36dp"
+	             android:maxWidth="36dp"
 	             android:minHeight="28dp"
-	             android:minWidth="28dp"
-	             android:src="@drawable/de" />
+	             android:minWidth="28dp" />
 	
 	    	<TextView
 	    	    android:id="@+id/act_users_contact_name"
 	    	    android:layout_width="wrap_content"
 	    	    android:layout_height="wrap_content"
-	    	    android:layout_centerHorizontal="true"
-	    	    android:layout_centerInParent="true"
+	    	    android:layout_marginLeft="10dp"
+	    	    android:layout_marginTop="3dp"
+	    	    android:layout_toRightOf="@id/act_users_contact_img"
+	    	    android:textColor="@color/white"
+	    	    android:textSize="14sp" />
+	    	
+	    	<ImageView
+	    	    android:id="@+id/act_users_contact_gender"
+	    	    android:layout_width="16dp"
+	    	    android:layout_height="16dp"
+	    	    android:layout_marginLeft="5dp"
+	    	    android:layout_marginTop="3dp"
+	    	    android:layout_toRightOf="@id/act_users_contact_name" />
+	    	
+	    	<TextView
+	    	    android:id="@+id/act_users_contact_status"
+	    	    android:layout_width="wrap_content"
+	    	    android:layout_height="wrap_content"
+	    	    android:layout_below="@id/act_users_contact_name"
 	    	    android:layout_marginLeft="10dp"
 	    	    android:layout_toRightOf="@id/act_users_contact_img"
-	    	    android:textColor="@color/black" />
-	    	
+	    	    android:textColor="@color/white"
+	    	    android:textSize="12sp"
+	    	    android:visibility="visible" />
+
     	</RelativeLayout>
 
-    	<ImageButton
-    	    android:id="@+id/act_users_contact_btn_skip"
-    	    android:layout_width="30dp"
-    	    android:layout_height="26dp"
-    	    android:layout_below="@+id/act_users_contact_container"
+    	<TextView
+    	    android:id="@+id/act_users_contact_deno"
+    	    android:layout_width="wrap_content"
+    	    android:layout_height="wrap_content"
+    	    android:layout_alignParentLeft="false"
+    	    android:layout_below="@id/act_users_contact_container"
     	    android:layout_centerHorizontal="true"
-    	    android:background="@drawable/act_users_redo"
-    	    android:contentDescription="@string/act_main_verify"
-    	    android:onClick="rebootCanvas" />
+    	    android:layout_marginTop="5dp"
+    	    android:textColor="@color/white"
+    	    android:textSize="13sp"
+    	    android:visibility="visible" />
+
+    	<RelativeLayout
+    	    android:layout_width="wrap_content"
+    	    android:layout_height="wrap_content"
+    	    android:layout_below="@+id/act_users_contact_deno"
+    	    android:layout_centerHorizontal="true"
+    	    android:paddingBottom="15dp"
+    	    android:paddingLeft="5dp"
+    	    android:paddingRight="5dp"
+    	    android:paddingTop="10dp"
+    	    android:visibility="visible" >
+		    	
+	    	<ImageButton
+	    	    android:id="@+id/act_users_contact_btn_skip"
+	    	    android:layout_width="24dp"
+	    	    android:layout_height="22dp"
+	    	    android:layout_marginTop="5dp"
+	    	    android:background="@drawable/act_users_redo"
+	    	    android:contentDescription="@string/act_main_verify"
+	    	    android:onClick="rebootCanvas" />
+	    	
+	    	<ImageButton
+	    	    android:id="@+id/act_users_contact_btn_chat"
+	    	    android:layout_width="24dp"
+	    	    android:layout_height="22dp"
+	    	    android:layout_marginLeft="15dp"
+	    	    android:layout_marginTop="5dp"
+	    	    android:layout_toRightOf="@id/act_users_contact_btn_skip"
+	    	    android:background="@drawable/act_users_chat"
+	    	    android:contentDescription="@string/act_main_verify"
+	    	    android:onClick="startChat" />
+
+    	</RelativeLayout>
     	
 	</RelativeLayout>
 	

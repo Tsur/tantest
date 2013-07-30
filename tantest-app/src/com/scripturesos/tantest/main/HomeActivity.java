@@ -71,6 +71,8 @@ public class HomeActivity extends Application {
 	private EditText sender;
 	public static IOSocket server;
 	public static Drawable default_dr;
+	public static Drawable gender_m;
+	public static Drawable gender_f;
 	
 	private ArrayList<IOMessage> messages_offine = new ArrayList<IOMessage>();
 	private HashMap<String, ArrayList<ChatMessage>> chatMessages = new HashMap<String, ArrayList<ChatMessage>>();
@@ -97,6 +99,8 @@ public class HomeActivity extends Application {
 		handler = new HomeActivityHandler(this);
 	
 		default_dr = getResources().getDrawable(R.drawable.profile);
+		default_dr = getResources().getDrawable(R.drawable.gender_m);
+		default_dr = getResources().getDrawable(R.drawable.gender_f);
 		
 		(new Thread() {
 		    
