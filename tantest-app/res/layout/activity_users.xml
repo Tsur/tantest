@@ -2,15 +2,96 @@
     android:id="@+id/users_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/gray_strong"
+    android:background="@color/black"
     android:windowActionBarOverlay="true" >
 
-     <ProgressBar
-         android:id="@+id/act_contacts_loader"
-         android:layout_width="wrap_content"
+     <RelativeLayout
+         android:id="@+id/act_users_contact"
+         android:layout_width="match_parent"
          android:layout_height="wrap_content"
          android:layout_centerHorizontal="true"
          android:layout_centerVertical="true"
-         android:indeterminate="true" />
+         android:layout_marginRight="40dp"
+         android:background="@drawable/rounded_corners"
+         android:visibility="gone" >
+    
+    	<RelativeLayout
+    	    android:id="@+id/act_users_contact_container"
+    	    android:layout_width="wrap_content"
+    	    android:layout_height="wrap_content"
+    	    android:layout_centerHorizontal="true"
+    	    android:layout_centerInParent="true"
+    	    android:layout_centerVertical="true"
+    	    android:focusable="true"
+    	    android:padding="10dp"
+    	    android:visibility="visible" >
+         
+	         <ImageView
+	             android:id="@+id/act_users_contact_img"
+	             android:layout_width="32dp"
+	             android:layout_height="32dp"
+	             android:maxHeight="32dp"
+	             android:maxWidth="32dp"
+	             android:minHeight="28dp"
+	             android:minWidth="28dp"
+	             android:src="@drawable/de" />
+	
+	    	<TextView
+	    	    android:id="@+id/act_users_contact_name"
+	    	    android:layout_width="wrap_content"
+	    	    android:layout_height="wrap_content"
+	    	    android:layout_centerHorizontal="true"
+	    	    android:layout_centerInParent="true"
+	    	    android:layout_marginLeft="10dp"
+	    	    android:layout_toRightOf="@id/act_users_contact_img"
+	    	    android:textColor="@color/black" />
+    	</RelativeLayout>
+
+    	<ImageButton
+    	    android:id="@+id/act_users_contact_btn_skip"
+    	    android:layout_width="30dp"
+    	    android:layout_height="26dp"
+    	    android:layout_below="@+id/act_users_contact_container"
+    	    android:layout_centerHorizontal="true"
+    	    android:background="@drawable/act_users_redo"
+    	    android:contentDescription="@string/act_main_verify"
+    	    android:onClick="rebootCanvas" />
+    	
+	</RelativeLayout>
+	
+   	<RelativeLayout
+   	    android:id="@+id/act_users_loading"
+   	    android:layout_width="match_parent"
+   	    android:layout_height="wrap_content"
+   	    android:layout_alignParentBottom="true"
+   	    android:layout_centerHorizontal="true"
+   	    android:layout_centerVertical="true"
+   	    android:background="@color/trans_blue"
+   	    android:padding="10dp"
+   	    android:visibility="gone" >
+        
+         <ProgressBar
+             android:id="@+id/act_users_loading_progress"
+             android:layout_width="wrap_content"
+             android:layout_height="wrap_content"
+             android:layout_centerVertical="true"
+             android:indeterminate="true"
+             android:maxHeight="28dp"
+             android:maxWidth="28dp"
+             android:minHeight="28dp"
+             android:minWidth="28dp" />
+
+    	<TextView
+    	    android:id="@+id/act_users_loading_txt"
+    	    android:layout_width="wrap_content"
+    	    android:layout_height="wrap_content"
+    	    android:layout_centerHorizontal="true"
+    	    android:layout_centerInParent="true"
+    	    android:layout_marginLeft="10dp"
+    	    android:layout_toRightOf="@id/act_users_loading_progress"
+    	    android:text="@string/act_users_loading_txt"
+    	    android:textColor="@color/black" />
+   	
+   	</RelativeLayout>
 	
 </RelativeLayout>

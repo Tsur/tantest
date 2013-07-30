@@ -11,6 +11,9 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
+import android.os.Message;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -18,7 +21,9 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.View.OnTouchListener;
 
-public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callback, OnTouchListener  
+import com.scripturesos.tantest.main.UsersActivity.UsersActivityHandler;
+
+public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callback, OnTouchListener
 {
 
 	UserGameThread thread;
@@ -37,6 +42,11 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 		setFocusableInTouchMode(true);
 	}
 	
+	public void setHandler(UsersActivityHandler uah)
+	{
+		thread.usersActHandler = uah;
+	}
+	
 	public UserGameThread getThread() 
 	{
 	    return thread;
@@ -44,8 +54,12 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 	
 	public void surfaceCreated(SurfaceHolder holder) 
 	{
-	    thread.setRunning(true);
-	    thread.start();
+	    if(!thread.getRunning())
+	    {
+	    	thread.setRunning(true);
+	    	thread.start();
+	    }
+		
 	}
 	
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,int height) 
@@ -76,6 +90,16 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 		Log.i("tantest","Thread destroyed");
 	}
 	
+
+	public boolean onTouch(View v, MotionEvent event) 
+	{
+		//Log.d("tantest", "Touch");
+		
+		thread.detectTouch(event);
+	    
+	    return super.onTouchEvent(event);
+	}
+
 	class UserGameThread extends Thread 
 	{
 		private SurfaceHolder sh;
@@ -95,6 +119,10 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 		private int boatX;
 		private int boatY;
 		private int boat_bindY;
+		private Rect player;
+		private Rect fishrect;
+		private Random rand = new Random();
+		public UsersActivityHandler usersActHandler;
 		//Matrix matrix = new Matrix();
 		
 		//private static final int SPEED = 2;
@@ -105,16 +133,18 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 		public UserGameThread(SurfaceHolder surfaceHolder) 
 		{
 			 sh = surfaceHolder;
+			 
 			 paint.setColor(Color.rgb(46, 203, 237));
 			 paint.setStyle(Paint.Style.STROKE);
 			 paint.setStrokeWidth(1);
-			 boat = BitmapFactory.decodeResource(getResources(), R.drawable.users_boat);
+			 boat = BitmapFactory.decodeResource(getResources(), R.drawable.users_boatc);
 			 boat_bind = BitmapFactory.decodeResource(getResources(), R.drawable.users_boat_bind2);
 			 boat_info = BitmapFactory.decodeResource(getResources(), R.drawable.users_game_bubble);
 			 boat_stone1 = BitmapFactory.decodeResource(getResources(), R.drawable.users_game_stonel);
 			 boat_stone2 = BitmapFactory.decodeResource(getResources(), R.drawable.users_game_stonec);
 			 boat_stone3 = BitmapFactory.decodeResource(getResources(), R.drawable.users_game_stoner);
-			 boat_fish = BitmapFactory.decodeResource(getResources(), R.drawable.users_game_fishr);
+			 boat_fish = BitmapFactory.decodeResource(getResources(), R.drawable.users_game_fishr2);
+			 rand.setSeed(10000);
 		}
 		  
 		public void doStart() 
@@ -125,6 +155,17 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 				boatX = (canvasWidth/2)-36;
 				boat_bindY = (canvasHeight/2)-24;
 				offsetY = 0;
+				
+				/*Random r = new Random();
+				for(int i=0;i<=2;i++)
+				{
+					FishGame afish = new FishGame();
+					afish.setY(r.nextInt(canvasHeight-FishGame.height - 115 + 1) + 115);
+					//afish.setVx((int) (Math.random() * 5));
+					afish.setMaxW(canvasWidth);
+					fish.add(afish);
+				}*/
+
 				Canvas c = null;
 				
 				try 
@@ -133,6 +174,7 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 					
 					if(c != null)
 					{
+						
 						/*Draw Initial Wave sea*/
 						/*Path p = new Path();
 				         
@@ -144,6 +186,24 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 						c.restore();
 						//canvas.drawColor(Color.BLACK);
 						c.drawPath(p, paint);*/
+						/*(new Thread() {
+						    
+							public void run() 
+							{
+								
+								
+								try
+								{
+									sleep(rand.nextInt(300)+200);
+								} 
+								catch (InterruptedException e) 
+								{
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
+						    }
+						}).start();*/
+						
 					}
 					
 				} 
@@ -169,7 +229,10 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 					
 					synchronized(sh) 
 					{
-						doDraw(c);
+						if(!contactFound)
+						{
+							doDraw(c);
+						}
 					}
 				} 
 				finally 
@@ -185,6 +248,11 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 		public void setRunning(boolean b) 
 		{ 
 			run = b;
+		}
+		
+		public boolean getRunning() 
+		{ 
+			return run;
 		}
 		
 		public void moveBoat(int w) 
@@ -212,11 +280,14 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 			{
 				canvasWidth = width;
 				canvasHeight = height;
-				fish.add(new FishGame(120, canvasHeight-20,canvasWidth));
-				fish.add(new FishGame(120, canvasHeight-20,canvasWidth,10));
-				fish.add(new FishGame(120, canvasHeight-20,canvasWidth,3));
 				doStart();
 			}
+		}
+		
+		public void restart()
+		{
+			doStart();
+			contactFound = false;
 		}
 		
 		private void doDraw(Canvas canvas) 
@@ -224,11 +295,8 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 			
 			try 
 			{
-				if(contactFound)
-				{
-					return;
-				}
-				
+				//int saveCount = canvas.getSaveCount();
+			    
 				Path p = new Path();
 		        
 				p.moveTo(0,  (float) (110+offsetY+(10 *(Math.sin((float)(1+offset)*1/35))))); 
@@ -247,10 +315,10 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 				
 				p2.lineTo(boatX+36, boat_bindY); 
 		        
-		        canvas.restore();
+		        //canvas.restore();
 				canvas.drawColor(Color.BLACK);
-				canvas.drawBitmap(boat, boatX, boatY, paint);
-				canvas.drawBitmap(boat_bind, boatX, boat_bindY, paint);
+				canvas.drawBitmap(boat, boatX, boatY, null);
+				canvas.drawBitmap(boat_bind, boatX, boat_bindY, null);
 				
 				//canvas.drawColor(Color.BLACK);
 				paint.setColor(Color.rgb(46, 203, 237));
@@ -269,40 +337,109 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 					offsetY = -offsetY;
 				}
 				
-				canvas.drawBitmap(boat_info, boatX+72, boatY-25, paint);
-				canvas.drawBitmap(boat_stone1, 0, canvasHeight-50, paint);
-				canvas.drawBitmap(boat_stone2, (canvasWidth/2)-35, canvasHeight-30, paint);
-				canvas.drawBitmap(boat_stone3, canvasWidth-100, canvasHeight-50, paint);
+				canvas.drawBitmap(boat_info, boatX+72, boatY-25, null);
+				canvas.drawBitmap(boat_stone1, 0, canvasHeight-50, null);
+				canvas.drawBitmap(boat_stone2, (canvasWidth/2)-35, canvasHeight-30, null);
+				canvas.drawBitmap(boat_stone3, canvasWidth-100, canvasHeight-50, null);
 				
-				for(FishGame afish:fish)
+				//canvas.save();
+				
+				player = new Rect(boatX+40, boat_bindY+15,boatX+44,boat_bindY+33);
+				
+				for(int f=0;f<fish.size();f++)
 				{
-					if(!afish.update( boatX, boat_bindY))
+					FishGame afish = fish.get(f);
+					
+					if(afish.ismarked())
+					{
+						fish.remove(f);
+
+						continue;
+					}
+					else
+					{
+						afish.update();
+					}
+					
+					fishrect = new Rect(afish.x, afish.y,afish.x+FishGame.width,afish.y+FishGame.height);
+
+					if(Rect.intersects(player,fishrect))
 					{
 						contactFound = true;
+						fish.clear();
+						//canvas.restoreToCount(saveCount);
+						//canvas.drawColor(Color.BLACK);
+						
+						Bitmap bg = Bitmap.createBitmap(canvas.getWidth(), canvas.getHeight(), Bitmap.Config.RGB_565);
+						Canvas tempCanvas = new Canvas(bg);
+						
+						makeBG(tempCanvas);
+						
+						Message msg = new Message();
+						msg.what = 0;
+						msg.obj = new BitmapDrawable(bg);
+						usersActHandler.sendMessage(msg);
+						//invalidate();
 						return;
 					}
 					
-					canvas.drawBitmap(boat_fish, afish.x, afish.y, paint);
+					canvas.drawBitmap(boat_fish, afish.x, afish.y, null);
 				}
 
-				
-				
 				UserGameThread.sleep(20);
+				
+				if(fish.size()<3 && rand.nextInt(1000)<50)
+				{
+					Log.i("tantest", "Length: "+ fish.size());
+					FishGame afish = new FishGame();
+					afish.setY(rand.nextInt(canvasHeight-FishGame.height - 115 + 1) + 115);
+					afish.setVx(rand.nextInt(5)+1);
+					afish.setMaxW(canvasWidth);
+					fish.add(afish);
+				}
 			} 
 			catch (InterruptedException e) 
 			{
 				
 			}
 		}
-	}
-
-	public boolean onTouch(View v, MotionEvent event) 
-	{
-		Log.d("tantest", "Touch");
 		
-		thread.detectTouch(event);
-	    
-	    return super.onTouchEvent(event);
+		private void makeBG(Canvas a)
+		{
+			Path p = new Path();
+	        
+			p.moveTo(0,  (float) (110+offsetY+(10 *(Math.sin((float)(1+offset)*1/35))))); 
+			
+	        for (int i=1; i<canvasWidth; i++) 
+			{
+				p.lineTo(i, (float) (110+offsetY+(10 *(Math.sin((float)(i+offset)*1/35))))); 
+			}
+			
+			Path p2 = new Path();
+	        
+			p2.moveTo(boatX+36, boatY+50);
+			
+			p2.lineTo(boatX+36, boat_bindY); 
+	        
+	        //canvas.restore();
+			a.drawColor(Color.BLACK);
+			a.drawBitmap(boat, boatX, boatY, null);
+			a.drawBitmap(boat_bind, boatX, boat_bindY, null);
+			
+			//canvas.drawColor(Color.BLACK);
+			paint.setColor(Color.rgb(46, 203, 237));
+			paint.setStrokeWidth(3);
+			a.drawPath(p, paint);
+			paint.setColor(Color.rgb(177, 177, 177));
+			paint.setStrokeWidth(1);
+	        a.drawPath(p2, paint);
+			
+			a.drawBitmap(boat_info, boatX+72, boatY-25, null);
+			a.drawBitmap(boat_stone1, 0, canvasHeight-50, null);
+			a.drawBitmap(boat_stone2, (canvasWidth/2)-35, canvasHeight-30, null);
+			a.drawBitmap(boat_stone3, canvasWidth-100, canvasHeight-50, null);
+			
+		}
 	}
 	
 	class FishGame 
@@ -311,62 +448,60 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 		static final int height = 20;
 		int x = -width;
 		int y = 0;
-		int speed = 3;
+		int speed = 2;
 		int starting = 0;
-		
-		int max;
-		int min;
+		private Random r = new Random();
 		int maxWidth;
+		int linearY = 0;
+		int linearDir = 0;
 		
-		public FishGame(int mi,int ma, int mw)
+		public FishGame(){}
+		
+		public void setX(int x)
 		{
-			//bottomLimit = canvasHeight-20;
-			//topLimit = 120;
-			Random rand = new Random();
-
-			// nextInt is normally exclusive of the top value,
-			// so add 1 to make it inclusive
-			y = rand.nextInt(ma - mi + 1) + mi;
-			
-			max = ma;
-			min = mi;
-			maxWidth = mw;
-			
-			//y = (int) (Math.random()*(bottomLimit-topLimit)) + topLimit;
-			
+			this.x = x;
 		}
 		
-		public FishGame(int mi,int ma, int mw, int s)
+		public void setY(int y)
 		{
-			
-			Random rand = new Random();
-			y = rand.nextInt(ma - mi + 1) + mi;
-			
-			max = ma;
-			min = mi;
-			maxWidth = mw;
-			speed = s;
+			this.y = y;
 		}
 		
-		public boolean update(int netX, int netY)
+		public void setVx(int x)
 		{
-			
-			/*if(((x-netX)^2+(y-netY)^2)<=((15+32)^2))
-			{
-				return false;
-			}*/
-			
+			this.speed = x;
+		}
+		
+		public void setMaxW(int w)
+		{
+			this.maxWidth = w;
+		}
+		
+		public void update()
+		{
 			x += speed;
-			
-			if(x >= maxWidth)
+
+			if(y<=120)
 			{
-				x=-width;
-				Random rand = new Random();
-				y = rand.nextInt(max - min + 1) + min;
-				//starting = ;
+				y += r.nextInt(3);
 			}
-			
-			return true;
+			else if(linearY == 0)
+			{
+				linearY = r.nextInt(12);
+				linearDir = r.nextInt(2);
+			}
+			else
+			{
+				y = (linearDir == 0) ? y+1:y-1;
+				//y += 1;
+				linearY--;
+			}
+		}
+		
+		public boolean ismarked()
+		{
+			if(x >= maxWidth) return true;
+			return false;
 		}
 	}
 }

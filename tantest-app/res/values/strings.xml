@@ -19,6 +19,11 @@
 	<string name="act_main_phone">Teléfono</string>
 	
 	
+	
+	
+	
+	
+	
 	<string name="act_main_email">Correo Electrónico</string>
 	<string name="act_main_password">Contraseña</string>
 	<string name="act_main_connect">Acceder</string>
@@ -27,6 +32,14 @@
 	<string name="act_main_code">Código</string>
 	<string name="act_main_right_code">¡ Código de Validación Correcto !</string>
 	<string name="act_main_resend_code">¿ No recibiste el código de verificación ?</string>
+	
+	<string name="act_users_loading_txt">Buscando contacto &#8230;</string>
+	
+	
+	
+	
+	
+	
 	
 	<string name="act_main_country">Selecciona país de origen</string>
 	<string name="act_main_offine">Desconectado</string>
