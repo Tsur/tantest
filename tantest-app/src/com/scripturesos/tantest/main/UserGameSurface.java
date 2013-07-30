@@ -282,7 +282,7 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 		
 		public void restart()
 		{
-			doStart();
+			//doStart();
 			contactFound = false;
 		}
 		
@@ -369,7 +369,7 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 						Bitmap bg = Bitmap.createBitmap(canvas.getWidth(), canvas.getHeight(), Bitmap.Config.RGB_565);
 						Canvas tempCanvas = new Canvas(bg);
 						
-						makeBG(tempCanvas);
+						makeBG(canvas, tempCanvas);
 						
 						Message msg = new Message();
 						msg.what = 0;
@@ -400,8 +400,9 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 			}
 		}
 		
-		private void makeBG(Canvas a)
+		private void makeBG(Canvas a, Canvas b)
 		{
+
 			Path p = new Path();
 	        
 			p.moveTo(0,  (float) (110+offsetY+(10 *(Math.sin((float)(1+offset)*1/35))))); 
@@ -422,19 +423,29 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 			a.drawBitmap(boat, boatX, boatY, null);
 			a.drawBitmap(boat_bind, boatX, boat_bindY, null);
 			
+			b.drawColor(Color.BLACK);
+			b.drawBitmap(boat, boatX, boatY, null);
+			b.drawBitmap(boat_bind, boatX, boat_bindY, null);
+			
 			//canvas.drawColor(Color.BLACK);
 			paint.setColor(Color.rgb(46, 203, 237));
 			paint.setStrokeWidth(3);
 			a.drawPath(p, paint);
+			b.drawPath(p, paint);
 			paint.setColor(Color.rgb(177, 177, 177));
 			paint.setStrokeWidth(1);
 	        a.drawPath(p2, paint);
-			
+	        b.drawPath(p2, paint);
+	        
 			a.drawBitmap(boat_info, boatX+72, boatY-25, null);
 			a.drawBitmap(boat_stone1, 0, canvasHeight-50, null);
 			a.drawBitmap(boat_stone2, (canvasWidth/2)-35, canvasHeight-30, null);
 			a.drawBitmap(boat_stone3, canvasWidth-100, canvasHeight-50, null);
 			
+			b.drawBitmap(boat_info, boatX+72, boatY-25, null);
+			b.drawBitmap(boat_stone1, 0, canvasHeight-50, null);
+			b.drawBitmap(boat_stone2, (canvasWidth/2)-35, canvasHeight-30, null);
+			b.drawBitmap(boat_stone3, canvasWidth-100, canvasHeight-50, null);
 		}
 	}
 	

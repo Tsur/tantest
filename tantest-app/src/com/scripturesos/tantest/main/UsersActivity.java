@@ -222,7 +222,7 @@ public class UsersActivity extends Application  //implements SensorEventListener
 		
 		Log.i("tantest","hiding surfaceView");
 		gameView.setVisibility(View.GONE);
-		//userGameView.invalidate();
+		userGameView.invalidate();
 		
 		vib.vibrate(vib_pattern,-1);
 		
@@ -289,9 +289,11 @@ public class UsersActivity extends Application  //implements SensorEventListener
 			Toast.makeText(UsersActivity.this, txt, Toast.LENGTH_SHORT).show();
 		}
 		
-		//userGameView.requestLayout();
-		gameView.setVisibility(View.VISIBLE);
+		userGameView.requestLayout();
+		Log.i("tantest","mostrando surfaceview");
 		userGameView.getThread().restart();
+		gameView.setVisibility(View.VISIBLE);
+		Log.i("tantest","mostrando surfaceview 2");
 	}
 	
 	public void displayUserFound(JSONObject user)
