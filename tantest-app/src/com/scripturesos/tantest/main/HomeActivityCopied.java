@@ -57,7 +57,7 @@ import com.scripturesos.tantest.connection.IOMessage;
 import com.scripturesos.tantest.connection.IOSocket;
 import com.scripturesos.tantest.connection.MessageCallback;
 
-public class HomeActivity extends Application {
+public class HomeActivityCopied extends Application {
 
 	private ProgressBar loader;
 	public static String client_id;
@@ -555,7 +555,7 @@ public class HomeActivity extends Application {
         });
 		
 		chatsListView = (ListView) findViewById(R.id.act_home_lv);
-		chatsListView.setAdapter(new ContactListAdapterHome(HomeActivity.this, chats));
+		chatsListView.setAdapter(new ContactListAdapterHome(HomeActivityCopied.this, chats));
 		chatsListView.setOnItemClickListener(new OnItemClickListener()
 		{
 				@Override 
@@ -611,7 +611,7 @@ public class HomeActivity extends Application {
             	chatMessages.put(contact,lcm);
             }
             
-            lv.setAdapter(new MessageListAdapter(HomeActivity.this,lcm));
+            lv.setAdapter(new MessageListAdapter(HomeActivityCopied.this,lcm));
             
 			chatViews.put(contact, chatView);
 			chats_temp.add(contact);
@@ -824,7 +824,7 @@ public class HomeActivity extends Application {
 		            
 		            ArrayList<ChatMessage> lcm = new ArrayList<ChatMessage>();
 		            
-		            lv.setAdapter(new MessageListAdapter(HomeActivity.this,lcm));
+		            lv.setAdapter(new MessageListAdapter(HomeActivityCopied.this,lcm));
 		            
 					chatViews.put(client, chatView);
 					chatMessages.put(client,lcm);
@@ -859,9 +859,9 @@ public class HomeActivity extends Application {
 	
 	public class HomeActivityHandler extends Handler 
 	{
-        private HomeActivity parent;
+        private HomeActivityCopied parent;
 
-        public HomeActivityHandler(HomeActivity parent) 
+        public HomeActivityHandler(HomeActivityCopied parent) 
         {
             this.parent = parent;
         }
@@ -1084,7 +1084,7 @@ public class HomeActivity extends Application {
 	
 	public void ifError(String txt)
 	{
-		Toast.makeText(HomeActivity.this, txt, Toast.LENGTH_SHORT).show();
+		Toast.makeText(HomeActivityCopied.this, txt, Toast.LENGTH_SHORT).show();
 	}
 	
 	public void handlerReceivedMessage(JSONObject response)
@@ -1121,7 +1121,7 @@ public class HomeActivity extends Application {
 			{
 				// Prepare intent which is triggered if the
 			    // notification is selected
-			    Intent intent = new Intent(HomeActivity.this, HomeActivity.class);
+			    Intent intent = new Intent(HomeActivityCopied.this, HomeActivityCopied.class);
 			    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 			    
 			    /*Bundle bundle = new Bundle();
@@ -1130,7 +1130,7 @@ public class HomeActivity extends Application {
 				intent.putExtras(bundle);*/
 			    intent.putExtra("client", client);
 			    
-			    PendingIntent pIntent = PendingIntent.getActivity(HomeActivity.this, (int) System.currentTimeMillis(), intent, 0);
+			    PendingIntent pIntent = PendingIntent.getActivity(HomeActivityCopied.this, (int) System.currentTimeMillis(), intent, 0);
 			
 			    Drawable d = ContactUtil.Cache.images.get(client);  
 			    Bitmap bitmap = null;
@@ -1152,7 +1152,7 @@ public class HomeActivity extends Application {
 			    }
 			    // Build notification
 			    // Actions are just fake
-			    Notification noti = (new NotificationCompat.Builder(HomeActivity.this))
+			    Notification noti = (new NotificationCompat.Builder(HomeActivityCopied.this))
 			        .setContentTitle(getString(R.string.act_home_notification)+" "+ContactUtil.Cache.contacts.get(client).getName())
 			        .setContentText((msg.length() > 65 ? msg.substring(0,64)+"...":msg))
 			        .setSmallIcon(R.drawable.notification)

@@ -413,8 +413,15 @@ public final class HttpUtil {
 		Matcher m = emailPattern.matcher(email); 
 		return m.matches();
 	}
+	
+	public static boolean isValidPhone(String phone) 
+	{
+		Matcher m = phonelPattern.matcher(phone); 
+		return m.matches();
+	}
 
     static Pattern emailPattern = Pattern.compile("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
+    static Pattern phonelPattern = Pattern.compile("^+?[0-9]{2,3}-? ?6[0-9]{6,9}$");
 	
     public static AtomicInteger uniqid 			= new AtomicInteger();
     private static final String BASE_URL 		= "http://www.scripturesos.com:3001/";

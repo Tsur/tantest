@@ -4,6 +4,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -13,8 +14,8 @@ import android.util.Log;
 import android.view.Display;
 import android.view.View;
 import android.view.animation.Animation;
-import android.view.animation.TranslateAnimation;
 import android.view.animation.Animation.AnimationListener;
+import android.view.animation.TranslateAnimation;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -23,42 +24,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 import com.scripturesos.tantest.connection.HttpUtil;
 
 
 public class UsersActivity extends Application  //implements SensorEventListener  
 {
-	public static class UsersActivityHandler extends Handler 
-	{
-        private UsersActivity parent;
-
-        public UsersActivityHandler(UsersActivity parent) 
-        {
-            this.parent = parent;
-        }
-
-        public void handleMessage(Message msg) 
-        {
-            parent.handleMessage(msg);
-        }
-    }
-	
-	public void handleMessage(Message msg) 
-	{
-        //JSONObject response = (JSONObject) msg.obj;
-        
-		switch(msg.what) 
-        {
-			case 0: findContact((Drawable) msg.obj);break;
-        	case 1: error(null);break;
-			case 2: displayUserFound((JSONObject) msg.obj);break;
-			case 10: error("Problema de conectividad"); break;
-        	default:break;
-        }
-    }
-	
-	public UsersActivityHandler handler;
-	
 	//TextView debug;
 	private RelativeLayout gameView, loadingView, contactView;
 	private ListView contactsListView;
@@ -210,7 +181,24 @@ public class UsersActivity extends Application  //implements SensorEventListener
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
 		// Inflate the menu; this adds items to the action bar if it is present.
-		getSupportMenuInflater().inflate(R.menu.activity_contacts, menu);
+		getSupportMenuInflater().inflate(R.menu.act_users, menu);
+		return true;
+	}
+	
+	public boolean onOptionsItemSelected(MenuItem item)
+	{
+		
+		switch(item.getItemId())
+		{
+			case R.id.menu_users_findbyid:
+				
+				Intent intent = new Intent(this, UsersIDActivity.class);
+				startActivityForResult(intent,1);
+				break;
+
+			default:break;
+		}
+		
 		return true;
 	}
 	
@@ -337,12 +325,27 @@ public class UsersActivity extends Application  //implements SensorEventListener
 			
 			if(user.has("status"))
 			{
+				((TextView) contactView.findViewById(R.id.act_users_contact_status)).setVisibility(View.VISIBLE);
 				((TextView) contactView.findViewById(R.id.act_users_contact_status)).setText(user.getString("status").toString());	
+			}
+			else
+			{
+				RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
+			            RelativeLayout.LayoutParams.WRAP_CONTENT, 
+			            RelativeLayout.LayoutParams.WRAP_CONTENT);
+				
+				params.addRule(RelativeLayout.RIGHT_OF, R.id.act_users_contact_img);
+				params.addRule(RelativeLayout.CENTER_VERTICAL);
+				params.addRule(RelativeLayout.CENTER_IN_PARENT);
+				params.setMargins(10, 0, 0, 0);
+				
+				((TextView) contactView.findViewById(R.id.act_users_contact_name)).setLayoutParams(params);
 			}
 			
 			if(user.has("deno"))
 			{
 				((TextView) contactView.findViewById(R.id.act_users_contact_deno)).setText(user.getString("deno").toString());	
+				((TextView) contactView.findViewById(R.id.act_users_contact_deno)).setVisibility(View.VISIBLE);
 			}
 			
 			((ImageView) contactView.findViewById(R.id.act_users_contact_img)).setImageDrawable(UsersUtil.imagesCache.get(id));
@@ -389,7 +392,7 @@ public class UsersActivity extends Application  //implements SensorEventListener
 	
 	public void startChat(View view)
 	{
-		error(null);
+		
 	}
 	/*
 	public void onAccuracyChanged(Sensor sensor, int accuracy) 
@@ -495,4 +498,35 @@ public class UsersActivity extends Application  //implements SensorEventListener
         }
     }
 	*/
+	
+	public static class UsersActivityHandler extends Handler 
+	{
+        private UsersActivity parent;
+
+        public UsersActivityHandler(UsersActivity parent) 
+        {
+            this.parent = parent;
+        }
+
+        public void handleMessage(Message msg) 
+        {
+            parent.handleMessage(msg);
+        }
+    }
+	
+	public void handleMessage(Message msg) 
+	{
+        //JSONObject response = (JSONObject) msg.obj;
+        
+		switch(msg.what) 
+        {
+			case 0: findContact((Drawable) msg.obj);break;
+        	case 1: error(null);break;
+			case 2: displayUserFound((JSONObject) msg.obj);break;
+			case 10: error("Problema de conectividad"); break;
+        	default:break;
+        }
+    }
+	
+	public UsersActivityHandler handler;
 }

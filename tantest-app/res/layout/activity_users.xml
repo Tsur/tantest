@@ -73,7 +73,7 @@
 	    	    android:layout_toRightOf="@id/act_users_contact_img"
 	    	    android:textColor="@color/white"
 	    	    android:textSize="12sp"
-	    	    android:visibility="visible" />
+	    	    android:visibility="gone" />
 
     	</RelativeLayout>
 
@@ -87,23 +87,23 @@
     	    android:layout_marginTop="5dp"
     	    android:textColor="@color/white"
     	    android:textSize="13sp"
-    	    android:visibility="visible" />
+    	    android:visibility="gone" />
 
     	<RelativeLayout
     	    android:layout_width="wrap_content"
     	    android:layout_height="wrap_content"
     	    android:layout_below="@+id/act_users_contact_deno"
     	    android:layout_centerHorizontal="true"
-    	    android:paddingBottom="15dp"
-    	    android:paddingLeft="5dp"
-    	    android:paddingRight="5dp"
-    	    android:paddingTop="10dp"
+    	    android:paddingBottom="10dp"
+    	    android:paddingLeft="3dp"
+    	    android:paddingRight="3dp"
+    	    android:paddingTop="5dp"
     	    android:visibility="visible" >
 		    	
 	    	<ImageButton
 	    	    android:id="@+id/act_users_contact_btn_skip"
-	    	    android:layout_width="24dp"
-	    	    android:layout_height="22dp"
+	    	    android:layout_width="16dp"
+	    	    android:layout_height="14dp"
 	    	    android:layout_marginTop="5dp"
 	    	    android:background="@drawable/act_users_redo"
 	    	    android:contentDescription="@string/act_main_verify"
@@ -111,8 +111,8 @@
 	    	
 	    	<ImageButton
 	    	    android:id="@+id/act_users_contact_btn_chat"
-	    	    android:layout_width="24dp"
-	    	    android:layout_height="22dp"
+	    	    android:layout_width="16dp"
+	    	    android:layout_height="14dp"
 	    	    android:layout_marginLeft="15dp"
 	    	    android:layout_marginTop="5dp"
 	    	    android:layout_toRightOf="@id/act_users_contact_btn_skip"
@@ -131,32 +131,40 @@
    	    android:layout_alignParentBottom="true"
    	    android:layout_centerHorizontal="true"
    	    android:layout_centerVertical="true"
-   	    android:background="@color/trans_blue"
+   	    android:background="@color/main_blue"
    	    android:padding="10dp"
    	    android:visibility="gone" >
         
-         <ProgressBar
-             android:id="@+id/act_users_loading_progress"
-             android:layout_width="wrap_content"
-             android:layout_height="wrap_content"
-             android:layout_centerVertical="true"
-             android:indeterminate="true"
-             android:maxHeight="28dp"
-             android:maxWidth="28dp"
-             android:minHeight="28dp"
-             android:minWidth="28dp" />
-
-    	<TextView
-    	    android:id="@+id/act_users_loading_txt"
-    	    android:layout_width="wrap_content"
-    	    android:layout_height="wrap_content"
-    	    android:layout_centerHorizontal="true"
-    	    android:layout_centerInParent="true"
-    	    android:layout_marginLeft="10dp"
-    	    android:layout_toRightOf="@id/act_users_loading_progress"
-    	    android:text="@string/act_users_loading_txt"
-    	    android:textColor="@color/black" />
-   	
+   	    	<RelativeLayout
+	   	    android:layout_width="wrap_content"
+	   	    android:layout_height="wrap_content"
+	   	    android:layout_centerHorizontal="true"
+	   	    android:layout_centerVertical="true" >
+		    	
+	         <ProgressBar
+	             android:id="@+id/act_users_loading_progress"
+	             android:layout_width="wrap_content"
+	             android:layout_height="wrap_content"
+	             android:layout_centerVertical="true"
+	             android:indeterminate="true"
+	             android:maxHeight="28dp"
+	             android:maxWidth="28dp"
+	             android:minHeight="28dp"
+	             android:minWidth="28dp" />
+	
+	    	<TextView
+	    	    android:id="@+id/act_users_loading_txt"
+	    	    android:layout_width="wrap_content"
+	    	    android:layout_height="wrap_content"
+	    	    android:layout_centerHorizontal="true"
+	    	    android:layout_centerInParent="true"
+	    	    android:layout_marginLeft="10dp"
+	    	    android:layout_toRightOf="@id/act_users_loading_progress"
+	    	    android:text="@string/act_users_loading_txt"
+	    	    android:textColor="@color/black" />
+	    	
+	   	</RelativeLayout>
+	   	
    	</RelativeLayout>
 	
 </RelativeLayout>

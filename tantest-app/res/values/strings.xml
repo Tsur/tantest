@@ -34,10 +34,10 @@
 	<string name="act_main_resend_code">¿ No recibiste el código de verificación ?</string>
 	
 	<string name="act_users_loading_txt">Buscando contacto &#8230;</string>
+	<string name="menu_users_findbyid">Buscar por ID</string>
 	
-	
-	
-	
+	<string name="act_usersID_title">Buscar contacto</string>
+	<string name="act_usersID_search">Introduce ID, alias, email o teléfono</string>
 	
 	
 	
