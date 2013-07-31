@@ -1,27 +1,25 @@
 package com.scripturesos.tantest.main;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.scripturesos.tantest.connection.HttpUtil;
-
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
-import android.widget.AdapterView.OnItemClickListener;
+
+import com.scripturesos.tantest.connection.HttpUtil;
 
 public class UsersIDActivity extends Application
 {
@@ -29,7 +27,8 @@ public class UsersIDActivity extends Application
 	private ListView usersList;
 	private ProgressBar progress;
 	private EditText searchbox;
-
+	private ImageButton searchbtn;
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -43,29 +42,8 @@ public class UsersIDActivity extends Application
 		searchbox = (EditText) findViewById(R.id.act_usersID_searchbox);
 		progress = (ProgressBar) findViewById(R.id.act_usersID_loader);
 		usersList =(ListView) findViewById(R.id.act_usersID_results);
-		
+		searchbtn = (ImageButton) findViewById(R.id.act_usersID_searchbtn);
 		handler = new UsersIDActivityHandler(this);
-	}
-	
-	@Override
-    public void onDestroy() 
-	{
-		//m_sensorManager.unregisterListener(this);
-        super.onDestroy();
-    }
-	
-	@Override
-	protected void onResume()
-    {
-		//registerListeners();
-		super.onResume();
-    }
-	
-	@Override
-	protected void onPause() 
-	{
-		//m_sensorManager.unregisterListener(this);
-		super.onPause();
 	}
 	
 	public void search(View view)
@@ -75,6 +53,7 @@ public class UsersIDActivity extends Application
 		if(searchbox.getText().toString().equals(""))
 		{
 			error("Introduzca datos requeridos");
+			return;
 		}
 		
 		progress.setVisibility(View.VISIBLE);
@@ -88,7 +67,7 @@ public class UsersIDActivity extends Application
 				{
 					String id = searchbox.getText().toString();
 					JSONObject response;
-					
+					Log.i("tantest","UsersIDActivity 1");
 					if(HttpUtil.isValidEmail(id))
 					{
 						response = HttpUtil.get(HttpUtil.getURL(HttpUtil.ID, new String[]{"email",id}));
@@ -106,6 +85,7 @@ public class UsersIDActivity extends Application
 						response = HttpUtil.get(HttpUtil.getURL(HttpUtil.ID, new String[]{"alias",id}));
 					}
 					
+					Log.i("tantest","UsersIDActivity 2");
 					Message msg = new Message();
 					
 					if(response.getInt("error") == 1)
@@ -127,13 +107,14 @@ public class UsersIDActivity extends Application
 						}
 					}
 					
+					Log.i("tantest","UsersIDActivity 3");
 					handler.sendMessage(msg);	
 				}
 				catch(Exception e)
 				{	
 					Message msg = new Message();
 					msg.what = 10;
-					
+					Log.i("tantest","UsersIDActivity 4");
 					handler.sendMessage(msg);
 				}
 				
@@ -200,12 +181,19 @@ public class UsersIDActivity extends Application
 		{
 
 		}
+		finally
+		{
+			searchbtn.setEnabled(true);
+		}
 	}
 	
 	public void error(String txt)
 	{
-		Toast.makeText(UsersIDActivity.this, txt, Toast.LENGTH_SHORT).show();
+		
+		searchbtn.setEnabled(true);
 		progress.setVisibility(View.GONE);
+		Toast.makeText(UsersIDActivity.this, txt, Toast.LENGTH_SHORT).show();
+		Log.i("tantest","msg: "+txt);
 	}
 	
 	public static class UsersIDActivityHandler extends Handler 
@@ -226,7 +214,7 @@ public class UsersIDActivity extends Application
 	public void handleMessage(Message msg) 
 	{
         //JSONObject response = (JSONObject) msg.obj;
-        
+		Log.i("tantest","UsersIDActivity handling msg");
 		switch(msg.what) 
         {
 			case 1: error("No se ha encontrado ningún resultado");break;

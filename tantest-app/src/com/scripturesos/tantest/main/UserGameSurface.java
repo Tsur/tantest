@@ -54,8 +54,9 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 	
 	public void surfaceCreated(SurfaceHolder holder) 
 	{
-	    	thread.setRunning(true);
-	    	thread.start();
+		Log.i("tantest","calling created");
+		thread.setRunning(true);
+	    thread.start();
 	}
 	
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,int height) 
@@ -69,7 +70,7 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 
 		 thread.setRunning(false);
 		 
-		 while (retry) 
+		 while(retry) 
 		 {
 			 try 
 			 {
@@ -82,8 +83,6 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 				 
 		     }
 		}
-
-		Log.i("tantest","Thread destroyed");
 	}
 	
 

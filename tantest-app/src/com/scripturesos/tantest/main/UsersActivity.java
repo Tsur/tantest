@@ -35,7 +35,7 @@ public class UsersActivity extends Application  //implements SensorEventListener
 	private ListView contactsListView;
 	private ProgressBar progress;
 	private UserGameSurface userGameView;
-	
+	private boolean resuming = false;
 	
 	private Vibrator vib;
 	private long[] vib_pattern = { 0, 1000, 0};
@@ -167,13 +167,26 @@ public class UsersActivity extends Application  //implements SensorEventListener
 	protected void onResume()
     {
 		//registerListeners();
+		if(resuming)
+		{
+			Log.i("tantest","resuming");
+			Display display = getWindowManager().getDefaultDisplay();
+			userGameView = new UserGameSurface(this);
+			userGameView.setHandler(handler);
+			userGameView.getThread().setSurfaceSize(display.getWidth(), display.getHeight());
+			userGameView.requestFocus();
+			gameView.addView(userGameView);
+		}
+		
 		super.onResume();
     }
 	
 	@Override
 	protected void onPause() 
 	{
-		//m_sensorManager.unregisterListener(this);
+		userGameView.invalidate();
+		gameView.removeAllViews();
+		resuming = true;
 		super.onPause();
 	}
 	

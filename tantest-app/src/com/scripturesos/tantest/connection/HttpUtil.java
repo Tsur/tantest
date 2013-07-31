@@ -76,7 +76,9 @@ public final class HttpUtil {
 				}
 				break;
 			case ID:
+				Log.i("tantest","p0: " + params[0]+" p1:"+params[1]);
 				url += "id?"+params[0]+"="+URLEncoder.encode(params[1],"UTF-8");
+				Log.i("tantest","URL: " + url);
 				break;
 			/*case GET_CONTACTS:
 				url += "getContacts/";
