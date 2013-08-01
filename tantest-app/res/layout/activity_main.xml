@@ -93,7 +93,8 @@
 		            android:hint="@string/act_main_password"
 		            android:inputType="textPassword"
 		            android:textColor="@color/black"
-		            android:textColorHint="@color/black" />
+		            android:textColorHint="@color/black" 
+		            android:nextFocusForward="@+id/main_connect"/>
 		        
 		    </RelativeLayout>
 			
@@ -118,7 +119,8 @@
 				    android:hint="@string/act_main_code"
 				    android:inputType="textPassword"
 				    android:textColor="@color/black"
-				    android:textColorHint="@color/black" />
+				    android:textColorHint="@color/black"
+				    android:nextFocusForward="@+id/main_validate" />
 				
 		    </RelativeLayout>
 		    

@@ -5,9 +5,12 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import android.graphics.drawable.Drawable;
+
+import com.scripturesos.tantest.connection.HttpUtil;
 
 public class UsersUtil 
 {
@@ -24,6 +27,47 @@ public class UsersUtil
     		UsersUtil.imagesCache.put(id, HomeActivity.default_dr);
     	}
 	      
+    }
+    
+    public static void saveUsers(String[] users)
+    {
+    	try 
+    	{
+			JSONObject response = HttpUtil.post(HttpUtil.GET_USERS, users);
+			
+			if(response.getInt("error") == 0)
+			{
+				JSONArray ausers = response.getJSONArray("users");
+				
+				for(int i=0; i<ausers.length();i++)
+				{
+					saveUser(ausers.getJSONObject(i));
+				}
+			}
+		}
+    	catch(Exception e) 
+    	{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+    
+    public static void initUser(JSONObject user)
+    {
+    	try 
+    	{
+			UKEY = user.getString("key");
+			UID = user.getString("_id");
+			UTOKEN = user.getString("token");
+			UEMAIL = user.getString("email");
+			saveUser(user);
+		} 
+    	catch (Exception e) 
+    	{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
     }
     
     public static void saveUser(JSONObject user)
@@ -105,6 +149,7 @@ public class UsersUtil
 	      
     }
     
+    static public String UKEY, UID, UTOKEN, UEMAIL;
     static public Map<String, UserItemListView> contactsCache = new HashMap<String, UserItemListView>();
     static public Map<String, Drawable> imagesCache = new HashMap<String, Drawable>();
 }

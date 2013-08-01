@@ -36,6 +36,7 @@ public class UsersActivity extends Application  //implements SensorEventListener
 	private ProgressBar progress;
 	private UserGameSurface userGameView;
 	private boolean resuming = false;
+	private String id;
 	
 	private Vibrator vib;
 	private long[] vib_pattern = { 0, 1000, 0};
@@ -206,7 +207,7 @@ public class UsersActivity extends Application  //implements SensorEventListener
 			case R.id.menu_users_findbyid:
 				
 				Intent intent = new Intent(this, UsersIDActivity.class);
-				startActivityForResult(intent,1);
+				startActivityForResult(intent,0);
 				break;
 
 			default:break;
@@ -215,13 +216,37 @@ public class UsersActivity extends Application  //implements SensorEventListener
 		return true;
 	}
 	
+	@Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) 
+	{
+        super.onActivityResult(requestCode, resultCode, data);
+        
+        switch(requestCode) 
+        {
+            case 0:      
+	            if(resultCode == RESULT_OK) 
+	            {  
+	            	Bundle b = data.getExtras();
+	            	
+	            	//Recibimos usuario
+	            	if(b.containsKey("userID"))
+	            	{
+	            		id = b.getString("userID");
+	            		startChat(null);
+	            	}
+	            }
+	            break;
+            default:break;
+        }
+        
+    }
+	
 	public void findContact(Drawable bg)
 	{
 		//Mostramos un loading
 		//userGameView.clearFocus();
 		((RelativeLayout) findViewById(R.id.users_container)).setBackgroundDrawable(bg);
 		
-		Log.i("tantest","hiding surfaceView");
 		gameView.setVisibility(View.GONE);
 		userGameView.invalidate();
 		
@@ -247,20 +272,11 @@ public class UsersActivity extends Application  //implements SensorEventListener
 					else
 					{
 						//Found
-						msg.what = 2;
-						
 						JSONObject user = response.getJSONObject("users");
-						msg.obj = user;
+						UsersUtil.saveUser(user);
 						
-						//Download image
-						if(user.has("img"))
-						{
-							UsersUtil.downloadImg(user.getString("email"), user.getString("img"));
-						}
-						else
-						{
-							UsersUtil.imagesCache.put(user.getString("email"), HomeActivity.default_dr);
-						}
+						msg.what = 2;
+						msg.obj = user;					
 					}
 					
 					handler.sendMessage(msg);	
@@ -303,7 +319,7 @@ public class UsersActivity extends Application  //implements SensorEventListener
 		
 		try 
 		{
-			String id = user.getString("email").toString();
+			id = user.getString("email").toString();
 			
 			if(user.has("alias"))
 			{
@@ -405,7 +421,22 @@ public class UsersActivity extends Application  //implements SensorEventListener
 	
 	public void startChat(View view)
 	{
-		
+		if(id != null)
+		{
+		    Bundle bundle = new Bundle();
+			bundle.putString("userID", id);
+			
+			Intent mIntent = new Intent();
+			mIntent.putExtras(bundle);
+		    
+		    setResult(RESULT_OK, mIntent);
+
+		    finish();
+		}
+		else
+		{
+			error(null);
+		}
 	}
 	/*
 	public void onAccuracyChanged(Sensor sensor, int accuracy) 

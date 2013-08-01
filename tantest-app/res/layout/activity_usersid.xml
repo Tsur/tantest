@@ -22,6 +22,8 @@
 	        android:ellipsize="end"
 	        android:gravity="center_vertical|center_horizontal"
 	        android:hint="@string/act_usersID_search"
+	        android:maxLines="1"
+	        android:nextFocusForward="@+id/act_usersID_searchbtn"
 	        android:padding="10dp"
 	        android:textColor="@color/black"
 	        android:textColorHint="@color/black"
@@ -29,11 +31,11 @@
 	    
 	   <ImageButton
 	       android:id="@+id/act_usersID_searchbtn"
-	       android:layout_width="16dp"
-	       android:layout_height="16dp"
+	       android:layout_width="35dp"
+	       android:layout_height="35dp"
 	       android:layout_alignParentRight="true"
-	       android:layout_marginRight="15dp"
-	       android:layout_marginTop="20dp"
+	       android:layout_marginRight="5dp"
+	       android:layout_marginTop="10dp"
 	       android:background="@drawable/act_usersid_search"
 	       android:contentDescription="@string/act_usersID_title"
 	       android:onClick="search" />

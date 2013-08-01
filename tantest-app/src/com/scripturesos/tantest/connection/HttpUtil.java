@@ -38,6 +38,8 @@ import org.apache.http.message.BasicNameValuePair;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.scripturesos.tantest.main.UsersUtil;
+
 /*
 import com.scripturesos.tantest.main.ContactItemListView;
 import com.scripturesos.tantest.main.ContactListAdapter;
@@ -76,9 +78,7 @@ public final class HttpUtil {
 				}
 				break;
 			case ID:
-				Log.i("tantest","p0: " + params[0]+" p1:"+params[1]);
 				url += "id?"+params[0]+"="+URLEncoder.encode(params[1],"UTF-8");
-				Log.i("tantest","URL: " + url);
 				break;
 			/*case GET_CONTACTS:
 				url += "getContacts/";
@@ -160,10 +160,10 @@ public final class HttpUtil {
 	   			httppost = new HttpPost(BASE_URL+url);
 	   			
 	   			params = new ArrayList<NameValuePair>();
-	   			params.add(new BasicNameValuePair("key", User.key));
-	   			params.add(new BasicNameValuePair("email", User.get("email")));
-	   			params.add(new BasicNameValuePair("id", User.get("_id")));
-	   			params.add(new BasicNameValuePair("token", User.get("token")));
+	   			params.add(new BasicNameValuePair("key", UsersUtil.UKEY));
+	   			params.add(new BasicNameValuePair("email", UsersUtil.UEMAIL));
+	   			params.add(new BasicNameValuePair("id",UsersUtil.UID));
+	   			params.add(new BasicNameValuePair("token", UsersUtil.UTOKEN));
 	   			
 	   			for(int k=0;k<data.length;k+=2)
 				{
@@ -174,6 +174,31 @@ public final class HttpUtil {
 	   	    	httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
    	    	
    			break;
+   			
+   	    	case GET_USERS:
+   	    		
+   	    		url = "getUsers";
+	   			httppost = new HttpPost(BASE_URL+url);
+	   			
+	   			params = new ArrayList<NameValuePair>();
+	   			
+	   			String users = "[";
+
+	   			for(int k=0;k<data.length;k++)
+				{
+	   				users += "\""+data[k]+"\",";
+				}
+	   			
+	   			users = users.substring(0, users.length()-1);
+				
+	   			users += "]";
+	   			
+	   			params.add(new BasicNameValuePair("users", users));
+	   			
+	   			// Request parameters and other properties.
+	   	    	httppost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+	   	    	
+   	    		break;
    			
    	    	case REGISTER_TEST:
    	    		
@@ -320,8 +345,8 @@ public final class HttpUtil {
              conn.setRequestProperty("Connection", "Keep-Alive");
              conn.setRequestProperty("ENCTYPE", "multipart/form-data");
              conn.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
-             conn.setRequestProperty("key", User.key); 
-             conn.setRequestProperty("id", User.get("_id")); 
+             conn.setRequestProperty("key", UsersUtil.UKEY); 
+             conn.setRequestProperty("id", UsersUtil.UID); 
              
              dos = new DataOutputStream(conn.getOutputStream());
     
@@ -423,7 +448,7 @@ public final class HttpUtil {
 	}
 
     static Pattern emailPattern = Pattern.compile("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
-    static Pattern phonelPattern = Pattern.compile("^+?[0-9]{2,3}-? ?6[0-9]{6,9}$");
+    static Pattern phonelPattern = Pattern.compile(("^(\\+[0-9]{2,3})?6[0-9]{8,15}$"));
 	
     public static AtomicInteger uniqid 			= new AtomicInteger();
     private static final String BASE_URL 		= "http://www.scripturesos.com:3001/";
@@ -433,6 +458,7 @@ public final class HttpUtil {
     public static final int RESTORE		 		= 3;
     public static final int RANDOM		 		= 4;
     public static final int ID			 		= 5;
+    public static final int GET_USERS 			= 11;
     public static final int GET_UNCHEKED_MSG 	= 6;
     public static final int INFO		 		= 7;
    // public static final int UPLOAD_FILE 		= 8;

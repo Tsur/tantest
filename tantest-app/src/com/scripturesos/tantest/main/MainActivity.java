@@ -4,14 +4,11 @@ package com.scripturesos.tantest.main;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-//import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
-
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -20,22 +17,19 @@ import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.TranslateAnimation;
-
 import android.widget.EditText;
 import android.widget.ImageButton;
-
 import android.widget.ProgressBar;
-//import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.scripturesos.tantest.connection.HttpUtil;
+//import android.annotation.TargetApi;
+//import android.widget.RelativeLayout;
 //import com.google.i18n.phonenumbers.NumberParseException;
 //import com.google.i18n.phonenumbers.PhoneNumberUtil;
 //import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;
 //import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
-
-import com.scripturesos.tantest.connection.HttpUtil;
-import com.scripturesos.tantest.connection.User;
 
 public class MainActivity extends Activity 
 {
@@ -137,7 +131,6 @@ public class MainActivity extends Activity
 			getActionBar().hide();
 		}*/
 		
-		/* INIT CONTENT VIEW */
 		setContentView(R.layout.activity_main);
 
 		handler = new MainActivityHandler(this);
@@ -381,89 +374,7 @@ public class MainActivity extends Activity
 	{	
 		super.onDestroy();
 	}
-	/*
-	public void verifyCodeSMS(JSONObject response)
-	{
-
-		loader.setVisibility(View.GONE);
-
-		boolean confirmated = false;
-		
-		try 
-		{
-			confirmated = response.getBoolean("response");
-		} 
-		catch (JSONException e) 
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		
-		if(confirmated)
-		{
-			Log.i("tantest", "Codigo correcto!");
-			
-			unregisterReceiver(bcr_sent);
-			unregisterReceiver(bcr_received);
-			
-			goHome(true);
-		}
-		else
-		{
-			ifError("Vaya...esto es vergonzoso! No deberías hacer cosas malas");
-		}
-
-	}
 	
-	
-	
-	public void requestCode(JSONObject response)
-	{
-		
-		try
-		{
-
-			boolean success =  response.getBoolean("response");
-			
-			if(success)
-			{
-				info("Introduzca el codigo de verificacion que hemos enviado a su direccion de correo electrónico", false);
-				
-				//Ocultamos interfaz paso 1
-				country.setVisibility(View.GONE);
-				phone_input.setVisibility(View.GONE);
-				connect.setVisibility(View.GONE);
-				
-				View line = (View) findViewById(R.id.main_vertical_line);
-				line.setVisibility(View.GONE);
-				
-				ImageButton test = (ImageButton) findViewById(R.id.main_test);
-				test.setVisibility(View.GONE);
-				
-				//Mostramos interfaz paso 2
-				phone_code.setVisibility(View.VISIBLE);
-				
-				ImageButton verify = (ImageButton) findViewById(R.id.main_verify);
-				verify.setVisibility(View.VISIBLE);
-			}
-			else
-			{
-				info("Para añadir un nuevo dispositivo, debes registrar una cuenta de correo electrónico.",false);
-				((ImageButton) findViewById(R.id.main_connect)).setEnabled(true);
-			}
-			
-		} 
-		catch (JSONException e) 
-		{
-			info("Para añadir un nuevo dispositivo, debes registrar una cuenta de correo electrónico.",false);
-			((ImageButton) findViewById(R.id.main_connect)).setEnabled(true);
-		}
-		
-		
-		
-	}
-	*/
 	public void verifyCodeButtom(View view)
 	{
 		
@@ -572,7 +483,6 @@ public class MainActivity extends Activity
 			{
 				try 
 				{
-
 					Message msg = new Message();
 					msg.what = 4;
 					msg.obj = HttpUtil.get(HttpUtil.getURL(HttpUtil.ACCESS, new String[]{email,password}));
@@ -595,14 +505,11 @@ public class MainActivity extends Activity
 	{
 		
 		//Base de datos
-		/*if(db)
-		{
-			SQLiteDatabase dbw = DatabaseHelper.getInstance(getApplicationContext()).getWritableDatabase();
-			
-			dbw.execSQL("INSERT INTO options (key, value) VALUES (0,'"+phone+"')");
-			dbw.execSQL("INSERT INTO options (key, value) VALUES (1,'"+phone_country+"')");
-		}*/
-		User.init(user);
+		/*SQLiteDatabase dbw = DatabaseHelper.getInstance(getApplicationContext()).getWritableDatabase();
+		
+		dbw.execSQL("INSERT INTO options (key, value) VALUES (0,'"+email+"')");*/
+		
+		UsersUtil.initUser(user);
 		startActivity(new Intent(MainActivity.this, HomeActivity.class));
 		finish();
 	}
@@ -627,14 +534,18 @@ public class MainActivity extends Activity
     @Override
     public void onResume()
     {
-    	Log.i("tantest", "RESUME");
-    	
     	if(loader != null)
 		{
     		loader.setVisibility(View.GONE);
 		}
     	
     	super.onResume();
+    }
+    
+    @Override
+    public void onBackPressed() 
+    {
+    	moveTaskToBack(true);
     }
 
 }

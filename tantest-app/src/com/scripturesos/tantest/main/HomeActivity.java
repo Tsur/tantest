@@ -59,24 +59,21 @@ import com.scripturesos.tantest.connection.MessageCallback;
 
 public class HomeActivity extends Application {
 
-	private ProgressBar loader;
-	public static String client_id;
+	
+	
 	public static String country_id;
-	private ListView chatsListView;
-	private Map<String,View> chatViews= new HashMap<String,View>();
-	private String current_client;
+	
+	
+	
 	private String last_current_client;
 	private RelativeLayout chatContainer;
 	private RelativeLayout container;
 	private EditText sender;
 	public static IOSocket server;
-	public static Drawable default_dr;
-	public static Drawable gender_m;
-	public static Drawable gender_f;
+	
 	
 	private ArrayList<IOMessage> messages_offine = new ArrayList<IOMessage>();
-	private HashMap<String, ArrayList<ChatMessage>> chatMessages = new HashMap<String, ArrayList<ChatMessage>>();
-	private ArrayList<String> chats = new ArrayList<String>();
+	
 	private String contacts_serialized;
 	private boolean canSave = false;
 	private MediaPlayer sound;
@@ -85,17 +82,31 @@ public class HomeActivity extends Application {
 	private DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
 	
 	
+	
+	//Chats Components
+	private String current_client;
+	private Map<String,View> chatViews = new HashMap<String,View>();
+	private HashMap<String, ArrayList<ChatMessage>> chatMessages = new HashMap<String, ArrayList<ChatMessage>>();
+	
+	private ListView chatsListView;
+	private ArrayList<String> chats = new ArrayList<String>();
+	
+	//Static Drawables
+	public static Drawable default_dr;
+	public static Drawable gender_m;
+	public static Drawable gender_f;
+	
+	//Layout Components
+	private ProgressBar loader;
+	
 	@Override
-	protected void onCreate(Bundle savedInstanceState)
+	protected void onCreate(Bundle data)
 	{
-		super.onCreate(savedInstanceState);
-		/* INIT CONTENT VIEW */
-		Log.i("tantest","CREATE HOME ACTIVITY");
-		
+		super.onCreate(data);
+
 		setContentView(R.layout.activity_home);
 		
 		loader = (ProgressBar) findViewById(R.id.home_progressbar);
-		
 		handler = new HomeActivityHandler(this);
 	
 		default_dr = getResources().getDrawable(R.drawable.profile);
@@ -106,86 +117,71 @@ public class HomeActivity extends Application {
 		    
 			public void run() 
 			{
-				/*if(client_id == null || country_id == null)
+				
+				try
 				{
 					SQLiteDatabase db = DatabaseHelper.getInstance(getApplicationContext()).getReadableDatabase();
-					
 					Cursor cursor = db.rawQuery("SELECT value FROM options", null);
-					//Cursor cursor = db.rawQuery("SELECT value FROM options WHERE key=0 OR key=1", null);
 					
-					cursor.moveToFirst();
-					
-					client_id = cursor.getString(0);
-					
-					cursor.moveToNext();
-					
-					country_id = cursor.getString(0);
-					
-					ContactUtil.createAgenda(HomeActivity.this, client_id, country_id);
-
-					try 
+					if(cursor.getCount() > 0)
 					{
+						cursor.moveToFirst();
+
+						chatMessages = (HashMap<String, ArrayList<ChatMessage>>) HttpUtil.fromString(cursor.getString(0));
+								
 						if(cursor.moveToNext())
 						{
-							//Log.i("tantest","Tenemos chat messages");
-							
-							chatMessages = (HashMap<String, ArrayList<ChatMessage>>) HttpUtil.fromString(cursor.getString(0));
-							
-							if(cursor.moveToNext())
-							{
-								//Log.i("tantest","Tenemos chats");
-								chats = (ArrayList<String>) HttpUtil.fromString(cursor.getString(0));
-							}
-
-							if(chats.size() > 0)
-							{
-								//Log.i("tantest","tamaño mayor que uno");
-								
-								String scontacts = "[";
-								
-								for(String contact: chats)
-								{
-									scontacts += "\""+contact+"\",";
-									//Log.i("tantest","Contacto en chats: "+contact);
-								}
-								
-								scontacts = scontacts.substring(0, scontacts.length()-1);
-								
-								scontacts += "]";
-								
-								//Log.i("tantest","Contacto server: "+scontacts);
-								
-								ContactUtil.createContacts(scontacts);
-								
-								initChatViews();
-							}
-
-							if(cursor.moveToNext())
-							{
-								//Log.i("tantest","Tenemos messages offine");
-								messages_offine = (ArrayList<IOMessage>) HttpUtil.fromString(cursor.getString(0));
-								
-								db.execSQL("DELETE FROM options WHERE key=4");
-								
-							}
+							chats = (ArrayList<String>) HttpUtil.fromString(cursor.getString(0));
 						}
 						
+						if(chats.size() > 0)
+						{
+							String[] users = new String[chats.size()];
+							
+						    UsersUtil.saveUsers(chats.toArray(users));
+							
+							initChatViews();
+						}
+						
+						if(cursor.moveToNext())
+						{
+							//Log.i("tantest","Tenemos messages offine");
+							messages_offine = (ArrayList<IOMessage>) HttpUtil.fromString(cursor.getString(0));
+							
+							db.execSQL("DELETE FROM options WHERE key=4");
+						}
 					}
-					catch (Exception e) 
+
+					cursor.close();
+						
+					db.close();
+					
+					//Servidor
+					
+					sound = MediaPlayer.create(HomeActivity.this, R.raw.alert); 
+					
+					Message msg = new Message();
+					//Segun lo que sea, mostrar mensaje o mostrar listView 
+					if(chats.size() > 0)
 					{
+						msg.what = 6;
+					}
+					else
+					{
+						msg.what = 3;
 						
 					}
 					
-					cursor.close();
-					
-					db.close();
-					
-					//Log.i("tantest","phone: "+client_id);
-					//Log.i("tantest","country: "+country_id);
+					handler.sendMessage(msg);	
+				}
+				catch(Exception e)
+				{
 					
 				}
-				*/
-				/*server = new IOSocket(client_id, new MessageCallback() {
+
+			}
+				
+				/*server = new IOSocket(UsersUtil.UEMAIL, new MessageCallback() {
 					  
 					  @Override
 					  public void onConnect() 
@@ -224,7 +220,7 @@ public class HomeActivity extends Application {
 								  
 								  try 
 								  {
-									  response = HttpUtil.post(HttpUtil.GET_UNCHEKED_MSG,new String[]{client_id});
+									  response = HttpUtil.post(HttpUtil.GET_UNCHEKED_MSG,new String[]{UsersUtil.UEMAIL});
 									
 									  JSONArray unconfirmed = response.getJSONArray("response");
 									  
@@ -241,7 +237,7 @@ public class HomeActivity extends Application {
 								  
 								  try 
 								  {
-									  response = HttpUtil.post(HttpUtil.GET_UNREAD_MSG,new String[]{client_id});
+									  response = HttpUtil.post(HttpUtil.GET_UNREAD_MSG,new String[]{UsersUtil.UEMAIL});
 									
 									  JSONArray unread = response.getJSONArray("response");
 									  
@@ -337,31 +333,8 @@ public class HomeActivity extends Application {
 	
 				server.connect();
 				
-				sound = MediaPlayer.create(HomeActivity.this, R.raw.alert); 
 				
-				//Segun lo que sea, mostrar mensaje o mostrar listView 
-				if(chats.size() > 0)
-				{
-					for(String contact: chats)
-					{
-						if(server != null)
-						{
-							server.send(MessageCallback.CHAT_CREATE, contact);
-						}
-					}
-					
-					Message msg = new Message();
-					msg.what = 6;
-					handler.sendMessage(msg);
-				}
-				else
-				{
-					Message msg = new Message();
-					msg.what = 3;
-					handler.sendMessage(msg);	
-				}
 				*/
-		    }
 		}).start();
 	}
 
@@ -384,7 +357,7 @@ public class HomeActivity extends Application {
     		//loader.setVisibility(View.GONE);
 		}*/
     	
-    	if(client_id != null && server != null && !chats.isEmpty())
+    	if(UsersUtil.UEMAIL != null && server != null && !chats.isEmpty())
 		{
 			server.send(MessageCallback.CHAT_ONLINE);
 		}
@@ -468,7 +441,7 @@ public class HomeActivity extends Application {
     	else
     	{
     		//mismo efecto que si pulsa el boton home: moveTaskToBackGround
-    		if(client_id != null && server != null && !chats.isEmpty())
+    		if(UsersUtil.UEMAIL != null && server != null && !chats.isEmpty())
     		{
     			server.send(MessageCallback.CHAT_HAS_GONE);
     		}
@@ -486,23 +459,22 @@ public class HomeActivity extends Application {
 		sender = (EditText) findViewById(R.id.act_home_chat_input);
 		sender.setOnKeyListener(new OnKeyListener(){           
 
-			@Override
 			public boolean onKey(View arg0, int arg1, KeyEvent event) 
 			{
 				if(event.getAction()==KeyEvent.ACTION_DOWN) 
 				{
-					if(current_client!= null && !writing)
+					/*if(current_client!= null && !writing)
 					{
 						server.send(MessageCallback.CHAT_IS_WRITING,current_client,"on");
 						writing = true;
-					}
+					}*/
 					
 					return false;  
 	            }
 				
 				if (event.getAction()==KeyEvent.ACTION_UP) 
 				{
-					if(firstActionUp && writing)
+					/*if(firstActionUp && writing)
 					{
 						firstActionUp = false;
 						(new Thread(){
@@ -531,7 +503,8 @@ public class HomeActivity extends Application {
 								firstActionUp = true;
 						   }
 						}).start();
-					}
+					}*/
+					
 					/*if(writing)
 					{
 						if(current_client!= null)
@@ -555,17 +528,16 @@ public class HomeActivity extends Application {
         });
 		
 		chatsListView = (ListView) findViewById(R.id.act_home_lv);
-		chatsListView.setAdapter(new ContactListAdapterHome(HomeActivity.this, chats));
+		chatsListView.setAdapter(new UsersHomeListAdapter(HomeActivity.this, chats));
 		chatsListView.setOnItemClickListener(new OnItemClickListener()
 		{
-				@Override 
 				public void onItemClick(AdapterView<?> adapter, View view, int position, long arg3)
 			    { 
 					chatsListView.setVisibility(View.GONE);
 					
-					ContactItemListView contact = ContactUtil.Cache.contacts.get(((ContactListAdapterHome) chatsListView.getAdapter()).getContacts().get(position));
+					UserItemListView user = UsersUtil.contactsCache.get(((UsersHomeListAdapter) chatsListView.getAdapter()).getContacts().get(position));
 
-					current_client = contact.getID();
+					current_client = user.getEmail();
 					
 					makeChatVisible();
 			    }
@@ -577,7 +549,7 @@ public class HomeActivity extends Application {
     {
     	LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View chatView;
-		ContactItemListView contactlv;
+		UserItemListView contactlv;
 		ListView lv;
 		ArrayList<ChatMessage> lcm;
 		ArrayList<String> chats_temp = new ArrayList<String>();
@@ -586,20 +558,20 @@ public class HomeActivity extends Application {
 		{
 			chatView = inflater.inflate(R.layout.chat, null);
 			
-			if(ContactUtil.Cache.contacts.get(contact) == null)
+			if(UsersUtil.contactsCache.get(contact) == null)
 	        {
 				continue;
 	        }
 			else
 			{
-				contactlv = ContactUtil.Cache.contacts.get(contact);
+				contactlv = UsersUtil.contactsCache.get(contact);
 			}
 
-			((ImageView) chatView.findViewById(R.id.chat_img)).setImageDrawable(ContactUtil.Cache.images.get(contact));
+			((ImageView) chatView.findViewById(R.id.chat_img)).setImageDrawable(UsersUtil.imagesCache.get(contact));
             
 			//((TextView) header.findViewById(R.id.chat_lv_name)).setText(contact.getName());
-			((TextView) chatView.findViewById(R.id.chat_name)).setText(contactlv.getName());
-			((TextView) chatView.findViewById(R.id.chat_points)).setText(contactlv.getPoints());
+			((TextView) chatView.findViewById(R.id.chat_name)).setText(contactlv.getEmail());
+			((TextView) chatView.findViewById(R.id.chat_points)).setText(Integer.toString(contactlv.getLevel()));
 
             lv = (ListView) chatView.findViewById(R.id.chat_lv);
             
@@ -615,7 +587,6 @@ public class HomeActivity extends Application {
             
 			chatViews.put(contact, chatView);
 			chats_temp.add(contact);
-
 		}
 		
 		if(chats.size() != chats_temp.size())
@@ -656,17 +627,9 @@ public class HomeActivity extends Application {
 			case R.id.menu_header_social:
 				
 				Intent cintent = new Intent(this, UsersActivity.class);
-				Log.i("tantets","iniciando actividad ContactsActivity");
-				
-				if(contacts_serialized != null)
-			    {
-			    	Bundle bundle = new Bundle();
-			    	bundle.putString("contacts", contacts_serialized);
-			    	cintent.putExtras(bundle);
-			    }
-				
 				startActivityForResult(cintent,0);
 				break;
+				
 			case R.id.menu_settings:
 
 				break;
@@ -688,23 +651,11 @@ public class HomeActivity extends Application {
             {  
             	Bundle b = data.getExtras();
             	
-            	//Problema: Como actualizamos cuando cambie foto o estado?
-            	if(b.containsKey("contacts"))
+            	//Recibimos usuario
+            	if(b.containsKey("userID"))
             	{
-            		contacts_serialized = b.getString("contacts");
-            		
-            		//Los guardamos en BD
-            		//Log.i("tantest","Tenemos datos serializados");
+            		createChat(b.getString("userID"),null, true);
             	}
-            	
-            	if(b.containsKey("chat"))
-            	{
-            		String chat = b.getString("chat");
-            		
-            		//createChat((ContactItemListView)HttpUtil.fromString(chat));
-					createChat(chat,null, true);
-            	}
-
             }
             break;
             case 1:
@@ -776,80 +727,82 @@ public class HomeActivity extends Application {
 		}
 		else
 		{
-			//chatsListView.setVisibility(View.GONE);
+			//Ocultamos aviso de no chats iniciados aun
+			((TextView) findViewById(R.id.home_text)).setVisibility(View.GONE);
 			
-			TextView no_chats = (TextView) findViewById(R.id.home_text);
-			no_chats.setVisibility(View.GONE);
-			
+			//Mostramos loader
 			loader.setVisibility(View.VISIBLE);
 			
-			//Añadir a listView del HomeActivity
+			//Añadir a lista de user IDs 
 			chats.add(contact);
-			//((ContactListAdapter)chatsListView.getAdapter()).add(contact);
 
 			(new Thread() {
 			    
 				public void run() 
 				{
-					
-					LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-					View chatView = inflater.inflate(R.layout.chat, null);
-					
-					String client = chats.get(chats.size()-1);
-					//current_client = chats.get(chats.size()-1);
-					
-					ContactItemListView contact = null;
-					
-					if(ContactUtil.Cache.contacts.get(client) == null)
-			        {
+					try
+					{
+						LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+						View chatView = inflater.inflate(R.layout.chat, null);
 						
-						ContactUtil.createContacts("[\""+client+"\"]");
+						String id = chats.get(chats.size()-1);
 						
-						contact = ContactUtil.Cache.contacts.get(client);
+						//Obtenemos usuario
+						UserItemListView item = null;
+						
+						if(UsersUtil.contactsCache.get(id) == null)
+				        {
+							JSONObject response = HttpUtil.get(HttpUtil.getURL(HttpUtil.ID, new String[]{"email",id}));
+							
+							if(response.getInt("error") == 1)
+							{
+								//msg.what = 5;
+								//handler.sendMessage(msg);
+								return;
+							}
+							
+							UsersUtil.saveUser(response.getJSONArray("users").getJSONObject(0));
+				        }
+						
+						item = UsersUtil.contactsCache.get(id);
 
-			        }
-					else
-					{
-						contact = ContactUtil.Cache.contacts.get(client);
+						//Lista de Mensajes de la Vista del Chat
+						ListView lv = (ListView) chatView.findViewById(R.id.chat_lv);
+						//Datos del usuario con el que se abre el chat
+						((ImageView) chatView.findViewById(R.id.chat_img)).setImageDrawable(UsersUtil.imagesCache.get(id));
+						((TextView) chatView.findViewById(R.id.chat_name)).setText(item.getEmail());
+						((TextView) chatView.findViewById(R.id.chat_points)).setText(Integer.toString(item.getLevel()));
+			            
+			            //Adaptador para los mensajes del char
+			            ArrayList<ChatMessage> lcm = new ArrayList<ChatMessage>();
+			            lv.setAdapter(new MessageListAdapter(HomeActivity.this,lcm));
+			            
+			            //Añadimos para futuro acceso
+						chatViews.put(id, chatView);
+						chatMessages.put(id, lcm);//Esta ultima solo tiene caracter backup
+						
+						Message msg = new Message();
+	            		Log.i("tantest","Recogemos 1");
+						//Ambos msg 4 y 5: Añaden a listView del HomeActivity
+						//Cuando yo inicio
+						if(options == null)
+						{
+							current_client = id;
+							msg.what = 4;
+						}
+						//Cuando lo inician otros
+						else
+						{
+							msg.what = 5;
+							msg.obj = options;
+						}
+						 
+						handler.sendMessage(msg);
 					}
-					 
-					((ImageView) chatView.findViewById(R.id.chat_img)).setImageDrawable(ContactUtil.Cache.images.get(client));
-		            
-					//((TextView) header.findViewById(R.id.chat_lv_name)).setText(contact.getName());
-		            //((TextView) chatView.findViewById(R.id.chat_status)).setText(contact.getStatus());
-					((TextView) chatView.findViewById(R.id.chat_name)).setText(contact.getName());
-					((TextView) chatView.findViewById(R.id.chat_points)).setText(contact.getPoints());
-
-		            ListView lv = (ListView) chatView.findViewById(R.id.chat_lv);
-		            
-		            ArrayList<ChatMessage> lcm = new ArrayList<ChatMessage>();
-		            
-		            lv.setAdapter(new MessageListAdapter(HomeActivity.this,lcm));
-		            
-					chatViews.put(client, chatView);
-					chatMessages.put(client,lcm);
-					
-					Message msg = new Message();
-					
-					if(server != null)
+					catch(Exception e)
 					{
-						server.send(MessageCallback.CHAT_CREATE, client);
+						
 					}
-					
-					//Cuando yo inicio
-					if(options == null)
-					{
-						current_client = client;
-						msg.what = 4;
-					}
-					//Cuando lo inician otros
-					else
-					{
-						msg.what = 5;
-						msg.obj = options;
-					}
-					 
-					handler.sendMessage(msg);
 			    }
 			}).start();
 			
@@ -899,12 +852,12 @@ public class HomeActivity extends Application {
         		//RelativeLayout r = (RelativeLayout) findViewById(R.id.act_home_container);
         		//r.addView((LinearLayout) msg.obj);
         		canSave = true;
-        		((ContactListAdapterHome)chatsListView.getAdapter()).notifyDataSetChanged();
+        		((UsersHomeListAdapter)chatsListView.getAdapter()).notifyDataSetChanged();
         		//chatsListView.setVisibility(View.VISIBLE);
         		makeChatVisible();
         		break;
         	case 5:
-        		((ContactListAdapterHome)chatsListView.getAdapter()).notifyDataSetChanged();
+        		((UsersHomeListAdapter)chatsListView.getAdapter()).notifyDataSetChanged();
         		//makeChatVisible();
         		//Notificamos
         		String[] options = (String[])msg.obj;
@@ -1305,7 +1258,7 @@ public class HomeActivity extends Application {
 		
 		((MessageListAdapter)lv.getAdapter()).notifyDataSetChanged();
 		
-		server.send(MessageCallback.CHAT_CONFIRMATION, from, message_id, client_id);
+		server.send(MessageCallback.CHAT_CONFIRMATION, from, message_id, UsersUtil.UEMAIL);
 		
 		ContactItemListView contact  = ContactUtil.Cache.contacts.get(from);
 		if( contact != null)
@@ -1324,7 +1277,7 @@ public class HomeActivity extends Application {
 				//Envia mensaje al otro usuario
 				Log.i("tantest","Envio confirmacion");
 				
-				server.send(MessageCallback.CHAT_CONFIRMATION, from, message_id, client_id);
+				server.send(MessageCallback.CHAT_CONFIRMATION, from, message_id, UsersUtil.UEMAIL);
 				
 				ContactItemListView contact  = ContactUtil.Cache.contacts.get(from);
 				if( contact != null)

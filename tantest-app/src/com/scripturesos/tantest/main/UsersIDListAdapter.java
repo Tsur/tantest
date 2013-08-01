@@ -25,7 +25,7 @@ public class UsersIDListAdapter extends BaseAdapter
 		    this.users = users;
 	}
 	 
-	public ArrayList<String> getContacts()
+	public ArrayList<String> getUsers()
 	{
 		return users;
 	}

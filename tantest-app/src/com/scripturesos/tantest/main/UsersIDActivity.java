@@ -6,6 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -29,7 +30,6 @@ public class UsersIDActivity extends Application
 	private EditText searchbox;
 	private ImageButton searchbtn;
 	
-	@SuppressWarnings("unchecked")
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
@@ -67,7 +67,7 @@ public class UsersIDActivity extends Application
 				{
 					String id = searchbox.getText().toString();
 					JSONObject response;
-					Log.i("tantest","UsersIDActivity 1");
+					
 					if(HttpUtil.isValidEmail(id))
 					{
 						response = HttpUtil.get(HttpUtil.getURL(HttpUtil.ID, new String[]{"email",id}));
@@ -80,12 +80,21 @@ public class UsersIDActivity extends Application
 					{
 						response = HttpUtil.get(HttpUtil.getURL(HttpUtil.ID, new String[]{"tid",id}));
 					}
+					else if(id.startsWith("<<e>>"))
+					{
+						id = id.replace("<<e>>", "");
+						response = HttpUtil.get(HttpUtil.getURL(HttpUtil.ID, new String[]{"email",id}));
+					}
+					else if(id.startsWith("<<p>>"))
+					{
+						id = id.replace("<<p>>", "");
+						response = HttpUtil.get(HttpUtil.getURL(HttpUtil.ID, new String[]{"phone",id}));
+					}
 					else
 					{
 						response = HttpUtil.get(HttpUtil.getURL(HttpUtil.ID, new String[]{"alias",id}));
 					}
 					
-					Log.i("tantest","UsersIDActivity 2");
 					Message msg = new Message();
 					
 					if(response.getInt("error") == 1)
@@ -107,14 +116,12 @@ public class UsersIDActivity extends Application
 						}
 					}
 					
-					Log.i("tantest","UsersIDActivity 3");
 					handler.sendMessage(msg);	
 				}
 				catch(Exception e)
 				{	
 					Message msg = new Message();
 					msg.what = 10;
-					Log.i("tantest","UsersIDActivity 4");
 					handler.sendMessage(msg);
 				}
 				
@@ -149,28 +156,19 @@ public class UsersIDActivity extends Application
 				public void onItemClick(AdapterView<?> adapter, View view, int position, long arg3)
 			    { 
 					
-					/*Intent mIntent = new Intent();
+					Intent mIntent = new Intent();
 				    
 				    Bundle bundle = new Bundle();
 					
-					ContactItemListView contact = ContactUtil.Cache.contacts.get(((ContactListAdapter) contactsListView.getAdapter()).getContacts().get(position));
+					UserItemListView user = UsersUtil.contactsCache.get(((UsersIDListAdapter) usersList.getAdapter()).getUsers().get(position));
 					
-					bundle.putString("chat", contact.getID());
-					
-					try 
-					{
-						bundle.putString("contacts", HttpUtil.toString(((ContactListAdapter) contactsListView.getAdapter()).getContacts()));
-					} 
-					catch (IOException e) 
-					{
+					bundle.putString("userID", user.getEmail());
 
-					}
-						
 					mIntent.putExtras(bundle);
 				    
 				    setResult(RESULT_OK, mIntent);
 				    
-				    finish();*/
+				    finish();
 			    }
 			});
 	        
@@ -188,12 +186,10 @@ public class UsersIDActivity extends Application
 	}
 	
 	public void error(String txt)
-	{
-		
+	{	
 		searchbtn.setEnabled(true);
 		progress.setVisibility(View.GONE);
 		Toast.makeText(UsersIDActivity.this, txt, Toast.LENGTH_SHORT).show();
-		Log.i("tantest","msg: "+txt);
 	}
 	
 	public static class UsersIDActivityHandler extends Handler 
@@ -214,7 +210,6 @@ public class UsersIDActivity extends Application
 	public void handleMessage(Message msg) 
 	{
         //JSONObject response = (JSONObject) msg.obj;
-		Log.i("tantest","UsersIDActivity handling msg");
 		switch(msg.what) 
         {
 			case 1: error("No se ha encontrado ningún resultado");break;

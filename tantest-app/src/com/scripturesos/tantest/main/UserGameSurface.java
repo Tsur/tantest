@@ -54,7 +54,6 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 	
 	public void surfaceCreated(SurfaceHolder holder) 
 	{
-		Log.i("tantest","calling created");
 		thread.setRunning(true);
 	    thread.start();
 	}
@@ -224,7 +223,7 @@ public class UserGameSurface extends SurfaceView implements SurfaceHolder.Callba
 					
 					synchronized(sh) 
 					{
-						if(!contactFound)
+						if(!contactFound && c!=null)
 						{
 							doDraw(c);
 						}

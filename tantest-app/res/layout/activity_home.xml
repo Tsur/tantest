@@ -2,8 +2,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:windowActionBarOverlay="true"
-    android:background="@drawable/wall3">
+    android:background="@drawable/act_test_grade3"
+    android:windowActionBarOverlay="true" >
     
     <RelativeLayout
          android:id="@+id/act_home_container"

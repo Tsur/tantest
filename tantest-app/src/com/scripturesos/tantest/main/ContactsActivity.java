@@ -116,12 +116,10 @@ public class ContactsActivity extends Application {
         super.onConfigurationChanged(newConfig);
     }
 	
-	/*
-	 * Obtenemos contactos de la Agenda
-	 */
+	
 	private void getContacts()
 	{
-		ContactUtil.createAgenda(this, HomeActivity.client_id, HomeActivity.country_id);
+		ContactUtil.createAgenda(this, "client_id", HomeActivity.country_id);
 
 		if(ContactUtil.Cache.agenda.size() > 0)
 		{
@@ -222,7 +220,7 @@ public class ContactsActivity extends Application {
         					// Create a File from this Uri
         		            File file = FileUtils.getFile(uri);
         		            
-        					ContactUtil.createAgendaFromVCard(file, HomeActivity.client_id, HomeActivity.country_id);
+        					ContactUtil.createAgendaFromVCard(file, "client_id", HomeActivity.country_id);
         			        
         					if(ContactUtil.Cache.agenda.size() > 0)
         					{
