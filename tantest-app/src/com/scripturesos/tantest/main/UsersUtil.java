@@ -56,7 +56,7 @@ public class UsersUtil
     {
     	try 
     	{
-			UKEY = user.getString("key");
+			//UKEY = user.getString("key");
 			UID = user.getString("_id");
 			UTOKEN = user.getString("token");
 			UEMAIL = user.getString("email");
@@ -149,7 +149,8 @@ public class UsersUtil
 	      
     }
     
-    static public String UKEY, UID, UTOKEN, UEMAIL;
+    static public String UID, UTOKEN, UEMAIL;
+    static final public String UKEY = "";
     static public Map<String, UserItemListView> contactsCache = new HashMap<String, UserItemListView>();
     static public Map<String, Drawable> imagesCache = new HashMap<String, Drawable>();
 }

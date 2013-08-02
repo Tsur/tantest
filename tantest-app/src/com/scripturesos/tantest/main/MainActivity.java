@@ -13,7 +13,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.AlphaAnimation;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.TranslateAnimation;
@@ -71,7 +71,7 @@ public class MainActivity extends Activity
 				{
 					if(response.getInt("access") == 0)
 					{
-						info("Se ha enviado un nuevo código a su correo", false);
+						info("Hemos vuelto a enviar un código de verificación a su correo electrónico, introdúzcalo y pulse verificar para validar su cuenta, por favor.", false);
 					}
 					else
 					{
@@ -83,11 +83,13 @@ public class MainActivity extends Activity
 					 ifError("¡ Tenemos un problema Houston ! Inténtelo más tarde");break;
 				}
 				
-				
+				resend_text.setEnabled(true);
 				break;
         	//Errors
         	case 10: ifError("¡ Tenemos un problema Houston ! Inténtelo más tarde");break;
-        	case 11: ifError("El teléfono introducido no es correcto");break;
+        	case 11: 
+        		resend_text.setEnabled(true);
+        		break;
         	case 12: ifError("Revise su conexion a internet");break;
         	
         	//Database
@@ -125,10 +127,10 @@ public class MainActivity extends Activity
 		super.onCreate(savedInstanceState);
 		
 		Log.i("tantest", "CREANDO");
-
+		
 		/*if(Build.VERSION.SDK_INT >= 11)
 		{
-			getActionBar().hide();
+			
 		}*/
 		
 		setContentView(R.layout.activity_main);
@@ -307,11 +309,11 @@ public class MainActivity extends Activity
 				Log.i("tantest","No account");
 				
 				//Hide Elements
-				email_input.setVisibility(View.GONE);
-				password_input.setVisibility(View.GONE);
+				((ViewGroup)email_input.getParent()).setVisibility(View.GONE);
+				((ViewGroup)password_input.getParent()).setVisibility(View.GONE);
 				connect_bt.setVisibility(View.GONE);
 				
-				code_input.setVisibility(View.VISIBLE);
+				((ViewGroup)code_input.getParent()).setVisibility(View.VISIBLE);
 				validate_bt.setVisibility(View.VISIBLE);
 				resend_text.setVisibility(View.VISIBLE);
 				
@@ -378,10 +380,19 @@ public class MainActivity extends Activity
 	public void verifyCodeButtom(View view)
 	{
 		
+		//code_text.setVisibility(View.GONE);
+		resend_text.setVisibility(View.GONE);
 		view.setVisibility(View.GONE);//.setEnabled(false);
 		loader.setVisibility(View.VISIBLE);
+		
 		validating = true;
 		
+		if(code_input.getText().toString().equals("") || code_input.getText().toString().length() != 8)
+		{
+			ifError("Por favor, introduzca el código de verificación");
+			return;
+		}
+
 		(new Thread() {
 		    
 			public void run() 
@@ -420,21 +431,20 @@ public class MainActivity extends Activity
 			{
 				code_input.setText("");
 				validate_bt.setVisibility(View.VISIBLE);//.setEnabled(true);
-				
-				info("El Codigo de validación es incorrecto", false);
+				resend_text.setVisibility(View.VISIBLE);
+				ifError("El Codigo de validación es incorrecto");
 			}
 			else
 			{
-				final Animation out = new AlphaAnimation(1.0f, 0.0f);
-				out.setDuration(500);
-				out.setStartOffset(1500);
+				Animation out = new TranslateAnimation(0, 0, -50, 0);
+				out.setFillAfter(true);
+				out.setDuration(700);
 				
 				out.setAnimationListener(new AnimationListener() {
 
-				    public void onAnimationEnd(Animation animation)
-				    {
-				    	
-				    	code_text.setVisibility(View.GONE);
+				    public void onAnimationEnd(Animation animation) {
+
+				    	code_text.clearAnimation();
 				    	
 				    	try
 				    	{
@@ -443,6 +453,7 @@ public class MainActivity extends Activity
 				    	catch(Exception e)
 				    	{
 				    		ifError("Un problema ha ocurrido");
+				    		resend_text.setVisibility(View.VISIBLE);
 				    	}
 
 				    }
@@ -456,10 +467,11 @@ public class MainActivity extends Activity
 						// TODO Auto-generated method stub
 						
 					}
+
 				});
 				
 				code_text.setText(R.string.act_main_right_code);
-				
+				//code_text.setVisibility(View.VISIBLE);
 				code_text.startAnimation(out);
 			}
 
@@ -467,15 +479,17 @@ public class MainActivity extends Activity
 		catch (JSONException e) 
 		{
 			code_input.setText("");
-			validate_bt.setEnabled(true);
-			
-			info("El Codigo de validación es incorrecto", false);
+			validate_bt.setVisibility(View.VISIBLE);
+			resend_text.setVisibility(View.VISIBLE);
+			ifError("El Codigo de validación es incorrecto");
 		}
 		
 	}
 	
 	public void sendCodeButtom(View view)
 	{
+		
+		view.setEnabled(false);
 		
 		(new Thread() {
 		    
@@ -493,7 +507,7 @@ public class MainActivity extends Activity
 				{
 					
 					Message msg = new Message();
-					msg.what = 10;
+					msg.what = 11;
 					
 					handler.sendMessage(msg);
 				}
@@ -517,17 +531,18 @@ public class MainActivity extends Activity
 	public void ifError(String txt)
 	{
 		loader.setVisibility(View.GONE);
-		code_text.setVisibility(View.GONE);
-
+		
 		Toast.makeText(MainActivity.this, txt, Toast.LENGTH_SHORT).show();
 		
 		if(validating)
 		{
 			validate_bt.setVisibility(View.VISIBLE);
+			resend_text.setVisibility(View.VISIBLE);
 		}
 		else
 		{
 			connect_bt.setVisibility(View.VISIBLE);
+			code_text.setVisibility(View.GONE);
 		}
 	}
 	
@@ -545,7 +560,9 @@ public class MainActivity extends Activity
     @Override
     public void onBackPressed() 
     {
-    	moveTaskToBack(true);
+    	//if(validating){}
+    	moveTaskToBack(false);
+    	super.onBackPressed();
     }
 
 }

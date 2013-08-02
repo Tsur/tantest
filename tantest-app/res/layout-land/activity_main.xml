@@ -126,11 +126,11 @@
 		     
 		    <ImageButton
 		        android:id="@+id/main_validate"
-		        android:layout_width="120dp"
+		        android:layout_width="65dp"
 		        android:layout_height="50dp"
 		        android:layout_below="@+id/main_edit_inputs"
 		        android:layout_centerHorizontal="true"
-		        android:layout_marginTop="10dp"
+		        android:layout_marginTop="20dp"
 		        android:background="@drawable/main_connect_buttom"
 		        android:contentDescription="@string/act_main_verify"
 		        android:onClick="verifyCodeButtom"
@@ -142,7 +142,6 @@
 		        android:layout_height="50dp"
 		        android:layout_below="@+id/main_edit_inputs"
 		        android:layout_centerHorizontal="true"
-		        android:layout_marginBottom="20dp"
 		        android:layout_marginTop="20dp"
 		        android:background="@drawable/main_connect_buttom"
 		        android:contentDescription="@string/act_main_connect"
@@ -170,9 +169,7 @@
 		        android:layout_centerHorizontal="true"
 		        android:layout_marginBottom="15dp"
 		        android:layout_marginTop="15dp"
-		        android:background="@drawable/loader_bg"
 		        android:indeterminate="true"
-		        android:padding="18dp"
 		        android:visibility="gone" />
 		   
 		</RelativeLayout>

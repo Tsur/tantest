@@ -64,6 +64,15 @@
 		  <artifactId>libphonenumber</artifactId>
 		  <version>5.4</version>
 		</dependency>
+		
+		<dependency>
+		    <groupId>socketio</groupId>
+		    <artifactId>socketio</artifactId>
+		    <version>0.9.2</version>
+		    <scope>system</scope>
+		    <systemPath>${project.basedir}/../tantest-lib/socketio.jar</systemPath>
+		    <type>jar</type>
+		</dependency>
 		-->
 		
 		<dependency>
@@ -79,11 +88,10 @@
 		</dependency>
 		
 		<dependency>
-		    <groupId>socketio</groupId>
+		    <groupId>com.socketio</groupId>
 		    <artifactId>socketio</artifactId>
 		    <version>0.9.2</version>
-		    <scope>system</scope>
-		    <systemPath>${project.basedir}/../tantest-lib/socketio.jar</systemPath>
+		    <type>jar</type>
 		</dependency>
 
     </dependencies>

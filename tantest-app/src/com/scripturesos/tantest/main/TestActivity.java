@@ -123,7 +123,7 @@ public class TestActivity extends Application {
 					tc = new TestConfiguration();
 				}
 
-				HomeActivity.server.send(MessageCallback.CHAT_IN_TEST);
+				HomeActivity.server.emit("CHAT_IN_TEST");
 				
 				test = TestFactory.createTest(String.valueOf(tc.category));
 

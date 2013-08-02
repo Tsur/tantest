@@ -124,9 +124,6 @@ public class HomeActivity extends Application {
 		gender_m = getResources().getDrawable(R.drawable.gender_m);
 		gender_f = getResources().getDrawable(R.drawable.gender_f);
 		
-		//Para debug
-		UsersUtil.UEMAIL = "prucheta@gmail.com";
-		
 		(new Thread() {
 		    
 			public void run() 
@@ -176,10 +173,14 @@ public class HomeActivity extends Application {
 
 						public void onConnect() 
 						{
-							Log.i("tantest","Conectado");
+							//Log.i("tantest","Conectado");
 							
 							if(UsersUtil.UEMAIL != null)
-								server.emit("INIT",UsersUtil.UEMAIL);
+							{
+								//Log.i("tantest","emitiendo INIT");
+								server.emit("INIT", UsersUtil.UEMAIL);
+							}
+								
 						}
 
 						public void onDisconnect() 
@@ -541,7 +542,7 @@ public class HomeActivity extends Application {
     		}
 			
     		moveTaskToBack(true);
-    		//super.onBackPressed();
+    		super.onBackPressed();
     	}
     }
 	

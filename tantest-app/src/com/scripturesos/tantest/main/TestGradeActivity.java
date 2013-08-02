@@ -44,7 +44,7 @@ public class TestGradeActivity extends Application {
 			    
 				public void run() 
 				{
-					HomeActivity.server.send(MessageCallback.CHAT_HAS_CHANGED, "2", String.valueOf(tg.getPoints()));
+					HomeActivity.server.emit("CHAT_HAS_CHANGED", "2", String.valueOf(tg.getPoints()));
 					
 			    }
 				
