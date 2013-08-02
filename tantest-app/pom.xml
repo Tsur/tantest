@@ -77,6 +77,14 @@
 		  <artifactId>commons-lang3</artifactId>
 		  <version>3.1</version>
 		</dependency>
+		
+		<dependency>
+		    <groupId>socketio</groupId>
+		    <artifactId>socketio</artifactId>
+		    <version>0.9.2</version>
+		    <scope>system</scope>
+		    <systemPath>${project.basedir}/../tantest-lib/socketio.jar</systemPath>
+		</dependency>
 
     </dependencies>
 

@@ -18,7 +18,7 @@ public class UserItemListView implements Serializable
 	protected String desc;
 	protected String whereabout;
 	protected char gender;
-	protected String deno = "";
+	protected String deno = "Adenominacional";
 	protected String phone;
 	protected String qr;
 	protected int level = 0;
