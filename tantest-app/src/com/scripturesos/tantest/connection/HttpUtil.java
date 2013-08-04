@@ -451,7 +451,7 @@ public final class HttpUtil {
     static Pattern phonelPattern = Pattern.compile(("^(\\+[0-9]{2,3})?6[0-9]{8,15}$"));
 	
     public static AtomicInteger uniqid 			= new AtomicInteger();
-    public static final String BASE_URL 		= "http://192.168.1.132:3001/";//"http://www.scripturesos.com:3001/";
+    public static final String BASE_URL 		= "http://www.scripturesos.com:3001/";//"http://192.168.1.132:3001/";
     public static final int ACCESS		 		= 0;
     public static final int VALIDATE_CODE 		= 1;
     public static final int FORGOT		 		= 2;

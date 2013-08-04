@@ -542,7 +542,7 @@ public class HomeActivity extends Application {
     		}
 			
     		moveTaskToBack(true);
-    		super.onBackPressed();
+    		//super.onBackPressed();
     	}
     }
 	

@@ -93,7 +93,7 @@ public class MainActivity extends Activity
         	case 12: ifError("Revise su conexion a internet");break;
         	
         	//Database
-        	case 20: loginGUI();break;
+        	//case 20: loginGUI();break;
         	default:break;
         }
     }
@@ -165,7 +165,7 @@ public class MainActivity extends Activity
 		    }
 		}).start();*/
 		
-		loginGUI();
+		loginGUI(savedInstanceState);
 	}
 	
 	@Override
@@ -190,7 +190,7 @@ public class MainActivity extends Activity
 		return true;
 	}
 	
-	public void loginGUI()
+	public void loginGUI(Bundle data)
 	{
 		//Get Loader
 		loader = (ProgressBar) findViewById(R.id.main_progressbar);
@@ -209,10 +209,43 @@ public class MainActivity extends Activity
 		code_text = (TextView) findViewById(R.id.main_validate_text);
 		resend_text = (TextView) findViewById(R.id.main_validate_resend);
 		
-		//Hide pre-progress bar and display login view
-		//((ProgressBar) findViewById(R.id.main_initProgressbar)).setVisibility(View.GONE);
-		//((RelativeLayout) findViewById(R.id.login_view)).setVisibility(View.VISIBLE);
+		/*if(data == null)
+		{
+			return;
+		}
 		
+		if(data.containsKey("email"))
+		{
+			email_input.setText(data.getString("email"));
+		}
+		
+		try {
+			
+			if(data.containsKey("validation"))
+			{
+				JSONObject response = new JSONObject();
+				
+				response.put("error", 0);
+
+				requestCode(response);
+				
+				if(data.containsKey("code"))
+				{
+					code_input.setText(data.getString("code"));
+				}
+			}
+			else
+			{
+				if(data.containsKey("password"))
+				{
+					password_input.setText(data.getString("password"));
+				}
+			}
+		} 
+		catch (JSONException e) 
+		{
+
+		}*/
 	}
 	
 	public void connectButtom(View view)
@@ -524,7 +557,9 @@ public class MainActivity extends Activity
 		dbw.execSQL("INSERT INTO options (key, value) VALUES (0,'"+email+"')");*/
 		
 		UsersUtil.initUser(user);
-		startActivity(new Intent(MainActivity.this, HomeActivity.class));
+		Intent i = new Intent(MainActivity.this, HomeActivity.class);
+		//i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		startActivity(i);
 		finish();
 	}
 	
@@ -546,6 +581,42 @@ public class MainActivity extends Activity
 		}
 	}
 	
+	/*
+	@Override
+	public void onSaveInstanceState(Bundle savedInstanceState) 
+	{
+		super.onSaveInstanceState(savedInstanceState);
+		// Save UI state changes to the savedInstanceState.
+		  
+		//Save Email
+		if(!email.equals(""))
+		{
+			savedInstanceState.putString("email", email);
+		}
+		
+		//Save State
+		if(validating)
+		{
+			savedInstanceState.putBoolean("validation", true);
+			
+			String code = code_input.getText().toString();
+			
+			if(!code.equals(""))
+			{
+				savedInstanceState.putString("code", code);
+			}
+		}
+		else
+		{
+			if(!password.equals(""))
+			{
+				savedInstanceState.putString("password", password);
+			}
+		}
+			 
+	}
+	*/
+	
     @Override
     public void onResume()
     {
@@ -557,12 +628,60 @@ public class MainActivity extends Activity
     	super.onResume();
     }
     
+    /*
     @Override
     public void onBackPressed() 
     {
-    	//if(validating){}
-    	moveTaskToBack(false);
-    	super.onBackPressed();
-    }
-
+    	if(validating)
+    	{
+    		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getApplicationContext());
+     
+			//Set title
+			alertDialogBuilder.setTitle("¿Desea cancelar el proceso de nueva cuenta?");
+     
+			// set dialog message
+			alertDialogBuilder
+			.setMessage("Si")
+			.setCancelable(true)
+			.setPositiveButton("Si",new DialogInterface.OnClickListener(){
+				
+				public void onClick(DialogInterface dialog, int id) 
+				{
+					//Volvemos a estado inicial
+					((ViewGroup)email_input.getParent()).setVisibility(View.VISIBLE);
+					((ViewGroup)password_input.getParent()).setVisibility(View.VISIBLE);
+					connect_bt.setVisibility(View.VISIBLE);
+					
+					((ViewGroup)code_input.getParent()).setVisibility(View.GONE);
+					validate_bt.setVisibility(View.GONE);
+					resend_text.setVisibility(View.GONE);
+					code_text.setVisibility(View.GONE);
+					
+					email_input.setText("");
+					code_input.setText("");
+				}
+				
+			})
+			.setNegativeButton("No",new DialogInterface.OnClickListener() {
+				
+				public void onClick(DialogInterface dialog,int id) 
+				{
+					// if this button is clicked, just close
+					// the dialog box and do nothing
+					dialog.cancel();
+				}
+			});
+ 
+    		// create alert dialog
+			AlertDialog alertDialog = alertDialogBuilder.create();
+ 
+			// show it
+			alertDialog.show();
+    		
+    	}
+    	
+    	//moveTaskToBack(false);
+    	//super.onBackPressed();
+    }*/
+	
 }
