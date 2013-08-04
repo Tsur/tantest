@@ -48,7 +48,7 @@
         <activity
 			android:configChanges="keyboardHidden|orientation|screenSize" 
 			android:label="@string/app_name" 
-			android:name=".HomeActivity" 
+			android:name=".HomeActivity"
 			android:theme="@style/SherlockBaseTheme" 
 			android:windowSoftInputMode="adjustResize">
         </activity>

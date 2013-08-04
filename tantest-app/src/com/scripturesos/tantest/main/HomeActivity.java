@@ -113,6 +113,7 @@ public class HomeActivity extends Application {
 	@Override
 	protected void onCreate(Bundle data)
 	{
+		Log.i("tantest", "ONCREATE HOME ACTIVITY");
 		super.onCreate(data);
 
 		setContentView(R.layout.activity_home);
@@ -131,7 +132,7 @@ public class HomeActivity extends Application {
 				try
 				{
 					SQLiteDatabase db = DatabaseHelper.getInstance(getApplicationContext()).getReadableDatabase();
-					Cursor cursor = db.rawQuery("SELECT value FROM options", null);
+					Cursor cursor = db.rawQuery("SELECT value FROM options WHERE key>0", null);
 					
 					if(cursor.getCount() > 0)
 					{
@@ -451,7 +452,7 @@ public class HomeActivity extends Application {
     		chatsListView.setVisibility(View.VISIBLE);
     		//loader.setVisibility(View.GONE);
 		}*/
-    	
+    	Log.i("tantest", "ONRESUME HOME ACTIVITY");
     	if(UsersUtil.UEMAIL != null && server != null && !chats.isEmpty())
 		{
 			server.emit("CHAT_ONLINE");
@@ -540,7 +541,7 @@ public class HomeActivity extends Application {
     		{
     			server.emit("CHAT_HAS_GONE");
     		}
-			
+			Log.i("tantest","back button");
     		moveTaskToBack(true);
     		//super.onBackPressed();
     	}

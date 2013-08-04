@@ -5,7 +5,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -23,6 +27,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.scripturesos.tantest.connection.DatabaseHelper;
 import com.scripturesos.tantest.connection.HttpUtil;
 //import android.annotation.TargetApi;
 //import android.widget.RelativeLayout;
@@ -61,7 +66,7 @@ public class MainActivity extends Activity
         	case 2: requestCode(response);break;
         	
         	*/
-			case 1: goHome((JSONObject) msg.obj);break;
+			case 1: goHome((JSONObject) msg.obj, true);break;
 			case 2: requestCode((JSONObject) msg.obj);break;
 			case 3: verifyCode((JSONObject) msg.obj);break;
 			case 4: 
@@ -84,6 +89,9 @@ public class MainActivity extends Activity
 				}
 				
 				resend_text.setEnabled(true);
+				break;
+			case 5:
+				loginGUI();
 				break;
         	//Errors
         	case 10: ifError("¡ Tenemos un problema Houston ! Inténtelo más tarde");break;
@@ -126,7 +134,7 @@ public class MainActivity extends Activity
 	{
 		super.onCreate(savedInstanceState);
 		
-		Log.i("tantest", "CREANDO");
+		Log.i("tantest", "ONCREATE MAIN ACTIVITY");
 		
 		/*if(Build.VERSION.SDK_INT >= 11)
 		{
@@ -137,7 +145,7 @@ public class MainActivity extends Activity
 
 		handler = new MainActivityHandler(this);
 		
-		/*(new Thread() {
+		(new Thread() {
 		    
 			public void run() 
 			{
@@ -147,13 +155,22 @@ public class MainActivity extends Activity
 				
 				if(cursor.getCount() > 0)
 				{
-					goHome(false);
+					cursor.moveToFirst();
+					
+					try 
+					{
+						goHome(new JSONObject(cursor.getString(0)),false);
+					} 
+					catch (JSONException e) 
+					{
+						
+					}
 				}
 				else
 				{
 					
 				    Message msg = new Message();
-					msg.what = 20;
+					msg.what = 5;
 					
 					handler.sendMessage(msg);
 				}
@@ -163,9 +180,7 @@ public class MainActivity extends Activity
 				db.close();
 				
 		    }
-		}).start();*/
-		
-		loginGUI(savedInstanceState);
+		}).start();
 	}
 	
 	@Override
@@ -190,7 +205,7 @@ public class MainActivity extends Activity
 		return true;
 	}
 	
-	public void loginGUI(Bundle data)
+	public void loginGUI(/*Bundle data*/)
 	{
 		//Get Loader
 		loader = (ProgressBar) findViewById(R.id.main_progressbar);
@@ -208,6 +223,9 @@ public class MainActivity extends Activity
 		//TextView for displaying information messages on top
 		code_text = (TextView) findViewById(R.id.main_validate_text);
 		resend_text = (TextView) findViewById(R.id.main_validate_resend);
+		
+		//email_input.setText("zuriebu@gmail.com");
+		//password_input.setText("dei97");
 		
 		/*if(data == null)
 		{
@@ -354,7 +372,7 @@ public class MainActivity extends Activity
 			}
 			
 		} 
-		catch (JSONException e) 
+		catch (Exception e) 
 		{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -481,7 +499,7 @@ public class MainActivity extends Activity
 				    	
 				    	try
 				    	{
-				    		goHome(response.getJSONObject("result"));
+				    		goHome(response.getJSONObject("result"),true);
 				    	}
 				    	catch(Exception e)
 				    	{
@@ -548,17 +566,20 @@ public class MainActivity extends Activity
 		}).start();
 	}
 	
-	public void goHome(JSONObject user)
+	public void goHome(JSONObject user, boolean db)
 	{
 		
 		//Base de datos
-		/*SQLiteDatabase dbw = DatabaseHelper.getInstance(getApplicationContext()).getWritableDatabase();
+		if(db)
+		{
+			SQLiteDatabase dbw = DatabaseHelper.getInstance(getApplicationContext()).getWritableDatabase();
 		
-		dbw.execSQL("INSERT INTO options (key, value) VALUES (0,'"+email+"')");*/
+			dbw.execSQL("INSERT INTO options (key, value) VALUES (0,'"+user.toString()+"')");
+		}
 		
 		UsersUtil.initUser(user);
 		Intent i = new Intent(MainActivity.this, HomeActivity.class);
-		//i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		startActivity(i);
 		finish();
 	}
@@ -624,11 +645,10 @@ public class MainActivity extends Activity
 		{
     		loader.setVisibility(View.GONE);
 		}
-    	
+
     	super.onResume();
     }
     
-    /*
     @Override
     public void onBackPressed() 
     {
@@ -637,11 +657,11 @@ public class MainActivity extends Activity
     		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getApplicationContext());
      
 			//Set title
-			alertDialogBuilder.setTitle("¿Desea cancelar el proceso de nueva cuenta?");
+			alertDialogBuilder.setTitle("Cancelar cuenta");
      
 			// set dialog message
 			alertDialogBuilder
-			.setMessage("Si")
+			.setMessage("¿Desea cancelar su nueva cuenta y salir?")
 			.setCancelable(true)
 			.setPositiveButton("Si",new DialogInterface.OnClickListener(){
 				
@@ -679,9 +699,12 @@ public class MainActivity extends Activity
 			alertDialog.show();
     		
     	}
+    	else
+    	{
+    		super.onBackPressed();
+    	}
+    	//moveTaskToBack(true);
     	
-    	//moveTaskToBack(false);
-    	//super.onBackPressed();
-    }*/
+    }
 	
 }
