@@ -369,6 +369,8 @@ public class MainActivity extends Activity
 				resend_text.setVisibility(View.VISIBLE);
 				
 				info("Hemos enviado un código de verificación a su correo electrónico, introdúzcalo y pulse verificar para validar su cuenta, por favor.", false);
+				
+				validating = true;
 			}
 			
 		} 
@@ -435,9 +437,7 @@ public class MainActivity extends Activity
 		resend_text.setVisibility(View.GONE);
 		view.setVisibility(View.GONE);//.setEnabled(false);
 		loader.setVisibility(View.VISIBLE);
-		
-		validating = true;
-		
+
 		if(code_input.getText().toString().equals("") || code_input.getText().toString().length() != 8)
 		{
 			ifError("Por favor, introduzca el código de verificación");

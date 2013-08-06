@@ -7,6 +7,7 @@ import io.socket.SocketIOException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -20,6 +21,7 @@ import java.util.TimerTask;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.http.client.ClientProtocolException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -179,7 +181,24 @@ public class HomeActivity extends Application {
 							if(UsersUtil.UEMAIL != null)
 							{
 								//Log.i("tantest","emitiendo INIT");
-								server.emit("INIT", UsersUtil.UEMAIL);
+								if(chats.size() > 0)
+								{
+									try 
+									{
+										JSONObject contacts = new JSONObject("{\"contacts\":"+chats.toString()+"}");
+										server.emit("INIT", UsersUtil.UEMAIL, contacts.toString());
+									} 
+									catch (JSONException e) 
+									{
+										
+									}
+									
+								}
+								else
+								{
+									server.emit("INIT", UsersUtil.UEMAIL);
+								}
+								
 							}
 								
 						}
@@ -187,7 +206,8 @@ public class HomeActivity extends Application {
 						public void onDisconnect() 
 						{
 							//Intentamos reconectar cada 1 seg.
-							ifError("Se ha perdido la conexion. Reconectando en breve ...");
+							Log.i("tantest","Se ha perdido la conexion. Reconectando en breve ...T");
+							//ifError("Se ha perdido la conexion. Reconectando en breve ...");
 							
 							if(!server.isConnected())
 							{
@@ -197,7 +217,8 @@ public class HomeActivity extends Application {
 
 						public void onError(SocketIOException error)
 						{
-							ifError("Se ha producido un Error: "+ error.getMessage());
+							//ifError("Se ha producido un Error: "+ error.getMessage());
+							Log.i("tantest","Se ha producido un Error: "+ error.getMessage());
 							
 							if(!server.isConnected())
 							{
@@ -218,43 +239,84 @@ public class HomeActivity extends Application {
 						
 						public void on(String event, IOAcknowledge ack, Object... args) 
 						{
+							Log.i("tantest","recibiendo evento: "+event);
+							
+							try
+							{
+								  Message handlerMSG = new Message();
+								  
+								  if(event.equals("CHAT_MESSAGE"))
+								  {
+									  String[] res = new String[]{args[0].toString(), args[1].toString(), args[2].toString()};
+									  
+									  handlerMSG.what = 0;
+									  handlerMSG.obj = res;
+								  }
+								  else if(event.equals("CHAT_CONFIRMATION"))
+								  {
+									  Log.i("tantest","sending ACK");
+									  if((Boolean) args[0])
+									  {
+										  String[] resp = new String[]{args[1].toString(),args[2].toString()};
+										
+										  handlerMSG.what = 1;
+										  handlerMSG.obj = resp;
+									  }
+									  
+								  }
+								  else if(event.equals("OUT"))
+								  {
+									  handlerMSG.what = 7;
+									  handlerMSG.obj = args[0].toString();
+								  }
+								  else if(event.equals("UPDATED"))
+								  {
+									  handlerMSG.what = 8;
+									  handlerMSG.obj = args[0].toString();
+								  }
+								  else if(event.equals("CHAT_WRITING"))
+								  {
+									  handlerMSG.what = 9;
+									  handlerMSG.obj = args;
+								  }
+								  else if(event.equals("TEST_IN"))
+								  {
+									  handlerMSG.what = 10;
+									  handlerMSG.obj = args[0].toString();
+								  }
+								  else if(event.equals("TEST_OUT"))
+								  {
+									  handlerMSG.what = 12;
+									  handlerMSG.obj = args[0].toString();
+								  }
+								  else if(event.equals("IN"))
+								  {
+									  handlerMSG.what = 11;
+									  handlerMSG.obj = args[0].toString();
+								  }
+								  else if(event.equals("BROADCAST"))
+								  {
+									  handlerMSG.what = 13;
+									  handlerMSG.obj = args[0].toString();
+								  }
+								  else if(event.equals("BIBLE"))
+								  {
+									  handlerMSG.what = 14;
+									  handlerMSG.obj = args[0].toString();
+								  }
+								  
+								  
+								  handler.sendMessage(handlerMSG);
+							}
+							catch(Exception e)
+							{
+								
+							}
 							/*(new Thread(){
 								  
 								  public void run() 
 								  {*/
-										  Message handlerMSG = new Message();
 										  
-										  if(event.equals("CHAT_MESSAGE"))
-										  {
-											  handlerMSG.what = 0;
-										  }
-										  else if(event.equals("CHAT_CONFIRMATION"))
-										  {
-											  handlerMSG.what = 1;
-										  }
-										  else if(event.equals("CHAT_HAS_GONE"))
-										  {
-											  handlerMSG.what = 7;
-										  }
-										  else if(event.equals("CHAT_HAS_CHANGED"))
-										  {
-											  handlerMSG.what = 8;
-										  }
-										  else if(event.equals("CHAT_IS_WRITING"))
-										  {
-											  handlerMSG.what = 9;
-										  }
-										  else if(event.equals("CHAT_IN_TEST"))
-										  {
-											  handlerMSG.what = 10;
-										  }
-										  else if(event.equals("CHAT_ONLINE"))
-										  {
-											  handlerMSG.what = 11;
-										  }
-										  
-										  handlerMSG.obj = args;
-									  	  handler.sendMessage(handlerMSG);
 								   /*}
 								  
 							  }).start();*/
@@ -455,7 +517,7 @@ public class HomeActivity extends Application {
     	Log.i("tantest", "ONRESUME HOME ACTIVITY");
     	if(UsersUtil.UEMAIL != null && server != null && !chats.isEmpty())
 		{
-			server.emit("CHAT_ONLINE");
+			server.emit("STATE","IN");
 		}
     	
     	super.onResume();
@@ -539,8 +601,9 @@ public class HomeActivity extends Application {
     		//mismo efecto que si pulsa el boton home: moveTaskToBackGround
     		if(UsersUtil.UEMAIL != null && server != null && !chats.isEmpty())
     		{
-    			server.emit("CHAT_HAS_GONE");
+    			server.emit("STATE","OUT");
     		}
+    		
 			Log.i("tantest","back button");
     		moveTaskToBack(true);
     		//super.onBackPressed();
@@ -561,7 +624,7 @@ public class HomeActivity extends Application {
 				{
 					/*if(current_client!= null && !writing)
 					{
-						server.send(MessageCallback.CHAT_IS_WRITING,current_client,"on");
+						server.emit("CHAT_WRITING",current_client,true);
 						writing = true;
 					}*/
 					
@@ -651,6 +714,13 @@ public class HomeActivity extends Application {
 		
 		loader.setVisibility(View.GONE);
     }
+    
+    @Override
+	protected void onDestroy() 
+	{	
+		server.disconnect();
+    	super.onDestroy();
+	}
     
     public void initChatViews()
     {
@@ -904,6 +974,8 @@ public class HomeActivity extends Application {
 							msg.obj = options;
 						}
 						 
+						server.emit("ADD_CONTACT", id);
+						
 						handler.sendMessage(msg);
 					}
 					catch(Exception e)
@@ -922,14 +994,16 @@ public class HomeActivity extends Application {
 		Toast.makeText(HomeActivity.this, txt, Toast.LENGTH_SHORT).show();
 	}
 	
-	public void handlerReceivedMessage(Object... response)
+	public void handlerReceivedMessage(String[] args)
 	{
 		try 
 		{
-			String from = (String) response[0];
-			String message = (String) response[1];
-			String message_id = (String) response[2];
+			Log.i("tantest","In handlerReceivedMessage 2: ");
+			String from 		= args[0];
+			String message 		= args[1];
+			String message_id 	= args[2];
 			
+			Log.i("tantest","In handlerReceivedMessage 2: "+from);
 			if(current_client != null && current_client.equals(from))
 			{
 				composeReceivedMessage(current_client,message,message_id);
@@ -940,10 +1014,12 @@ public class HomeActivity extends Application {
 			{
 				createChat(from, new String[]{from, message,message_id}, false);
 			}
+			
+			
 		} 
 		catch (Exception e) 
 		{
-			
+			ifError("Se produjo un error inesperado");
 		}
 	}
 	
@@ -1027,22 +1103,25 @@ public class HomeActivity extends Application {
 		
 	}
 	
-	public void handlerConfirmation(JSONObject response)
+	public void handlerConfirmation(String[] response)
 	{
 		try 
 		{
-			String from = response.getString("client_from");
-			String id = response.getString("message_id");
+			String from 	= response[0];
+			String pos 		= response[1];
+			
+			Log.i("tantest","confirmacion identificada");
 			
 			if(chatMessages.containsKey(from))
 			{
-				ArrayList<ChatMessage> lcm = chatMessages.get(from);
+				//ArrayList<ChatMessage> lcm = chatMessages.get(from);
+				chatMessages.get(from).get(Integer.parseInt(pos)).confirmed = true;
 				
-				for(ChatMessage cm : lcm)
+				/*for(ChatMessage cm : lcm)
 				{
 					if(cm.id.equals(id))
 					{
-						//Log.i("tantest","confirmacion identificada");
+						
 						cm.confirmed = true;
 						canSave = true;
 						
@@ -1056,17 +1135,17 @@ public class HomeActivity extends Application {
 				{
 					client = last_current_client;
 				}
-				
-				ListView lv = (ListView) chatViews.get(client).findViewById(R.id.chat_lv);
+				*/
+				ListView lv = (ListView) chatViews.get(from).findViewById(R.id.chat_lv);
 				((MessageListAdapter)lv.getAdapter()).notifyDataSetChanged();
-				
+				/*
 				ContactItemListView contact  = ContactUtil.Cache.contacts.get(client);
 				if( contact != null)
 				{
 					 contact.setLastDate(new Date());
 					 ((BaseAdapter) chatsListView.getAdapter()).notifyDataSetChanged();
 				}
-				
+				*/
 				/*(new Thread(){
 				    
 					public void run() 
@@ -1094,12 +1173,10 @@ public class HomeActivity extends Application {
 						}
 				   }
 				}).start();*/
-				
-				
 			}
 			
 		} 
-		catch (JSONException e) 
+		catch (Exception e) 
 		{
 			
 		}
@@ -1139,7 +1216,7 @@ public class HomeActivity extends Application {
 		}
 		
 		((MessageListAdapter)lv.getAdapter()).notifyDataSetChanged();
-		
+		/*
 		server.emit("CHAT_CONFIRMATION", from, message_id, UsersUtil.UEMAIL);
 		
 		ContactItemListView contact  = ContactUtil.Cache.contacts.get(from);
@@ -1149,7 +1226,7 @@ public class HomeActivity extends Application {
 			 ((BaseAdapter) chatsListView.getAdapter()).notifyDataSetChanged();
 		}
 		
-		/*
+		
 		(new Thread(){
 		    
 			public void run() 
@@ -1174,7 +1251,22 @@ public class HomeActivity extends Application {
 	
 	public void ComposeSentMessage(View view)
 	{
-		ComposeSentCustomMessage(sender.getText().toString(), false);
+		String text = sender.getText().toString();
+		
+		if(text.startsWith("><>"))
+		{
+			text = text.replace("><>","");
+			
+			String[] command = text.split("/");
+			
+			if(command.length == 2 && (command[0].equals("bible") || command[0].equals("bc")))
+			{
+				server.emit("ROOT",command[0], command[1]);
+				return;
+			}
+		}
+		
+		ComposeSentCustomMessage(text, false);
 	}
 	
 	public void ComposeSentCustomMessage(String message, boolean root)
@@ -1212,26 +1304,7 @@ public class HomeActivity extends Application {
 					//String message_id = UUID.randomUUID().toString();
 					//Log.i("tantest", "mensaje enviado: "+ StringEscapeUtils.escapeJava(cm.message));
 					//Cuidado!! mirar cuando usuairo envia mensaje que contiene caracteres raros como comillas
-					server.emit("CHAT_MESSAGE", /*new IOAcknowledge() {
-
-						public void ack(Object... args) 
-						{
-							Log.i("tantest", "Server acknowledges the message sent.");
-							
-							if((Boolean)args[0])
-							{
-								
-							}
-							else
-							{
-								
-							}
-							
-							for(Object o : args)
-								System.out.println(o.toString());
-						}
-						
-					}, */current_client, StringEscapeUtils.escapeJava(cm.message), cm.id);
+					server.emit("CHAT_MESSAGE", current_client, StringEscapeUtils.escapeJava(cm.message), String.valueOf(last));
 				}
 				
 			}).start();
@@ -1266,10 +1339,11 @@ public class HomeActivity extends Application {
 				init();
 				break;
 			case 0:
-        		handlerReceivedMessage(msg.obj);
+				Log.i("tantest","In handlerReceivedMessage 1: ");
+        		handlerReceivedMessage((String[]) msg.obj);
         		break;//ifError("Tenemos algunos problemillas... pero tu sonrie que Dios te ama");break;
         	case 1:
-        		handlerConfirmation((JSONObject) msg.obj);
+        		handlerConfirmation((String[]) msg.obj);
         		break;//ifError("Revise su conexión a Internet y sonrie que Dios te ama");break;
         	case 2: 
         		ifError("Tenemos algunos problemillas... pero tu sonrie que Dios te ama");
@@ -1289,120 +1363,72 @@ public class HomeActivity extends Application {
         		String[] options = (String[])msg.obj;
         		composeReceivedMessage(options[0],options[1],options[2]);
         		//Notificamos
-        		createNotification(options[0],options[1]);
+        		
+        		
+        		//createNotification(options[0],options[1]);
+        		
+        		
         		chatsListView.setVisibility(View.VISIBLE);
         		loader.setVisibility(View.GONE);
         		break;
         		//Has gone
         	case 7:
-        		
-        		response = (JSONObject) msg.obj;
-        		
-        		try
-        		{
-        			String who = response.getString("from");
-
-    				String date = formatter.format(new Date());
-        			
-        			((TextView) chatViews.get(who).findViewById(R.id.chat_status)).setText("última vez: "+date);
-        			
-        		}
-        		catch(Exception e)
-        		{
-        			
-        		}
+        		String user_out = (String) msg.obj;
+        		String date = formatter.format(new Date());
+        		((TextView) chatViews.get(user_out).findViewById(R.id.chat_status)).setText("última vez: "+date);
 
         		break;
         	//Has changed
         	case 8: 
-
-        		response = (JSONObject) msg.obj;
         		
-        		try
-        		{
-        			final String who = response.getString("from");
-        			final String value = response.getString("value");
-        			
-        			switch(response.getInt("type"))
-        			{
-        				//PHOTO
-        				case 0:
-        					(new Thread(){
-        					    
-        						public void run() 
-        						{
-        							
-        							if(ContactUtil.updateContactImg(who, value))
-        							{
-        								ListView lv = (ListView) chatViews.get(who).findViewById(R.id.chat_lv);
-        								((MessageListAdapter)lv.getAdapter()).notifyDataSetChanged();
-        								((BaseAdapter) chatsListView.getAdapter()).notifyDataSetChanged();
-        							}
-
-        					   }
-        					}).start();
-        					break;
-        				//Status
-        				case 1:
-        					(new Thread(){
-        					    
-        						public void run() 
-        						{
-        							
-        							if(ContactUtil.Cache.contacts.get(who) != null)
-        							{
-        								ContactUtil.Cache.contacts.get(who).setStatus(value);
-        								ListView lv = (ListView) chatViews.get(who).findViewById(R.id.chat_lv);
-        								((MessageListAdapter)lv.getAdapter()).notifyDataSetChanged();
-        								((BaseAdapter) chatsListView.getAdapter()).notifyDataSetChanged();
-        							}
-
-        					   }
-        					}).start();
-        					break;
-        				//Points
-        				case 2:
-        					(new Thread(){
-        					    
-        						public void run() 
-        						{
-        							
-        							if(ContactUtil.Cache.contacts.get(who) != null)
-        							{
-        								ContactUtil.Cache.contacts.get(who).setPoints(value);
-        								ListView lv = (ListView) chatViews.get(who).findViewById(R.id.chat_lv);
-        								((MessageListAdapter)lv.getAdapter()).notifyDataSetChanged();
-        								((BaseAdapter) chatsListView.getAdapter()).notifyDataSetChanged();
-        							}
-
-        					   }
-        					}).start();
-        					break;
-        				default:
-        					break;
-        			}
-        			
-        		}
-        		catch(Exception e)
-        		{
-        			
-        		}
+        		final String user_updated = (String) msg.obj;
+        		
+        		(new Thread(){
+				    
+					public void run() 
+					{
+						
+						try 
+						{
+							JSONObject response = HttpUtil.get(HttpUtil.getURL(HttpUtil.ID, new String[]{"email",user_updated}));
+							
+							if(response.getInt("error") == 1)
+							{
+								//msg.what = 5;
+								//handler.sendMessage(msg);
+								return;
+							}
+							
+							UsersUtil.saveUser(response.getJSONArray("users").getJSONObject(0));
+							
+							ListView lv = (ListView) chatViews.get(user_updated).findViewById(R.id.chat_lv);
+							((MessageListAdapter)lv.getAdapter()).notifyDataSetChanged();
+							((BaseAdapter) chatsListView.getAdapter()).notifyDataSetChanged();
+						} 
+						catch (Exception e) 
+						{
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+				}).start();
+        		
         		break;
         	case 9: 
         		
-        		response = (JSONObject) msg.obj;
-        		
+        		Object[] writing_response = (Object[]) msg.obj;
+        		String user_writing = writing_response[0].toString();
+        		Boolean writing_state = (Boolean) writing_response[1];
         		try
         		{
-        			String who = response.getString("from");
-
-        			if(response.getBoolean("on"))
+        			
+        			if(writing_state)
         			{
-        				((TextView) chatViews.get(who).findViewById(R.id.chat_status)).setText(R.string.chat_writing);
+        				((TextView) chatViews.get(user_writing).findViewById(R.id.chat_status)).setText(R.string.chat_writing);
         			}
         			else
         			{
-        				((TextView) chatViews.get(who).findViewById(R.id.chat_status)).setText(R.string.chat_online);
+        				((TextView) chatViews.get(user_writing).findViewById(R.id.chat_status)).setText(R.string.chat_online);
         			}
         			
         		}
@@ -1413,43 +1439,30 @@ public class HomeActivity extends Application {
         		break;
         	case 10: 
 
-        		response = (JSONObject) msg.obj;
-        		
-        		try
-        		{
-        			String who = response.getString("from");
+        		String user_testing_in = (String) msg.obj;
+        		((TextView) chatViews.get(user_testing_in).findViewById(R.id.chat_status)).setText(R.string.chat_intest);
 
-        			if(response.getBoolean("on"))
-        			{
-        				((TextView) chatViews.get(who).findViewById(R.id.chat_status)).setText(R.string.chat_intest);
-        			}
-        			else
-        			{
-        				((TextView) chatViews.get(who).findViewById(R.id.chat_status)).setText(R.string.chat_online);
-        			}
-        			
-        		}
-        		catch(Exception e)
-        		{
-        			
-        		}
         		break;
         	//Has welcome
         	case 11:
         		
-        		response = (JSONObject) msg.obj;
-        		
-        		try
-        		{
-        			String who = response.getString("from");
-        			
-        			((TextView) chatViews.get(who).findViewById(R.id.chat_status)).setText(R.string.chat_online);
-        			
-        		}
-        		catch(Exception e)
-        		{
-        			
-        		}
+        		String user_in = (String) msg.obj;
+        		((TextView) chatViews.get(user_in).findViewById(R.id.chat_status)).setText(R.string.chat_online);
+        		break;
+        	case 12: 
+
+        		String user_testing_out = (String) msg.obj;
+        		((TextView) chatViews.get(user_testing_out).findViewById(R.id.chat_status)).setText(R.string.chat_online);
+    			
+        		break;
+        	case 13: 
+
+        		String broadcast_message = (String) msg.obj;
+        		ifError(broadcast_message);
+        		break;
+        	case 14: 
+        		String bible_passage = (String) msg.obj;
+        		ComposeSentCustomMessage(bible_passage,false);
         		break;
         	default:
         		break;
