@@ -67,8 +67,8 @@ public class TestGradeActivity extends Application {
 		{
 			case R.id.act_test_grade_menu_chat:
 				//Busca contacto y entonces abre chat
-				Intent tintent = new Intent(this, ContactsActivity.class);
-				startActivityForResult(tintent,0);
+				//Intent tintent = new Intent(this, ContactsActivity.class);
+				//startActivityForResult(tintent,0);
 				break;
 
 			case R.id.act_test_grade_menu_share:

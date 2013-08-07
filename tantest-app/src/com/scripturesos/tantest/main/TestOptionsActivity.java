@@ -107,16 +107,13 @@ public class TestOptionsActivity extends Application {
 		sb1_text.setText(String.valueOf(sb1.getProgress()+5));
 		sb1.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
 
-		    @Override
 		    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 		        
 		    	sb1_text.setText(String.valueOf(progress+5));
 		    }
 
-		    @Override
 		    public void onStartTrackingTouch(SeekBar seekBar) {}
 
-		    @Override
 		    public void onStopTrackingTouch(SeekBar seekBar) {}
 		});
 		
@@ -129,7 +126,6 @@ public class TestOptionsActivity extends Application {
 		sb2_text.setText(R.string.act_test_opt_text17);
 		sb2.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
 
-		    @Override
 		    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 		        
 		    	if(progress == 0)
@@ -143,10 +139,8 @@ public class TestOptionsActivity extends Application {
 		    	
 		    }
 
-		    @Override
 		    public void onStartTrackingTouch(SeekBar seekBar) {}
 
-		    @Override
 		    public void onStopTrackingTouch(SeekBar seekBar) { }
 		});
 		
@@ -167,7 +161,6 @@ public class TestOptionsActivity extends Application {
 		b1.setOnLongClickListener(new OnLongClickListener() 
 		{ 
 	        
-			@Override
 	        public boolean onLongClick(View v) 
 			{
 				longPressed = true;
@@ -181,7 +174,6 @@ public class TestOptionsActivity extends Application {
 		b2.setOnLongClickListener(new OnLongClickListener() 
 		{ 
 	        
-			@Override
 	        public boolean onLongClick(View v) 
 			{
 				longPressed = true;
@@ -195,7 +187,6 @@ public class TestOptionsActivity extends Application {
 		b3.setOnLongClickListener(new OnLongClickListener() 
 		{ 
 	        
-			@Override
 	        public boolean onLongClick(View v) 
 			{
 				longPressed = true;
@@ -209,7 +200,6 @@ public class TestOptionsActivity extends Application {
 		b4.setOnLongClickListener(new OnLongClickListener() 
 		{ 
 	        
-			@Override
 	        public boolean onLongClick(View v) 
 			{
 				longPressed = true;
@@ -221,7 +211,6 @@ public class TestOptionsActivity extends Application {
 	
 	}
 		
-	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getSupportMenuInflater().inflate(R.menu.activity_test_options, menu);

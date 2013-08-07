@@ -17,6 +17,6 @@
      <item android:id="@+id/menu_users_findbyid"
           android:icon="@drawable/menu_users_findbyid"
           android:title="@string/menu_users_findbyid"
-          android:showAsAction="ifRoom|collapseActionView"/>
+          android:showAsAction="ifRoom"/>
 
 </menu>

@@ -29,12 +29,6 @@ import android.widget.Toast;
 
 import com.scripturesos.tantest.connection.DatabaseHelper;
 import com.scripturesos.tantest.connection.HttpUtil;
-//import android.annotation.TargetApi;
-//import android.widget.RelativeLayout;
-//import com.google.i18n.phonenumbers.NumberParseException;
-//import com.google.i18n.phonenumbers.PhoneNumberUtil;
-//import com.google.i18n.phonenumbers.PhoneNumberUtil.PhoneNumberFormat;
-//import com.google.i18n.phonenumbers.Phonenumber.PhoneNumber;
 
 public class MainActivity extends Activity 
 {
@@ -128,18 +122,12 @@ public class MainActivity extends Activity
 	private String password;
 	private boolean validating = false;
 	
-	//@TargetApi(11)
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		
 		Log.i("tantest", "ONCREATE MAIN ACTIVITY");
-		
-		/*if(Build.VERSION.SDK_INT >= 11)
-		{
-			
-		}*/
 		
 		setContentView(R.layout.activity_main);
 
@@ -159,9 +147,9 @@ public class MainActivity extends Activity
 					
 					try 
 					{
-						goHome(new JSONObject(cursor.getString(0)),false);
+						//goHome(new JSONObject(cursor.getString(0)),false);
 					} 
-					catch (JSONException e) 
+					catch (Exception e) 
 					{
 						
 					}
@@ -268,7 +256,11 @@ public class MainActivity extends Activity
 	
 	public void connectButtom(View view)
 	{
-		Log.i("tantest", "Pulsado acceder");
+		Intent i = new Intent(this, HomeActivity.class);
+		startActivity(i);
+		finish();
+		
+		/*Log.i("tantest", "Pulsado acceder");
 		view.setVisibility(View.GONE);
 		loader.setVisibility(View.VISIBLE);
 		
@@ -322,7 +314,7 @@ public class MainActivity extends Activity
 				}
 				
 		    }
-		}).start();
+		}).start();*/
 	}
 	
 	public void test(View view)
@@ -423,13 +415,6 @@ public class MainActivity extends Activity
 		}
 	}
 
-	
-	@Override
-	protected void onDestroy() 
-	{	
-		super.onDestroy();
-	}
-	
 	public void verifyCodeButtom(View view)
 	{
 		
@@ -578,8 +563,8 @@ public class MainActivity extends Activity
 		}
 		
 		UsersUtil.initUser(user);
-		Intent i = new Intent(MainActivity.this, HomeActivity.class);
-		i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		Intent i = new Intent(this, HomeActivity.class);
+		//i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		startActivity(i);
 		finish();
 	}
@@ -648,6 +633,7 @@ public class MainActivity extends Activity
 
     	super.onResume();
     }
+    
     
     @Override
     public void onBackPressed() 

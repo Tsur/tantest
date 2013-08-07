@@ -34,26 +34,22 @@ public class MessageListAdapter extends BaseAdapter
 		chatsMessages.add(client);
 		//notifyDataSetChanged();
 	}
-	
-	@Override
+
 	public int getCount() 
 	{
 		  return chatsMessages.size();
 	}
-	 
-	@Override
+
 	public Object getItem(int position) 
 	{
 		  return chatsMessages.get(position);
 	}
-	 
-	@Override
+
 	public long getItemId(int position) 
 	{
 		  return position;
 	}
-	 
-	@Override
+
 	public View getView(int position, View convertView, ViewGroup parent) 
 	{
 		View vi = convertView;

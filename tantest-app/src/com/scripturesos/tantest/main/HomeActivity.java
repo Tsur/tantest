@@ -5,10 +5,6 @@ import io.socket.IOCallback;
 import io.socket.SocketIO;
 import io.socket.SocketIOException;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URL;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -16,13 +12,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.UUID;
 
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.http.client.ClientProtocolException;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -35,7 +27,6 @@ import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
@@ -63,9 +54,7 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.scripturesos.tantest.connection.DatabaseHelper;
 import com.scripturesos.tantest.connection.HttpUtil;
-import com.scripturesos.tantest.connection.IOMessage;
-import com.scripturesos.tantest.connection.IOSocket;
-import com.scripturesos.tantest.connection.MessageCallback;
+//import android.support.v13.app.NotificationCompat;
 
 public class HomeActivity extends Application {
 
@@ -82,7 +71,7 @@ public class HomeActivity extends Application {
 	//public static IOSocket server;
 	
 	
-	private ArrayList<IOMessage> messages_offine = new ArrayList<IOMessage>();
+	//private ArrayList<IOMessage> messages_offine = new ArrayList<IOMessage>();
 	
 	private String contacts_serialized;
 	private boolean canSave = false;
@@ -159,7 +148,7 @@ public class HomeActivity extends Application {
 						if(cursor.moveToNext())
 						{
 							//Log.i("tantest","Tenemos messages offine");
-							messages_offine = (ArrayList<IOMessage>) HttpUtil.fromString(cursor.getString(0));
+							//messages_offine = (ArrayList<IOMessage>) HttpUtil.fromString(cursor.getString(0));
 							
 							db.execSQL("DELETE FROM options WHERE key=4");
 						}
@@ -529,13 +518,13 @@ public class HomeActivity extends Application {
 		//server.close();
 		super.onPause();
 		
-		//Log.i("tantest", "On Pause");
+		Log.i("tantest", "On Pause");
 		if(canSave)
 		{
 			//Log.i("tantest", "Saving");
 			
 			//Actualizar base de datos
-			(new Thread(){
+			/*(new Thread(){
 				
 				public void run()
 				{
@@ -576,7 +565,7 @@ public class HomeActivity extends Application {
 					}
 				}
 				
-			}).start();
+			}).start();*/
 		}
 	}
 	
@@ -605,7 +594,12 @@ public class HomeActivity extends Application {
     		}
     		
 			Log.i("tantest","back button");
+			//Move task to background
     		moveTaskToBack(true);
+			/*Intent intent = new Intent(Intent.ACTION_MAIN);
+    intent.addCategory(Intent.CATEGORY_HOME);
+    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    startActivity(intent);*/
     		//super.onBackPressed();
     	}
     }
@@ -775,16 +769,7 @@ public class HomeActivity extends Application {
     
     public void showContacts(View v)
     {
-    	Intent cintent = new Intent(this, ContactsActivity.class);
-    	
-    	if(contacts_serialized != null)
-	    {
-	    	Bundle bundle = new Bundle();
-	    	bundle.putString("contacts", contacts_serialized);
-	    	cintent.putExtras(bundle);
-	    }
-    	
-		//Log.i("tantes","iniciando actividad");
+    	Intent cintent = new Intent(this, UsersActivity.class);
 		startActivityForResult(cintent,0);
     }
     
@@ -1043,7 +1028,7 @@ public class HomeActivity extends Application {
 			    
 			    PendingIntent pIntent = PendingIntent.getActivity(HomeActivity.this, (int) System.currentTimeMillis(), intent, 0);
 			
-			    Drawable d = ContactUtil.Cache.images.get(client);  
+			    Drawable d = UsersUtil.imagesCache.get(client);  
 			    Bitmap bitmap = null;
 			    if(d instanceof BitmapDrawable)
 			    {
@@ -1053,7 +1038,7 @@ public class HomeActivity extends Application {
 			    {
 			    	try 
 			    	{
-						bitmap = BitmapFactory.decodeStream((InputStream) new URL(ContactUtil.Cache.contacts.get(client).getImg()).getContent());
+						//bitmap = BitmapFactory.decodeStream((InputStream) new URL(UsersUtil.contactsCache.get(client).g).getContent());
 					}
 			    	catch (Exception e) 
 			    	{
@@ -1064,12 +1049,12 @@ public class HomeActivity extends Application {
 			    // Build notification
 			    // Actions are just fake
 			    Notification noti = (new NotificationCompat.Builder(HomeActivity.this))
-			        .setContentTitle(getString(R.string.act_home_notification)+" "+ContactUtil.Cache.contacts.get(client).getName())
+			        .setContentTitle(getString(R.string.act_home_notification)+" "+UsersUtil.contactsCache.get(client).getEmail())
 			        .setContentText((msg.length() > 65 ? msg.substring(0,64)+"...":msg))
 			        .setSmallIcon(R.drawable.notification)
 			        .setLargeIcon(bitmap)
 			        .setContentIntent(pIntent)
-			        //.addAction(R.drawable.icon, "Call", pIntent)
+			        //.addAction(0, "Call", pIntent)
 			        .build();
 			    
 			    NotificationManager notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);

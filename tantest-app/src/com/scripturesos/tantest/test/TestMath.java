@@ -13,15 +13,13 @@ public class TestMath extends AbstractTest implements Test{
 		URL = "http://www.scripturesos.com:3001/test/math/";
 	}
 	
-	@Override
 	public void initTest(int totalQuestions, int difficulty) throws TestException, JSONException, MalformedURLException, IOException
 	{
 		URL += String.valueOf(difficulty)+".json";
 		
 		initTest(totalQuestions, TestUtil.getRemoteSource(URL));
 	}
-	
-	@Override
+
 	public TestGrade grade(int base)
 	{
 		// TODO Auto-generated method stub

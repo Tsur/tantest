@@ -6,7 +6,7 @@
 	<LinearLayout
 	    android:layout_width="match_parent"
 	    android:layout_height="wrap_content"
-	    android:background="@drawable/wall3"
+	    android:background="@drawable/act_test_grade3"
 	    android:orientation="vertical" >
    
 	    <RelativeLayout
@@ -51,7 +51,7 @@
 		        android:layout_marginTop="40dp"
 		        android:orientation="horizontal" >
 	
-			    <com.scripturesos.tantest.LongPressRecursiveButtton
+			    <com.scripturesos.tantest.main.LongPressRecursiveButtton
 			        android:id="@+id/act_test_opt1_b1"
 			        android:layout_width="32dp"
 			        android:layout_height="32dp"
@@ -73,7 +73,7 @@
 			        android:paddingRight="25dp"
 			        android:paddingTop="3dp" />
 		    	
-			    <com.scripturesos.tantest.LongPressRecursiveButtton
+			    <com.scripturesos.tantest.main.LongPressRecursiveButtton
 			        android:id="@+id/act_test_opt1_b3"
 			        android:layout_width="32dp"
 			        android:layout_height="32dp"
@@ -98,7 +98,6 @@
 		        android:id="@+id/act_test_opt2_text"
 		        android:layout_width="wrap_content"
 		        android:layout_height="wrap_content"
-		        android:layout_below="@id/act_test_opt1_rl"
 		        android:layout_centerHorizontal="true"
 		        android:layout_marginBottom="5dp"
 		        android:layout_marginTop="10dp"
@@ -131,7 +130,7 @@
 		        android:layout_marginTop="40dp"
 		        android:orientation="horizontal" >
 	
-			    <com.scripturesos.tantest.LongPressRecursiveButtton
+			    <com.scripturesos.tantest.main.LongPressRecursiveButtton
 			        android:id="@+id/act_test_opt2_b1"
 			        android:layout_width="32dp"
 			        android:layout_height="32dp"
@@ -153,7 +152,7 @@
 			        android:paddingRight="25dp"
 			        android:paddingTop="3dp" />
 		    	
-			    <com.scripturesos.tantest.LongPressRecursiveButtton
+			    <com.scripturesos.tantest.main.LongPressRecursiveButtton
 			        android:id="@+id/act_test_opt2_b3"
 			        android:layout_width="32dp"
 			        android:layout_height="32dp"
@@ -178,7 +177,6 @@
 		        android:id="@+id/act_test_opt3_text"
 		        android:layout_width="wrap_content"
 		        android:layout_height="wrap_content"
-		        android:layout_below="@id/act_test_opt2_rl"
 		        android:layout_centerHorizontal="true"
 		        android:layout_marginBottom="5dp"
 		        android:layout_marginTop="15dp"
@@ -248,7 +246,6 @@
 		        android:id="@+id/act_test_opt4_text"
 		        android:layout_width="wrap_content"
 		        android:layout_height="wrap_content"
-		        android:layout_below="@id/act_test_opt3_rl"
 		        android:layout_centerHorizontal="true"
 		        android:layout_marginBottom="5dp"
 		        android:layout_marginTop="15dp"

@@ -15,7 +15,6 @@ public class TestSolutionCheck implements TestSolution{
 
 	public TestSolutionCheck(){}
 
-	@Override
 	public double grade(TestSolution userSolution)
 	{
 		// TODO Auto-generated method stub
@@ -60,7 +59,6 @@ public class TestSolutionCheck implements TestSolution{
 		return points;
 	}
 
-	@Override
 	public Object getSolutionADT()
 	{
 		// TODO Auto-generated method stub
@@ -68,7 +66,6 @@ public class TestSolutionCheck implements TestSolution{
 	}
 
 	@SuppressWarnings("unchecked")
-	@Override
 	public void setSolutionADT(Object adt) throws JSONException, TestException
 	{
 		// TODO Auto-generated method stub

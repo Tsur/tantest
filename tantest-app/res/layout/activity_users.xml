@@ -102,8 +102,8 @@
 		    	
 	    	<ImageButton
 	    	    android:id="@+id/act_users_contact_btn_skip"
-	    	    android:layout_width="16dp"
-	    	    android:layout_height="14dp"
+	    	    android:layout_width="26dp"
+	    	    android:layout_height="24dp"
 	    	    android:layout_marginTop="5dp"
 	    	    android:background="@drawable/act_users_redo"
 	    	    android:contentDescription="@string/act_main_verify"
@@ -111,8 +111,8 @@
 	    	
 	    	<ImageButton
 	    	    android:id="@+id/act_users_contact_btn_chat"
-	    	    android:layout_width="16dp"
-	    	    android:layout_height="14dp"
+	    	    android:layout_width="26dp"
+	    	    android:layout_height="24dp"
 	    	    android:layout_marginLeft="15dp"
 	    	    android:layout_marginTop="5dp"
 	    	    android:layout_toRightOf="@id/act_users_contact_btn_skip"

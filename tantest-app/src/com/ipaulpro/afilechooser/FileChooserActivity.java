@@ -97,7 +97,6 @@ public class FileChooserActivity extends FragmentActivity implements
 		outState.putString(PATH, mPath);
 	}
 
-	@Override
 	public void onBackStackChanged() {
 		mPath = EXTERNAL_BASE_PATH;
 		

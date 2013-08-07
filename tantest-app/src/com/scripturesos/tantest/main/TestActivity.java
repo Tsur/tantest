@@ -225,7 +225,7 @@ public class TestActivity extends Application {
             		//ifError(getString(R.string.act_test_text6));
     			    
     			    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-    			        @Override
+  
     			        public void onClick(DialogInterface dialog, int which) {
 
     			        	switch(which)
@@ -284,19 +284,17 @@ public class TestActivity extends Application {
 		seekbar.setProgress(0);
 		seekbar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener(){
 
-		    @Override
+
 		    public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
 		        
 		    	seekbarText.setText(String.valueOf((progress/100)+1));
 		        //seekBarValue.setText(String.valueOf(progress));
 		    }
 
-		    @Override
 		    public void onStartTrackingTouch(SeekBar seekBar) {
 		    	seekbarText.setVisibility(View.VISIBLE);
 		    }
 
-		    @Override
 		    public void onStopTrackingTouch(SeekBar seekBar) {
 
 		    	seekbarText.setVisibility(View.GONE);
@@ -313,7 +311,6 @@ public class TestActivity extends Application {
 		{
 
 			@SuppressWarnings("unchecked")
-			@Override
 			public void onCheckedChanged(CompoundButton checkbox,boolean checked)
 			{
 				
@@ -343,12 +340,12 @@ public class TestActivity extends Application {
 			
 			/*Creamos vertical ScrollView*/
 			ScrollView sv = new ScrollView(this);
-			ScrollView.LayoutParams svParams = new ScrollView.LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT);
+			ScrollView.LayoutParams svParams = new ScrollView.LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT);
 			sv.setLayoutParams(svParams);
 			
 			/*Creamos question container*/
 			LinearLayout questionContainer = new LinearLayout(this);
-			LinearLayout.LayoutParams qcParams = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT,LayoutParams.WRAP_CONTENT);
+			LinearLayout.LayoutParams qcParams = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT);
 			questionContainer.setOrientation(LinearLayout.VERTICAL);
 			questionContainer.setLayoutParams(qcParams);
 			

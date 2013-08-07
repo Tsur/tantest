@@ -13,7 +13,6 @@ public class TestLaw extends AbstractTest implements Test{
 		URL = "http://www.scripturesos.com:3001/test/law/";
 	}
 	
-	@Override
 	public void initTest(int totalQuestions, int difficulty) throws TestException, JSONException, MalformedURLException, IOException
 	{
 		URL += String.valueOf(difficulty)+".json";
@@ -21,7 +20,6 @@ public class TestLaw extends AbstractTest implements Test{
 		initTest(totalQuestions, TestUtil.getRemoteSource(URL));
 	}
 	
-	@Override
 	public TestGrade grade(int base)
 	{
 		// TODO Auto-generated method stub

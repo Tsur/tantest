@@ -6,7 +6,6 @@ public class TestSolutionRadio implements TestSolution{
 
 	public TestSolutionRadio(){}
 
-	@Override
 	public double grade(TestSolution ts)
 	{
 		if(ts == null)
@@ -22,14 +21,12 @@ public class TestSolutionRadio implements TestSolution{
 		return 0;
 	}
 
-	@Override
 	public Object getSolutionADT()
 	{
 		// TODO Auto-generated method stub
 		return radioAnswer;
 	}
 	
-	@Override
 	public void setSolutionADT(Object answer)
 	{
 		// TODO Auto-generated method stub

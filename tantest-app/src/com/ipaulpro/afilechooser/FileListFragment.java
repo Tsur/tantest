@@ -91,12 +91,10 @@ public class FileListFragment extends ListFragment implements
 		}
 	}
 
-	@Override
 	public Loader<List<File>> onCreateLoader(int id, Bundle args) {
 		return new FileLoader(getActivity(), mPath);
 	}
 
-	@Override
 	public void onLoadFinished(Loader<List<File>> loader, List<File> data) {
 		mAdapter.setListItems(data);
 
@@ -106,7 +104,6 @@ public class FileListFragment extends ListFragment implements
 			setListShownNoAnimation(true);
 	}
 
-	@Override
 	public void onLoaderReset(Loader<List<File>> loader) {
 		mAdapter.clear();
 	}
