@@ -31,7 +31,14 @@ by touching the two small icons on the top-right corner of the device's screen r
 
 Building ...
 
-![Title Image](http://)
+![Login Section](https://github.com/Tsur/tantest/blob/master/tantest-app/res/drawable-hdpi/e1.png?raw=true)
+
+![Contacts Section](https://github.com/Tsur/tantest/blob/master/tantest-app/res/drawable-hdpi/e2.png?raw=true)
+
+![Chat Section](https://github.com/Tsur/tantest/blob/master/tantest-app/res/drawable-hdpi/e3.png?raw=true)
+
+![Sending a message](https://github.com/Tsur/tantest/blob/master/tantest-app/res/drawable-hdpi/e4.png?raw=true)
+
 
 ## Instrucctions to generate the apk from sources
 
